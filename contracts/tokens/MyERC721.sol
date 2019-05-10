@@ -2,6 +2,9 @@ pragma solidity ^0.4.25;
 
 import "contracts/oracle/OracleAPI.sol";
 import "contracts/helpers/CRUD.sol";
+import "contracts/helpers/roles/ConsumerRole.sol";
+import "contracts/helpers/roles/ProducerRole.sol";
+import "contracts/helpers/roles/RecyclerRole.sol";
 import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol';
 import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Mintable.sol';
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -10,9 +13,9 @@ contract MyERC721 is ERC721Full, ERC721Mintable, Ownable, usingOracle {
   event LogCallback();
   uint constant MAX_STRING_SIZE = 8;
 
-  CRUD consumers;
-  CRUD producers;
-  CRUD recyclers;
+  ConsumerRole consumers;
+  ProducerRole producers;
+  RecyclerRole recyclers;
 
   constructor(string _name, string _symbol, address _lookupContract, address _crudconsumer
               , address _crudproducer, address _crudrecycler)
@@ -20,42 +23,42 @@ contract MyERC721 is ERC721Full, ERC721Mintable, Ownable, usingOracle {
   usingOracle(_lookupContract)
   public
   {
-    consumers = CRUD(_crudconsumer);
-    producers = CRUD(_crudproducer);
-    recyclers = CRUD(_crudrecycler);
+    consumers = ConsumerRole();
+    producers = ProducerRole();
+    recyclers = RecyclerRole();
   }
 
   /**
-   * Mint request to the oracle
-   * @dev This function will initatiate the mint process for IPs that are not
+   * Mint request for consumers
+   * @dev This function will initatiate the mint process for addresses that are not
    * already registered.
-   * @param ip The ip address of the consumer to be registered
+   * @param consumer The address of the consumer to be registered
   */
-  function requestConsumerMint(string ip) external payable {
-    require(!consumers.exists(ip), "A consumer with this IP already exists");
-    queryOracle('nodedb^mintConsumer', msg.sender, ip);
+  function requestConsumerMint(address consumer) external payable {
+    require(!consumers.isConsumer(consumer), "A consumer with this address already exists");
+    consumers.add(consumer);
   }
 
   /**
-   * Mint request to the oracle
-   * @dev This function will initatiate the mint process for IPs that are not
-   * already registered.
-   * @param ip The ip address of the producer to be registered
+   * Mint request for producers
+   * @dev This function will initatiate the mint process for producer
+   * addresses that are not already registered.
+   * @param producer The address of the producer to be registered
   */
-  function requestProducerMint(string ip) external payable {
-    require(!producers.exists(ip), "A producer with this IP already exists");
-    queryOracle('nodedb^mintProducer', msg.sender, ip);
+  function requestProducerMint(address producer) external payable {
+    require(!producers.isProducer(producer), "A producer with this address already exists");
+    producers.add(producer);
   }
 
   /**
-   * Mint request to the oracle
-   * @dev This function will initatiate the mint process for IPs that are not
+   * Mint request for recyclers
+   * @dev This function will initatiate the mint process for addresses that are not
    * already registered.
-   * @param ip The ip address of the recycler to be registered
+   * @param recycler The address of the recycler to be registered
   */
-  function requestRecyclerMint(string ip) external payable {
-    require(!recyclers.exists(ip), "A recycler with this IP already exists");
-    queryOracle('nodedb^mintRecycler', msg.sender, ip);
+  function requestRecyclerMint(address recycler) external payable {
+    require(!recyclers.isRecycler(recycler), "A recycler with this address already exists");
+    recyclers.add(recycler);
   }
 
   function getProducers() external view returns(address producer){
