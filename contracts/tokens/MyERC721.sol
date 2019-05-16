@@ -1,98 +1,90 @@
 pragma solidity ^0.4.25;
 
-import "contracts/oracle/OracleAPI.sol";
 import "contracts/helpers/CRUD.sol";
-import "contracts/helpers/roles/ConsumerRole.sol";
-import "contracts/helpers/roles/ProducerRole.sol";
-import "contracts/helpers/roles/RecyclerRole.sol";
 import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol';
 import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Mintable.sol';
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract MyERC721 is ERC721Full, ERC721Mintable, Ownable, usingOracle {
+contract MyERC721 is ERC721Full, ERC721Mintable, Ownable{
   event LogCallback();
   uint constant MAX_STRING_SIZE = 8;
 
   ConsumerRole consumers;
   ProducerRole producers;
   RecyclerRole recyclers;
+  CRUD devices;
 
-  constructor(string _name, string _symbol, address _lookupContract, address _crudconsumer
-              , address _crudproducer, address _crudrecycler)
+  constructor(string _name, string _symbol, address _crudDevices)
   ERC721Full(_name, _symbol)
-  usingOracle(_lookupContract)
-  public
-  {
-    consumers = ConsumerRole();
-    producers = ProducerRole();
-    recyclers = RecyclerRole();
+  public {
+    devices = CRUD(_crudDevices);
+    consumers = devices.getConsumers();
+    producers = devices.getProducers();
+    recyclers = devices.getRecyclers();
   }
 
-  /**
-   * Mint request for consumers
-   * @dev This function will initatiate the mint process for addresses that are not
-   * already registered.
-   * @param consumer The address of the consumer to be registered
-  */
-  function requestConsumerMint(address consumer) external payable {
-    require(!consumers.isConsumer(consumer), "A consumer with this address already exists");
-    consumers.add(consumer);
+  function getDevices() public view returns(address _devices){
+    return devices;
+  }
+  
+
+  function recycle(uint256 uid) public onlyRecycler {
+    // Destroy the token
+    uint index;
+    address owner;
+    string memory mac_address;
+    (index, owner, mac_address) = devices.getByUID(uid);
+    devices.del(uid);
+    super._burn(owner, uid);
+
+    // We need to transfer the investment to the recycler.
+    // ERC20.transferFrom(renter_investment, renter_account, msg.sender);
   }
 
-  /**
-   * Mint request for producers
-   * @dev This function will initatiate the mint process for producer
-   * addresses that are not already registered.
-   * @param producer The address of the producer to be registered
-  */
-  function requestProducerMint(address producer) external payable {
-    require(!producers.isProducer(producer), "A producer with this address already exists");
-    producers.add(producer);
+  function rent(uint256 uid, address destination) public onlyProducer {
+    require(destination != 0x0, "The destination cannot be the 0 address");
+    require(consumers.isConsumer(destination), "The destination is not a consumer");
+    
+    devices.changeOwnership(uid, destination);
+    super.transferFrom(msg.sender, destination, uid);
+
+    // We need to transfer the price of the device to the sender.
+
+    // ERC20.transferFrom(initial_investment, destination, msg.sender);
   }
 
-  /**
-   * Mint request for recyclers
-   * @dev This function will initatiate the mint process for addresses that are not
-   * already registered.
-   * @param recycler The address of the recycler to be registered
-  */
-  function requestRecyclerMint(address recycler) external payable {
-    require(!recyclers.isRecycler(recycler), "A recycler with this address already exists");
-    recyclers.add(recycler);
+  function pass(uint256 uid, address destination) public onlyConsumer {
+    require(destination != 0x0, "The destination cannot be the 0 address");
+    require(consumers.isConsumer(destination) || recyclers.isRecycler(destination)
+            , "The destination is not a consumer neither a recycler");
+    
+    devices.changeOwnership(uid, destination);
+    super.transferFrom(msg.sender, destination, uid);
+    // We need to transfer the initial investment from one consumer to another.
+
+    // ERC20.transferFrom(initial_investment, destination, msg.sender);
   }
 
-  function getProducers() external view returns(address producer){
-    return producers;
+  function mint_device(string mac_address) public onlyProducer returns (uint uid) {
+    require(!devices.exists_mac(mac_address), "A device with this MAC address already exists");
+    uint id = devices.getCount() + 1;
+    devices.add(id, mac_address, msg.sender);
+    super._mint(msg.sender, id);
+    return id;
   }
 
-  function getConsumers() external view returns(address consumer){
-    return consumers;
+  modifier onlyConsumer(){
+    require(consumers.isConsumer(msg.sender), "Message sender is not a consumer");
+    _;
   }
 
-  function getRecyclers() external view returns(address recycler){
-    return recyclers;
+  modifier onlyRecycler(){
+    require(recyclers.isRecycler(msg.sender), "Message sender is not a recycler");
+    _;
   }
 
-  function __mintProducerCallback(uint256 _uid, string _ip, address _address, address _originator) onlyFromOracle external {
-    emit LogCallback();
-    producers.add(_ip, _address, _uid);
-    super._mint(_originator, _uid);
+  modifier onlyProducer(){
+    require(producers.isProducer(msg.sender), "Message sender is not a producer");
+    _;
   }
-
-  function __mintConsumerCallback(uint256 _uid, string _ip, address _address, address _originator) onlyFromOracle external {
-    emit LogCallback();
-    consumers.add(_ip, _address, _uid);
-    super._mint(_originator, _uid);
-  }
-
-  function __mintRecyclerCallback(uint256 _uid, string _ip, address _address, address _originator) onlyFromOracle external {
-    emit LogCallback();
-    recyclers.add(_ip, _address, _uid);
-    super._mint(_originator, _uid);
-  }
-
-  // function updateRouterForwardingPrice(uint256 _uid, uint newForwardingPrice) public {
-  //   require(ownerOf(_uid) == msg.sender, "");
-  //   routers.updatePricePerMB(_uid, newForwardingPrice);
-  // }
 }

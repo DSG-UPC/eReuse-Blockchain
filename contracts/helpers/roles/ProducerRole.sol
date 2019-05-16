@@ -10,12 +10,12 @@ contract ProducerRole {
 
   Roles.Role private Producers;
 
-  constructor() internal {
+  constructor() public {
     // _addProducer(msg.sender);
   }
 
   modifier onlyProducer() {
-    require(isProducer(msg.sender));
+    require(isProducer(msg.sender), "The message sender is not a producer");
     _;
   }
 
@@ -23,11 +23,11 @@ contract ProducerRole {
     return Producers.has(account);
   }
 
-  function addProducer(address account) public onlyProducer {
+  function addProducer(address account) public {
     _addProducer(account);
   }
 
-  function renounceProducer() public {
+  function renounceProducer() public onlyProducer {
     _removeProducer(msg.sender);
   }
 

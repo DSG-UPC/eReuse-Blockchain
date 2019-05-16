@@ -10,12 +10,12 @@ contract ConsumerRole {
 
   Roles.Role private Consumers;
 
-  constructor() internal {
+  constructor() public {
     // _addConsumer(msg.sender);
   }
 
   modifier onlyConsumer() {
-    require(isConsumer(msg.sender));
+    require(isConsumer(msg.sender), "The message sender is not a consumer");
     _;
   }
 
@@ -23,11 +23,11 @@ contract ConsumerRole {
     return Consumers.has(account);
   }
 
-  function addConsumer(address account) public onlyConsumer {
+  function addConsumer(address account) public {
     _addConsumer(account);
   }
 
-  function renounceConsumer() public {
+  function renounceConsumer() public onlyConsumer {
     _removeConsumer(msg.sender);
   }
 

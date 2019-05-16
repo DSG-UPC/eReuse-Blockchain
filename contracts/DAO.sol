@@ -1,6 +1,9 @@
 pragma solidity ^0.4.25;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "contracts/helpers/roles/ConsumerRole.sol";
+import "contracts/helpers/roles/ProducerRole.sol";
+import "contracts/helpers/roles/RecyclerRole.sol";
 import "contracts/DAOInterface.sol";
 
 contract DAO is Ownable {
@@ -10,24 +13,20 @@ contract DAO is Ownable {
   address public OracleQuery;
   address OracleResponse;
   address ReserveAccount;
+  ConsumerRole consumers;
+  ProducerRole producers;
+  RecyclerRole recyclers;
   // uint256 public pricePerMB;
 
 
   constructor(address _OracleQuery)
     public
   {
-    // pricePerMB = _pricePerMB;
     OracleResponse = msg.sender;
-    //ReserveAccount = msg.sender;
     OracleQuery = _OracleQuery;
-  }
-
-  function setReserveAccount(address _address)  public onlyOwner {
-    ReserveAccount = _address;
-  }
-
-  function getReserveAccount() public view returns (address) {
-    return ReserveAccount;
+    consumers = new ConsumerRole();
+    producers = new ProducerRole();
+    recyclers = new RecyclerRole();
   }
 
   function setOracleQueryAddress(address _address)  public onlyOwner {
@@ -73,14 +72,61 @@ contract DAO is Ownable {
     return true;
   }
 
-  // function getPricePerMB() public view returns(uint256) {
-  //   return pricePerMB;
-  // }
+  /**
+   * Mint request for consumers
+   * @dev This function will initatiate the mint process for addresses that are not
+   * already registered.
+   * @param consumer The address of the consumer to be registered
+  */
+  function requestConsumerMint(address consumer) public {
+    require(!consumers.isConsumer(consumer), "A consumer with this address already exists");
+    consumers.addConsumer(consumer);
+  }
 
-  // function setPricePerMB(uint256 _pricePerMB) public returns(bool) {
-  //   //require(msg.sender == ReserveAccount);
-  //   pricePerMB = _pricePerMB;
-  //   return true;
-  // }
+  /**
+   * Mint request for producers
+   * @dev This function will initatiate the mint process for producer
+   * addresses that are not already registered.
+   * @param producer The address of the producer to be registered
+  */
+  function requestProducerMint(address producer) public {
+    require(!producers.isProducer(producer), "A producer with this address already exists");
+    producers.addProducer(producer);
+  }
+
+  /**
+   * Mint request for recyclers
+   * @dev This function will initatiate the mint process for addresses that are not
+   * already registered.
+   * @param recycler The address of the recycler to be registered
+  */
+  function requestRecyclerMint(address recycler) public {
+    require(!recyclers.isRecycler(recycler), "A recycler with this address already exists");
+    recyclers.addRecycler(recycler);
+  }
+
+  function isRecycler(address owner) view external returns(bool isIndeed){
+    return recyclers.isRecycler(owner);
+  }
+
+  function isProducer(address owner) view external returns(bool isIndeed){
+    return producers.isProducer(owner);
+  }
+
+  function isConsumer(address owner) view external returns(bool isIndeed){
+    return consumers.isConsumer(owner);
+  }
+
+  function getProducers() external view returns(address producer){
+    return producers;
+  }
+
+  function getConsumers() external view returns(address consumer){
+    return consumers;
+  }
+
+  function getRecyclers() external view returns(address recycler){
+    return recyclers;
+  }
 
 }

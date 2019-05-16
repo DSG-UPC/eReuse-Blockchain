@@ -10,12 +10,12 @@ contract RecyclerRole {
 
   Roles.Role private Recyclers;
 
-  constructor() internal {
+  constructor() public {
     // _addRecycler(msg.sender);
   }
 
   modifier onlyRecycler() {
-    require(isRecycler(msg.sender));
+    require(isRecycler(msg.sender), "The message sender is not a recycler");
     _;
   }
 
@@ -23,11 +23,11 @@ contract RecyclerRole {
     return Recyclers.has(account);
   }
 
-  function addRecycler(address account) public onlyRecycler {
+  function addRecycler(address account) public {
     _addRecycler(account);
   }
 
-  function renounceRecycler() public {
+  function renounceRecycler() public onlyRecycler {
     _removeRecycler(msg.sender);
   }
 

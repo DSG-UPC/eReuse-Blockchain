@@ -1,5 +1,9 @@
 pragma solidity ^0.4.25;
 
+import "contracts/helpers/roles/ConsumerRole.sol";
+import "contracts/helpers/roles/ProducerRole.sol";
+import "contracts/helpers/roles/RecyclerRole.sol";
+
 /**
 * @title Maintance of list of Available gateways
 * @dev see https://bitbucket.org/rhitchens2/soliditycrud
@@ -7,144 +11,122 @@ pragma solidity ^0.4.25;
 
 contract CRUDFactory{
 
-  address producers;
-  address recyclers;
-  address consumers;
+  address devices;
 
-  constructor() public {
-      producers = new CRUD('producers');
-      recyclers = new CRUD('recyclers');
-      consumers = new CRUD('consumers');
+  constructor(address _roleConsumer, address _roleProducer, address _roleRecycler) public {
+    devices = new CRUD(_roleConsumer, _roleProducer, _roleRecycler);
   }
-
-  function getConsumers() public view returns (address addr){
-      return consumers;
-    }
-
-  function getRecyclers() public view returns (address addr){
-      return recyclers;
-  }
-
-  function getProducers() public view returns (address addr){
-      return producers;
+  
+  function getDevices() public view returns (address addr){
+    return devices;
   }
 
 }
 
 contract CRUD{
 
-  enum Roles {Producer, Consumer, Recycler}
-  Roles roles;
-  Roles constant defaultChoice = Roles.Consumer;
-  string role = "consumer";
-
   struct crudStruct {
     uint256 uid;
-    address addr;
-    string ip;
+    address owner;
     uint index;
+    string mac_address;
   }
 
-  mapping(string => crudStruct) private crudStructs;
-  mapping(uint256 => string) public IDtoIP;
-  string[] private crudIndex;
+  ProducerRole private producers;
+  RecyclerRole private recyclers;
+  ConsumerRole private consumers;
+
+  function getConsumers() public view returns (ConsumerRole addr){
+      return consumers;
+  }
+
+  function getRecyclers() public view returns (RecyclerRole addr){
+      return recyclers;
+  }
+
+  function getProducers() public view returns (ProducerRole addr){
+      return producers;
+  }
+
+  mapping(uint256 => crudStruct) private crudStructs;
+  mapping(string => uint256) private mac_to_uid;
+  uint256[] private crudIndex;
+
+  constructor(address _roleConsumer, address _roleProducer, address _roleRecycler) public {
+    consumers = ConsumerRole(_roleConsumer);
+    producers = ProducerRole(_roleProducer);
+    recyclers = RecyclerRole(_roleRecycler);
+  }
   
-  event LogNew(string ip, uint index, address  addr, uint uid, string role);
-  event LogNewPosition(string ip, uint index);
-  event LogUpdate(string ip, uint index, address addr, uint  uid,  string role);
-  event LogDelete(string ip, uint index);
-
-  constructor(string _type) public {
-    role = _type;
+  function exists(uint256 uid) public view returns(bool isIndeed) {
+    if(crudIndex.length == 0)
+      return false;
+    return crudIndex[crudStructs[uid].index] == uid;
   }
 
-  function exists(string  ip)
-    public
-    view
-    returns(bool isIndeed)
-  {
-    if( crudIndex.length == 0) return false;
-    return ( compareStrings(crudIndex[crudStructs[ip].index], ip));
+  function exists_mac(string mac_address) public view returns(bool isIndeed) {
+    require(!compareStrings(mac_address, ""), "The received MAC address is not valid");
+    if(crudIndex.length == 0)
+      return false;
+    return mac_to_uid[mac_address] != 0;
   }
 
-  function add(string ip, address addr, uint256 uid)
-    public
-    returns(uint index)
-  {
-    require(!exists(ip), "The IP does exist");
-    crudStructs[ip].ip = ip;
-    crudStructs[ip].addr = addr;
-    crudStructs[ip].uid   = uid;
-    crudStructs[ip].index = crudIndex.push(ip)-1;
-    IDtoIP[uid] = ip;
-    emit LogNew(
-        ip,
-        crudStructs[ip].index,
-        addr,
-        uid,
-        role);
+  function add(uint256 uid, string mac_address, address owner) public returns(uint index) {
+    require(!exists_mac(mac_address), "This MAC address already exists");
+    crudStructs[uid].uid = uid;
+    crudStructs[uid].owner = owner;
+    crudStructs[uid].mac_address = mac_address;
+    crudStructs[uid].index = crudIndex.push(uid)-1;
+    mac_to_uid[mac_address] = uid;
     return crudIndex.length-1;
   }
 
-  function del(string ip)
-    public
-    returns(uint index)
-  {
-    require(exists(ip), "The IP does not exists");
-    uint rowToDelete = crudStructs[ip].index;
-    uint256 uid = crudStructs[ip].uid;
-    string memory keyToMove = crudIndex[crudIndex.length-1];
+  function del(uint256 uid) public returns(uint index){
+    require(exists(uid), "The ID does not exists");
+    uint rowToDelete = crudStructs[uid].index;
+    string storage mac = crudStructs[uid].mac_address;
+    uint keyToMove = crudIndex[crudIndex.length-1];
     crudIndex[rowToDelete] = keyToMove;
     crudStructs[keyToMove].index = rowToDelete;
+    mac_to_uid[mac] = 0;
     crudIndex.length--;
-    IDtoIP[uid] = '';
-    emit LogDelete(ip, rowToDelete);
-    emit LogNewPosition(keyToMove, index);
     return rowToDelete;
   }
 
-  function getByIP(string ip)
-    public
-    view
-    returns(uint uid, uint index, address addr)
-  {
-    require(exists(ip), "The IP does not exists");
+  function getByUID(uint256 uid) public view returns(uint index, address addr, string mac_address){
+    require(exists(uid), "The ID does not exist");
+    address _addr = crudStructs[uid].owner;
+    require((_addr != address(0)), "The owner address is either empty or it does not exist");
     return(
-      crudStructs[ip].uid,
-      crudStructs[ip].index,
-      crudStructs[ip].addr);
+      crudStructs[uid].index,
+      crudStructs[uid].owner,
+      crudStructs[uid].mac_address);
   }
 
-  function getByUID(uint256 uid) public view
-    returns(string ip, uint index, address addr)
-  {
-    string storage _ip = IDtoIP[uid];
-    require(!compareStrings(_ip,'') && exists(_ip), "The IP is either empty or it does not exist or ");
-    return(
-      _ip,
-      crudStructs[_ip].index,
-      crudStructs[_ip].addr);
+  function changeOwnership(uint256 uid, address to) public {
+    require(exists(uid), "A token with that ID does not exist");
+    crudStructs[uid].owner = to;
   }
 
+  function getByMacAddress(string mac) public view returns(uint256 id, uint index, address owner){
+    require(exists_mac(mac), "The ID does not exist");
+    uint256 uid = mac_to_uid[mac];
+    return(
+      uid,
+      crudStructs[uid].index,
+      crudStructs[uid].owner);
+  }
 
-  function getCount()
-    public
-    view
-    returns(uint count)
-  {
+  function getCount() public view returns(uint count){
     return crudIndex.length;
   }
 
-  function getAtIndex(uint index)
-    public
-    view
-    returns(string ip)
-  {
+  function getAtIndex(uint index) public view returns(uint256 uid){
     return crudIndex[index];
   }
 
   function compareStrings (string a, string b) public pure returns (bool){
        return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
-   }
+  }
 
 }
