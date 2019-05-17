@@ -20,7 +20,6 @@ contract CRUDFactory{
   function getDevices() public view returns (address addr){
     return devices;
   }
-
 }
 
 contract CRUD{
@@ -30,11 +29,12 @@ contract CRUD{
     address owner;
     uint index;
     string mac_address;
+    uint price;
   }
 
-  event LogAdd(uint256 uid, string mac_address, address owner, uint index);
-  event LogDel(uint256 uid, string mac_address, address owner, uint index);
-  event LogChangeOwner(uint256 uid, string mac_address, address owner, address owner_new, uint index);
+  event LogAdd(uint256 uid, string mac_address, address owner, uint index, uint price);
+  event LogDel(uint256 uid, string mac_address, address owner, uint index, uint price);
+  event LogChangeOwner(uint256 uid, string mac_address, address owner, address owner_new, uint index, uint price);
 
   ProducerRole private producers;
   RecyclerRole private recyclers;
@@ -54,6 +54,7 @@ contract CRUD{
 
   mapping(uint256 => crudStruct) private crudStructs;
   mapping(string => uint256) private mac_to_uid;
+  mapping(uint256 => address[]) private historicalOwners;
   uint256[] private crudIndex;
 
   constructor(address _roleConsumer, address _roleProducer, address _roleRecycler) public {
@@ -75,7 +76,7 @@ contract CRUD{
     return mac_to_uid[mac_address] != 0;
   }
 
-  function add(uint256 uid, string mac_address, address owner) public returns(uint index) {
+  function add(uint256 uid, string mac_address, address owner, uint price) public returns(uint index) {
     require(!exists_mac(mac_address), "This MAC address already exists");
     require(!exists(uid), "This id already exists");
     require(owner != address(0), "The owner address is the zero address");
@@ -83,12 +84,15 @@ contract CRUD{
     crudStructs[uid].owner = owner;
     crudStructs[uid].mac_address = mac_address;
     crudStructs[uid].index = crudIndex.push(uid)-1;
+    crudStructs[uid].price = price;
     mac_to_uid[mac_address] = uid;
+    historicalOwners[uid].push(owner);
     emit LogAdd(
         uid,
         mac_address,
         owner,
-        crudStructs[uid].index);
+        crudStructs[uid].index,
+        price);
     return crudIndex.length-1;
   }
 
@@ -105,39 +109,46 @@ contract CRUD{
         uid,
         mac,
         crudStructs[uid].owner,
-        crudStructs[uid].index);
+        crudStructs[uid].index,
+        crudStructs[uid].price);
     return rowToDelete;
   }
 
-  function getByUID(uint256 uid) public view returns(uint index, address owner, string mac_address){
+  function getByUID(uint256 uid) public view
+  returns(uint index, address owner, string mac_address, uint price){
     require(exists(uid), "The ID does not exist");
     address _owner = crudStructs[uid].owner;
     require((_owner != address(0)), "The owner address is either empty or it does not exist");
     return(
       crudStructs[uid].index,
       _owner,
-      crudStructs[uid].mac_address);
+      crudStructs[uid].mac_address,
+      crudStructs[uid].price);
   }
 
   function changeOwnership(uint256 uid, address to) public {
     require(exists(uid), "A token with that ID does not exist");
     address from = crudStructs[uid].owner;
     crudStructs[uid].owner = to;
+    historicalOwners[uid].push(to);
     emit LogChangeOwner(
         uid,
         crudStructs[uid].mac_address,
         from,
         to,
-        crudStructs[uid].index);
+        crudStructs[uid].index,
+        crudStructs[uid].price);
   }
 
-  function getByMacAddress(string mac) public view returns(uint256 id, uint index, address owner){
+  function getByMacAddress(string mac) public view
+  returns(uint256 id, uint index, address owner, uint price){
     require(exists_mac(mac), "The ID does not exist");
     uint256 uid = mac_to_uid[mac];
     return(
       uid,
       crudStructs[uid].index,
-      crudStructs[uid].owner);
+      crudStructs[uid].owner,
+      crudStructs[uid].price);
   }
 
   function getCount() public view returns(uint count){
@@ -146,6 +157,10 @@ contract CRUD{
 
   function getAtIndex(uint index) public view returns(uint256 uid){
     return crudIndex[index];
+  }
+  
+  function getHistoricalOwners(uint256 uid) public view returns(address[] owners){
+    return historicalOwners[uid];
   }
 
   function compareStrings (string a, string b) public pure returns (bool){

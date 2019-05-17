@@ -33,7 +33,8 @@ contract MyERC721 is ERC721Full, ERC721Mintable, Ownable{
     uint index;
     address owner;
     string memory mac_address;
-    (index, owner, mac_address) = devices.getByUID(uid);
+    uint price;
+    (index, owner, mac_address, price) = devices.getByUID(uid);
     devices.del(uid);
     super._burn(owner, uid);
 
@@ -65,10 +66,10 @@ contract MyERC721 is ERC721Full, ERC721Mintable, Ownable{
     // ERC20.transferFrom(initial_investment, destination, msg.sender);
   }
 
-  function mint_device(string mac_address) public onlyProducer returns (uint uid) {
+  function mint_device(string mac_address, uint price) public onlyProducer returns (uint uid) {
     require(!devices.exists_mac(mac_address), "A device with this MAC address already exists");
     uint id = devices.getCount() + 1;
-    devices.add(id, mac_address, msg.sender);
+    devices.add(id, mac_address, msg.sender, price);
     super._mint(msg.sender, id);
     return id;
   }

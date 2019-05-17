@@ -4,7 +4,7 @@ const DAO = artifacts.require("DAO");
 const CRUDFactory = artifacts.require("CRUDFactory");
 
 module.exports = function (deployer, network, accounts) {
-  deployer.deploy(ERC20, 1000000, 'Reusecoin', 0, 'RCN')
+  deployer.deploy(ERC20, 1000000, 'eReusecoin', 0, 'ECN')
   .then(async function (erc20) {
     await DAO.deployed().then(function(instance){dao=instance})
     console.log("ERC20: " + erc20.address);
@@ -18,7 +18,7 @@ module.exports = function (deployer, network, accounts) {
         console.log("crudconsumers: " + crudconsumers);
         const crudproducers = await dao.getProducers.call();
         console.log("crudproducers: " + crudproducers);
-        const erc721 = await deployer.deploy(MyERC721, 'GuifiDeviceToken', 'GDT',
+        const erc721 = await deployer.deploy(MyERC721, 'eReuseDeviceToken', 'EDT',
           crudfactory.getDevices());
         dao.setERC721(erc721.address);
         console.log('ERC721: '+erc721.address);
