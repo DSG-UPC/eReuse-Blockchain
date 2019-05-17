@@ -25,11 +25,9 @@ contract("Basic test with three roles and one device", async function (accounts)
         token = await MyERC721.deployed();
         dao = await DAO.deployed();
         cfact = await CrudFactory.deployed();
-        addr = await cfact.getDevices.call();
-        crud = await CRUD.at(addr);
-        
+
         console.log('Adding accounts to its corresponding role');
-        
+
         await dao.requestRecyclerMint(RecyclerAccount);
         await dao.requestProducerMint(ProducerAccount);
         await dao.requestConsumerMint(ConsumerAccount);
@@ -49,27 +47,66 @@ contract("Basic test with three roles and one device", async function (accounts)
 
         // Minting the device
 
-        token_id = await token.mint_device(MAC_ADDRESS, {
+        token_id = await token.mint_device.call(MAC_ADDRESS, {
             from: ProducerAccount
         });
 
-        console.log(token_id);  
+        await token.mint_device(MAC_ADDRESS, {
+            from: ProducerAccount
+        });
 
-        await crud.exists_mac(MAC_ADDRESS).then(i => {
+        await token.getDevices().then(async (devices) => {
+            return await CRUD.at(devices);
+        }).then(i => {
+            crud = i;
+        });
+
+        await crud.exists(token_id.toNumber()).then(i => {
             assert.isTrue(i, "The device was not minted correctly");
         });
 
-        // await token.rent(token_id, ConsumerAccount, {
-        //     from: ProducerAccount
-        // });
 
-        // await token.pass(token_id, RecyclerAccount, {
-        //     from: ConsumerAccount
-        // });
 
-        // await token.recycle({
-        //     from: ConsumerAccount
-        // });
+        // Token ownership transfer
+
+
+        /**
+         * The current owner must be the producer
+         */
+        result = await crud.getByUID.call(token_id.toNumber());
+        assert.equal(ProducerAccount, result.owner);
+
+
+        await token.rent(token_id.toNumber(), ConsumerAccount, {
+            from: ProducerAccount
+        });
+
+        /**
+         * The current owner must be the consumer
+         */
+        result = await crud.getByUID.call(token_id.toNumber());
+        assert.equal(ConsumerAccount, result.owner);
+
+        await token.pass(token_id.toNumber(), RecyclerAccount, {
+            from: ConsumerAccount
+        });
+
+        /**
+         * The current owner must be the recycler
+         */
+        result = await crud.getByUID.call(token_id.toNumber());
+        assert.equal(RecyclerAccount, result.owner);
+
+        await token.recycle(token_id.toNumber(), {
+            from: RecyclerAccount
+        });
+
+        /**
+         * The token shouldn't exist at this point
+         */
+        await crud.exists(token_id.toNumber()).then(i => {
+            assert.isFalse(i, "The device should not exist at this point");
+        });
 
         console.log('Succesfully minted the device');
     });

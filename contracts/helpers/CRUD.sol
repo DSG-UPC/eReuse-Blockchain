@@ -32,6 +32,10 @@ contract CRUD{
     string mac_address;
   }
 
+  event LogAdd(uint256 uid, string mac_address, address owner, uint index);
+  event LogDel(uint256 uid, string mac_address, address owner, uint index);
+  event LogChangeOwner(uint256 uid, string mac_address, address owner, address owner_new, uint index);
+
   ProducerRole private producers;
   RecyclerRole private recyclers;
   ConsumerRole private consumers;
@@ -73,11 +77,18 @@ contract CRUD{
 
   function add(uint256 uid, string mac_address, address owner) public returns(uint index) {
     require(!exists_mac(mac_address), "This MAC address already exists");
+    require(!exists(uid), "This id already exists");
+    require(owner != address(0), "The owner address is the zero address");
     crudStructs[uid].uid = uid;
     crudStructs[uid].owner = owner;
     crudStructs[uid].mac_address = mac_address;
     crudStructs[uid].index = crudIndex.push(uid)-1;
     mac_to_uid[mac_address] = uid;
+    emit LogAdd(
+        uid,
+        mac_address,
+        owner,
+        crudStructs[uid].index);
     return crudIndex.length-1;
   }
 
@@ -90,22 +101,34 @@ contract CRUD{
     crudStructs[keyToMove].index = rowToDelete;
     mac_to_uid[mac] = 0;
     crudIndex.length--;
+    emit LogDel(
+        uid,
+        mac,
+        crudStructs[uid].owner,
+        crudStructs[uid].index);
     return rowToDelete;
   }
 
-  function getByUID(uint256 uid) public view returns(uint index, address addr, string mac_address){
+  function getByUID(uint256 uid) public view returns(uint index, address owner, string mac_address){
     require(exists(uid), "The ID does not exist");
-    address _addr = crudStructs[uid].owner;
-    require((_addr != address(0)), "The owner address is either empty or it does not exist");
+    address _owner = crudStructs[uid].owner;
+    require((_owner != address(0)), "The owner address is either empty or it does not exist");
     return(
       crudStructs[uid].index,
-      crudStructs[uid].owner,
+      _owner,
       crudStructs[uid].mac_address);
   }
 
   function changeOwnership(uint256 uid, address to) public {
     require(exists(uid), "A token with that ID does not exist");
+    address from = crudStructs[uid].owner;
     crudStructs[uid].owner = to;
+    emit LogChangeOwner(
+        uid,
+        crudStructs[uid].mac_address,
+        from,
+        to,
+        crudStructs[uid].index);
   }
 
   function getByMacAddress(string mac) public view returns(uint256 id, uint index, address owner){
@@ -126,7 +149,7 @@ contract CRUD{
   }
 
   function compareStrings (string a, string b) public pure returns (bool){
-       return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
+    return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
   }
 
 }
