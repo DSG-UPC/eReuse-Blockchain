@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.25;
 
 import "openzeppelin-solidity/contracts/access/Roles.sol";
 
@@ -11,7 +11,6 @@ contract ConsumerRole {
   Roles.Role private Consumers;
 
   constructor() public {
-    // _addConsumer(msg.sender);
   }
 
   modifier onlyConsumer() {

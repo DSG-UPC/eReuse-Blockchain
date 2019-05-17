@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.25;
 
 import "openzeppelin-solidity/contracts/access/Roles.sol";
 
@@ -11,7 +11,6 @@ contract ProducerRole {
   Roles.Role private Producers;
 
   constructor() public {
-    // _addProducer(msg.sender);
   }
 
   modifier onlyProducer() {

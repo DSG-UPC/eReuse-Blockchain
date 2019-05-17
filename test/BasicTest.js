@@ -1,10 +1,9 @@
 const MyERC721 = artifacts.require("MyERC721");
 const CRUD = artifacts.require('CRUD');
+const RoleManager = artifacts.require('RoleManager');
+const RecycleChain = artifacts.require('RecycleChain');
 const DAO = artifacts.require('DAO');
 const CrudFactory = artifacts.require('CRUDFactory');
-const Producers = artifacts.require('ProducerRole');
-const Consumers = artifacts.require('ConsumerRole');
-const Recyclers = artifacts.require('RecyclerRole');
 
 
 const minimist = require('minimist'),
@@ -25,45 +24,53 @@ contract("Basic test with three roles and one device", async function (accounts)
         ConsumerAccount2 = accounts[2];
         ConsumerAccount3 = accounts[3];
         RecyclerAccount = accounts[4];
+        DeviceAccount = accounts[5];
 
         token = await MyERC721.deployed();
         dao = await DAO.deployed();
         cfact = await CrudFactory.deployed();
+        recycleChain = await RecycleChain.deployed();
 
         console.log('Adding accounts to its corresponding role');
 
-        await dao.requestRecyclerMint(RecyclerAccount);
-        await dao.requestProducerMint(ProducerAccount);
-        await dao.requestConsumerMint(ConsumerAccount);
-        await dao.requestConsumerMint(ConsumerAccount2);
-        await dao.requestConsumerMint(ConsumerAccount3);
+        await recycleChain.requestRecyclerMint(RecyclerAccount);
+        await recycleChain.requestProducerMint(ProducerAccount);
+        await recycleChain.requestConsumerMint(ConsumerAccount);
+        await recycleChain.requestConsumerMint(ConsumerAccount2);
+        await recycleChain.requestConsumerMint(ConsumerAccount3);
 
-        await dao.isConsumer(ConsumerAccount).then(i => {
-            assert.isTrue(i, 'Consumer account was not correctly added');
+        await recycleChain.getManager().then(manager_addr => {
+            return manager_addr;
+        }).then(async manager_addr => {
+            manager = await RoleManager.at(manager_addr);
+            await manager.isConsumer(ConsumerAccount).then(i => {
+                assert.isTrue(i, 'Consumer account was not correctly added');
+            });
+            await manager.isConsumer(ConsumerAccount2).then(i => {
+                assert.isTrue(i, 'Consumer account was not correctly added');
+            });
+            await manager.isConsumer(ConsumerAccount3).then(i => {
+                assert.isTrue(i, 'Consumer account was not correctly added');
+            });
+            await manager.isProducer(ProducerAccount).then(i => {
+                assert.isTrue(i, 'Producer account was not correctly added');
+            });
+            await manager.isRecycler(RecyclerAccount).then(i => {
+                assert.isTrue(i, 'Recycler account was not correctly added');
+            });
         });
-        await dao.isConsumer(ConsumerAccount2).then(i => {
-            assert.isTrue(i, 'Consumer account was not correctly added');
-        });
-        await dao.isConsumer(ConsumerAccount3).then(i => {
-            assert.isTrue(i, 'Consumer account was not correctly added');
-        });
-        await dao.isProducer(ProducerAccount).then(i => {
-            assert.isTrue(i, 'Producer account was not correctly added');
-        });
-        await dao.isRecycler(RecyclerAccount).then(i => {
-            assert.isTrue(i, 'Recycler account was not correctly added');
-        });
+
 
         console.log('Accounts added succesfully');
 
 
         // Minting the device
 
-        token_id = await token.mint_device.call(MAC_ADDRESS, price, {
+        token_id = await recycleChain.mint_device.call(MAC_ADDRESS, DeviceAccount, price, {
             from: ProducerAccount
         });
 
-        await token.mint_device(MAC_ADDRESS, price, {
+        await recycleChain.mint_device(MAC_ADDRESS, DeviceAccount, price, {
             from: ProducerAccount
         });
 
@@ -90,7 +97,7 @@ contract("Basic test with three roles and one device", async function (accounts)
         assert.equal(ProducerAccount, result.owner);
 
 
-        await token.rent(token_id.toNumber(), ConsumerAccount, {
+        await recycleChain.rent(token_id.toNumber(), ConsumerAccount, {
             from: ProducerAccount
         });
 
@@ -100,7 +107,7 @@ contract("Basic test with three roles and one device", async function (accounts)
         result = await crud.getByUID.call(token_id.toNumber());
         assert.equal(ConsumerAccount, result.owner);
 
-        await token.pass(token_id.toNumber(), ConsumerAccount2, {
+        await recycleChain.pass(token_id.toNumber(), ConsumerAccount2, {
             from: ConsumerAccount
         });
 
@@ -111,7 +118,7 @@ contract("Basic test with three roles and one device", async function (accounts)
         result = await crud.getByUID.call(token_id.toNumber());
         assert.equal(ConsumerAccount2, result.owner);
 
-        await token.pass(token_id.toNumber(), ConsumerAccount3, {
+        await recycleChain.pass(token_id.toNumber(), ConsumerAccount3, {
             from: ConsumerAccount2
         });
 
@@ -122,7 +129,7 @@ contract("Basic test with three roles and one device", async function (accounts)
         result = await crud.getByUID.call(token_id.toNumber());
         assert.equal(ConsumerAccount3, result.owner);
 
-        await token.pass(token_id.toNumber(), RecyclerAccount, {
+        await recycleChain.pass(token_id.toNumber(), RecyclerAccount, {
             from: ConsumerAccount3
         });
 
@@ -132,7 +139,7 @@ contract("Basic test with three roles and one device", async function (accounts)
         result = await crud.getByUID.call(token_id.toNumber());
         assert.equal(RecyclerAccount, result.owner);
 
-        await token.recycle(token_id.toNumber(), {
+        await recycleChain.recycle(token_id.toNumber(), {
             from: RecyclerAccount
         });
 

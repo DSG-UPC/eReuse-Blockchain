@@ -6,21 +6,17 @@ import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Mintable.sol';
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract MyERC721 is ERC721Full, ERC721Mintable, Ownable{
-  event LogCallback();
-  uint constant MAX_STRING_SIZE = 8;
+  event DeviceMint(uint uid, address wallet, address owner, string mac_address);
+  event DeviceRent(uint uid, address newOwner);
+  event DevicePass(uint uid, address newOwner);
+  event DeviceRecycle(uint uid);
 
-  ConsumerRole consumers;
-  ProducerRole producers;
-  RecyclerRole recyclers;
   CRUD devices;
 
   constructor(string _name, string _symbol, address _crudDevices)
   ERC721Full(_name, _symbol)
   public {
     devices = CRUD(_crudDevices);
-    consumers = devices.getConsumers();
-    producers = devices.getProducers();
-    recyclers = devices.getRecyclers();
   }
 
   function getDevices() public view returns(address _devices){
@@ -28,64 +24,45 @@ contract MyERC721 is ERC721Full, ERC721Mintable, Ownable{
   }
   
 
-  function recycle(uint256 uid) public onlyRecycler {
+  function recycle(uint256 uid)
+  external {
     // Destroy the token
     uint index;
     address owner;
+    address wallet;
     string memory mac_address;
     uint price;
-    (index, owner, mac_address, price) = devices.getByUID(uid);
+    (index, owner, wallet, mac_address, price) = devices.getByUID(uid);
     devices.del(uid);
     super._burn(owner, uid);
 
-    // We need to transfer the investment to the recycler.
-    // ERC20.transferFrom(renter_investment, renter_account, msg.sender);
+    emit DeviceRecycle(uid);
   }
 
-  function rent(uint256 uid, address destination) public onlyProducer {
-    require(destination != 0x0, "The destination cannot be the 0 address");
-    require(consumers.isConsumer(destination), "The destination is not a consumer");
-    
+  function rent(uint256 uid, address destination)
+  external{
     devices.changeOwnership(uid, destination);
     super.transferFrom(msg.sender, destination, uid);
 
-    // We need to transfer the price of the device to the sender.
-
-    // ERC20.transferFrom(initial_investment, destination, msg.sender);
+    emit DeviceRent(uid, destination);
   }
 
-  function pass(uint256 uid, address destination) public onlyConsumer {
-    require(destination != 0x0, "The destination cannot be the 0 address");
-    require(consumers.isConsumer(destination) || recyclers.isRecycler(destination)
-            , "The destination is not a consumer neither a recycler");
-    
+  function pass(uint256 uid, address destination)
+  external{
     devices.changeOwnership(uid, destination);
     super.transferFrom(msg.sender, destination, uid);
-    // We need to transfer the initial investment from one consumer to another.
-
-    // ERC20.transferFrom(initial_investment, destination, msg.sender);
+    
+    emit DevicePass(uid, destination);
   }
 
-  function mint_device(string mac_address, uint price) public onlyProducer returns (uint uid) {
-    require(!devices.exists_mac(mac_address), "A device with this MAC address already exists");
+  function mint_device(string mac_address, address wallet, uint price)
+  external
+  returns (uint uid) {
     uint id = devices.getCount() + 1;
-    devices.add(id, mac_address, msg.sender, price);
+    devices.add(id, mac_address, msg.sender, wallet, price);
     super._mint(msg.sender, id);
     return id;
-  }
 
-  modifier onlyConsumer(){
-    require(consumers.isConsumer(msg.sender), "Message sender is not a consumer");
-    _;
-  }
-
-  modifier onlyRecycler(){
-    require(recyclers.isRecycler(msg.sender), "Message sender is not a recycler");
-    _;
-  }
-
-  modifier onlyProducer(){
-    require(producers.isProducer(msg.sender), "Message sender is not a producer");
-    _;
+    emit DeviceMint(id, wallet, msg.sender, mac_address);
   }
 }

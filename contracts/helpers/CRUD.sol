@@ -1,9 +1,5 @@
 pragma solidity ^0.4.25;
 
-import "contracts/helpers/roles/ConsumerRole.sol";
-import "contracts/helpers/roles/ProducerRole.sol";
-import "contracts/helpers/roles/RecyclerRole.sol";
-
 /**
 * @title Maintance of list of Available gateways
 * @dev see https://bitbucket.org/rhitchens2/soliditycrud
@@ -13,8 +9,8 @@ contract CRUDFactory{
 
   address devices;
 
-  constructor(address _roleConsumer, address _roleProducer, address _roleRecycler) public {
-    devices = new CRUD(_roleConsumer, _roleProducer, _roleRecycler);
+  constructor() public {
+    devices = new CRUD();
   }
   
   function getDevices() public view returns (address addr){
@@ -27,46 +23,34 @@ contract CRUD{
   struct crudStruct {
     uint256 uid;
     address owner;
+    address wallet;
     uint index;
     string mac_address;
     uint price;
   }
 
-  event LogAdd(uint256 uid, string mac_address, address owner, uint index, uint price);
-  event LogDel(uint256 uid, string mac_address, address owner, uint index, uint price);
-  event LogChangeOwner(uint256 uid, string mac_address, address owner, address owner_new, uint index, uint price);
-
-  ProducerRole private producers;
-  RecyclerRole private recyclers;
-  ConsumerRole private consumers;
-
-  function getConsumers() public view returns (ConsumerRole addr){
-      return consumers;
-  }
-
-  function getRecyclers() public view returns (RecyclerRole addr){
-      return recyclers;
-  }
-
-  function getProducers() public view returns (ProducerRole addr){
-      return producers;
-  }
+  event LogAdd(uint256 uid, string mac_address, address owner, address wallet, uint index, uint price);
+  event LogDel(uint256 uid, string mac_address, address owner, address wallet, uint index, uint price);
+  event LogChangeOwner(uint256 uid, string mac_address, address owner, address owner_new, address wallet, uint index, uint price);
 
   mapping(uint256 => crudStruct) private crudStructs;
   mapping(string => uint256) private mac_to_uid;
+  mapping(address => uint256) private wallet_to_uid;
   mapping(uint256 => address[]) private historicalOwners;
   uint256[] private crudIndex;
 
-  constructor(address _roleConsumer, address _roleProducer, address _roleRecycler) public {
-    consumers = ConsumerRole(_roleConsumer);
-    producers = ProducerRole(_roleProducer);
-    recyclers = RecyclerRole(_roleRecycler);
-  }
+  constructor() public {}
   
   function exists(uint256 uid) public view returns(bool isIndeed) {
     if(crudIndex.length == 0)
       return false;
     return crudIndex[crudStructs[uid].index] == uid;
+  }
+
+  function exists_wallet(address wallet) public view returns(bool isIndeed) {
+    if(crudIndex.length == 0)
+      return false;
+    return wallet_to_uid[wallet] != 0;
   }
 
   function exists_mac(string mac_address) public view returns(bool isIndeed) {
@@ -76,21 +60,25 @@ contract CRUD{
     return mac_to_uid[mac_address] != 0;
   }
 
-  function add(uint256 uid, string mac_address, address owner, uint price) public returns(uint index) {
+  function add(uint256 uid, string mac_address, address owner, address wallet, uint price) public returns(uint index) {
     require(!exists_mac(mac_address), "This MAC address already exists");
+    require(!exists_wallet(wallet), "This wallet already exists");
     require(!exists(uid), "This id already exists");
     require(owner != address(0), "The owner address is the zero address");
     crudStructs[uid].uid = uid;
     crudStructs[uid].owner = owner;
+    crudStructs[uid].wallet = wallet;
     crudStructs[uid].mac_address = mac_address;
     crudStructs[uid].index = crudIndex.push(uid)-1;
     crudStructs[uid].price = price;
     mac_to_uid[mac_address] = uid;
+    wallet_to_uid[wallet] = uid;
     historicalOwners[uid].push(owner);
     emit LogAdd(
         uid,
         mac_address,
         owner,
+        crudStructs[uid].wallet,
         crudStructs[uid].index,
         price);
     return crudIndex.length-1;
@@ -99,29 +87,57 @@ contract CRUD{
   function del(uint256 uid) public returns(uint index){
     require(exists(uid), "The ID does not exists");
     uint rowToDelete = crudStructs[uid].index;
+    address wallet = crudStructs[uid].wallet;
     string storage mac = crudStructs[uid].mac_address;
     uint keyToMove = crudIndex[crudIndex.length-1];
     crudIndex[rowToDelete] = keyToMove;
     crudStructs[keyToMove].index = rowToDelete;
     mac_to_uid[mac] = 0;
+    wallet_to_uid[wallet] = 0;
     crudIndex.length--;
     emit LogDel(
         uid,
         mac,
         crudStructs[uid].owner,
+        crudStructs[uid].wallet,
         crudStructs[uid].index,
         crudStructs[uid].price);
     return rowToDelete;
   }
 
   function getByUID(uint256 uid) public view
-  returns(uint index, address owner, string mac_address, uint price){
+  returns(uint index, address owner, address wallet, string mac_address, uint price){
     require(exists(uid), "The ID does not exist");
     address _owner = crudStructs[uid].owner;
     require((_owner != address(0)), "The owner address is either empty or it does not exist");
     return(
       crudStructs[uid].index,
       _owner,
+      crudStructs[uid].wallet,
+      crudStructs[uid].mac_address,
+      crudStructs[uid].price);
+  }
+
+  function getByMacAddress(string mac) public view
+  returns(uint256 id, uint index, address owner, address wallet, uint price){
+    require(exists_mac(mac), "The ID does not exist");
+    uint256 uid = mac_to_uid[mac];
+    return(
+      uid,
+      crudStructs[uid].index,
+      crudStructs[uid].owner,
+      crudStructs[uid].wallet,
+      crudStructs[uid].price);
+  }
+
+  function getByWallet(address wallet) public view
+  returns(uint256 id, uint index, address owner, string mac_address, uint price){
+    require(exists_wallet(wallet), "The ID does not exist");
+    uint256 uid = wallet_to_uid[wallet];
+    return(
+      uid,
+      crudStructs[uid].index,
+      crudStructs[uid].owner,
       crudStructs[uid].mac_address,
       crudStructs[uid].price);
   }
@@ -136,19 +152,9 @@ contract CRUD{
         crudStructs[uid].mac_address,
         from,
         to,
+        crudStructs[uid].wallet,
         crudStructs[uid].index,
         crudStructs[uid].price);
-  }
-
-  function getByMacAddress(string mac) public view
-  returns(uint256 id, uint index, address owner, uint price){
-    require(exists_mac(mac), "The ID does not exist");
-    uint256 uid = mac_to_uid[mac];
-    return(
-      uid,
-      crudStructs[uid].index,
-      crudStructs[uid].owner,
-      crudStructs[uid].price);
   }
 
   function getCount() public view returns(uint count){
