@@ -10,7 +10,6 @@ contract MyERC721 is ERC721Full, ERC721Mintable, Ownable{
   event DeviceRent(uint uid, address newOwner);
   event DevicePass(uint uid, address newOwner);
   event DeviceRecycle(uint uid);
-
   CRUD devices;
 
   constructor(string _name, string _symbol, address _crudDevices)
@@ -22,9 +21,8 @@ contract MyERC721 is ERC721Full, ERC721Mintable, Ownable{
   function getDevices() public view returns(address _devices){
     return devices;
   }
-  
 
-  function recycle(uint256 uid)
+  function recycle(uint256 uid, address old_owner)
   external {
     // Destroy the token
     uint index;
@@ -33,36 +31,39 @@ contract MyERC721 is ERC721Full, ERC721Mintable, Ownable{
     string memory mac_address;
     uint price;
     (index, owner, wallet, mac_address, price) = devices.getByUID(uid);
-    devices.del(uid);
+    devices.del(uid, old_owner);
     super._burn(owner, uid);
 
     emit DeviceRecycle(uid);
   }
 
-  function rent(uint256 uid, address destination)
+  function rent(uint256 uid, address old_owner, address destination)
   external{
-    devices.changeOwnership(uid, destination);
-    super.transferFrom(msg.sender, destination, uid);
+    devices.changeOwnership(uid, old_owner, destination);
+    super.transferFrom(old_owner, destination, uid);
 
     emit DeviceRent(uid, destination);
   }
 
-  function pass(uint256 uid, address destination)
+  function pass(uint256 uid, address old_owner, address destination)
   external{
-    devices.changeOwnership(uid, destination);
-    super.transferFrom(msg.sender, destination, uid);
+    devices.changeOwnership(uid, old_owner, destination);
+    super.transferFrom(old_owner, destination, uid);
     
     emit DevicePass(uid, destination);
   }
 
-  function mint_device(string mac_address, address wallet, uint price)
+  function mint_device(string mac_address, address owner, address approved, address wallet, uint price)
   external
   returns (uint uid) {
     uint id = devices.getCount() + 1;
-    devices.add(id, mac_address, msg.sender, wallet, price);
-    super._mint(msg.sender, id);
+    devices.add(id, mac_address, approved, wallet, price);
+    super._mint(owner, id);
+    emit DeviceMint(id, wallet, approved, mac_address);
     return id;
+  }
 
-    emit DeviceMint(id, wallet, msg.sender, mac_address);
+  function clearApproval(address destination, uint uid) external {
+    this.clearApproval(destination, uid);
   }
 }

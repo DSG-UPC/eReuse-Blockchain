@@ -16,8 +16,10 @@ contract RecycleChain {
   constructor(address _dao) public {
     manager = new RoleManager();
     dao = DAO(_dao);
-    erc20 = EIP20(dao.getERC20());
-    erc721 = MyERC721(dao.getERC721());
+    address _erc20 = dao.getERC20();
+    address _erc721 = dao.getERC721();
+    erc20 = EIP20(_erc20);
+    erc721 = MyERC721(_erc721);
   }
 
   function getManager()
@@ -32,7 +34,8 @@ contract RecycleChain {
   returns (uint uid, address _wallet) {
     require(!compareStrings(mac_address, ''), "The MAC address cannot be empty");
     require(wallet != address(0), "The wallet cannot be the 0 address");
-    uint id = erc721.mint_device(mac_address, wallet, price);
+    uint id = erc721.mint_device(mac_address, address(this), msg.sender, wallet, price);
+    erc721.approve(msg.sender, id);
 
     // Then ERC20 tasks.
     return (id, wallet);
@@ -43,7 +46,9 @@ contract RecycleChain {
   onlyProducer {
     require(destination != address(0), "The destination cannot be the 0 address");
     require(manager.isConsumer(destination), "The destination is not a consumer");
-    erc721.rent(uid, destination);
+    erc721.clearApproval(address(this), uid);
+    erc721.approve(msg.sender, uid);
+    erc721.rent(uid, msg.sender, destination);
 
     // Then ERC20 tasks.
   }
@@ -54,8 +59,9 @@ contract RecycleChain {
     require(destination != address(0), "The destination cannot be the 0 address");
     require(manager.isConsumer(destination) || manager.isRecycler(destination)
             , "The destination is not a consumer neither a recycler");
-
-    erc721.pass(uid, destination);
+    erc721.clearApproval(address(this), uid);
+    erc721.approve(msg.sender, uid);
+    erc721.pass(uid, msg.sender, destination);
 
     // Then ERC20 tasks.
   }
@@ -63,7 +69,8 @@ contract RecycleChain {
   function recycle(uint256 uid)
   public
   onlyRecycler {
-    erc721.recycle(uid);
+    erc721.clearApproval(address(this), uid);
+    erc721.recycle(uid, msg.sender);
 
     // Then ERC20 tasks.
   }

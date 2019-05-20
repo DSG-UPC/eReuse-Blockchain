@@ -84,8 +84,10 @@ contract CRUD{
     return crudIndex.length-1;
   }
 
-  function del(uint256 uid) public returns(uint index){
+  function del(uint256 uid, address from) public returns(uint index){
     require(exists(uid), "The ID does not exists");
+    require(crudStructs[uid].owner == from
+            , "The sender of the request is not the owner of the device");
     uint rowToDelete = crudStructs[uid].index;
     address wallet = crudStructs[uid].wallet;
     string storage mac = crudStructs[uid].mac_address;
@@ -142,9 +144,10 @@ contract CRUD{
       crudStructs[uid].price);
   }
 
-  function changeOwnership(uint256 uid, address to) public {
+  function changeOwnership(uint256 uid, address from, address to) public{
     require(exists(uid), "A token with that ID does not exist");
-    address from = crudStructs[uid].owner;
+    require(crudStructs[uid].owner == from
+            , "The sender of the request is not the owner of the device");
     crudStructs[uid].owner = to;
     historicalOwners[uid].push(to);
     emit LogChangeOwner(

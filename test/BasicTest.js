@@ -66,8 +66,10 @@ contract("Basic test with three roles and one device", async function (accounts)
 
         // Minting the device
 
-        token_id = await recycleChain.mint_device.call(MAC_ADDRESS, DeviceAccount, price, {
+        await recycleChain.mint_device.call(MAC_ADDRESS, DeviceAccount, price, {
             from: ProducerAccount
+        }).then(i => {
+            token_id = i.uid.toNumber();
         });
 
         await recycleChain.mint_device(MAC_ADDRESS, DeviceAccount, price, {
@@ -80,7 +82,7 @@ contract("Basic test with three roles and one device", async function (accounts)
             crud = i;
         });
 
-        await crud.exists(token_id.toNumber()).then(i => {
+        await crud.exists(token_id).then(i => {
             assert.isTrue(i, "The device was not minted correctly");
         });
 
@@ -93,14 +95,13 @@ contract("Basic test with three roles and one device", async function (accounts)
         /**
          * The current owner must be the producer
          */
-        result = await crud.getByUID.call(token_id.toNumber());
+        result = await crud.getByUID.call(token_id);
         assert.equal(ProducerAccount, result.owner);
-
-
-        await recycleChain.rent(token_id.toNumber(), ConsumerAccount, {
+        
+        await recycleChain.rent(token_id, ConsumerAccount, {
             from: ProducerAccount
         });
-
+        
         /**
          * The current owner must be the first consumer
          */

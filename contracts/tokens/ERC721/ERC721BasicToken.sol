@@ -180,8 +180,8 @@ contract ERC721BasicToken is SupportsInterfaceWithLookup, ERC721Basic {
     public
     canTransfer(_tokenId)
   {
-    require(_from != address(0));
-    require(_to != address(0));
+    require(_from != address(0), "Current owner address is zero address");
+    require(_to != address(0), "New owner address is zero address");
 
     clearApproval(_from, _tokenId);
     removeTokenFrom(_from, _tokenId);
@@ -273,7 +273,7 @@ contract ERC721BasicToken is SupportsInterfaceWithLookup, ERC721Basic {
    * @param _tokenId uint256 ID of the token to be minted by the msg.sender
    */
   function _mint(address _to, uint256 _tokenId) internal {
-    require(_to != address(0));
+    require(_to != address(0), "The adress of the owner cannot be the zero address");
     addTokenTo(_to, _tokenId);
     emit Transfer(address(0), _to, _tokenId);
   }
