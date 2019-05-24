@@ -23,6 +23,7 @@ contract RecyclerRole {
   }
 
   function addRecycler(address account) public {
+    require(!isRecycler(account), "This account has already been registered as a recycler");
     _addRecycler(account);
   }
 

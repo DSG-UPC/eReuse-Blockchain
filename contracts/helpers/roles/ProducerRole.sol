@@ -23,6 +23,7 @@ contract ProducerRole {
   }
 
   function addProducer(address account) public {
+    require(!isProducer(account), "This account has already been registered as a producer");
     _addProducer(account);
   }
 

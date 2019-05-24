@@ -5,6 +5,10 @@ pragma solidity ^0.4.25;
 * @dev see https://bitbucket.org/rhitchens2/soliditycrud
 */
 
+import 'contracts/helpers/roles/ProducerRole.sol';
+import 'contracts/helpers/roles/ConsumerRole.sol';
+import 'contracts/helpers/roles/RecyclerRole.sol';
+
 contract CRUDFactory{
 
   address devices;
@@ -27,11 +31,13 @@ contract CRUD{
     uint index;
     string mac_address;
     uint price;
+    uint amount;
   }
 
-  event LogAdd(uint256 uid, string mac_address, address owner, address wallet, uint index, uint price);
-  event LogDel(uint256 uid, string mac_address, address owner, address wallet, uint index, uint price);
-  event LogChangeOwner(uint256 uid, string mac_address, address owner, address owner_new, address wallet, uint index, uint price);
+  event LogAdd(uint256 uid, string mac_address, address owner, address wallet, uint price, uint amount, uint index);
+  event LogDel(uint256 uid, address wallet);
+  event LogChangeOwner(uint256 uid, address owner, address owner_new);
+
 
   mapping(uint256 => crudStruct) private crudStructs;
   mapping(string => uint256) private mac_to_uid;
@@ -40,7 +46,7 @@ contract CRUD{
   uint256[] private crudIndex;
 
   constructor() public {}
-  
+
   function exists(uint256 uid) public view returns(bool isIndeed) {
     if(crudIndex.length == 0)
       return false;
@@ -69,8 +75,9 @@ contract CRUD{
     crudStructs[uid].owner = owner;
     crudStructs[uid].wallet = wallet;
     crudStructs[uid].mac_address = mac_address;
-    crudStructs[uid].index = crudIndex.push(uid)-1;
     crudStructs[uid].price = price;
+    crudStructs[uid].amount = price / 10;
+    crudStructs[uid].index = crudIndex.push(uid)-1;
     mac_to_uid[mac_address] = uid;
     wallet_to_uid[wallet] = uid;
     historicalOwners[uid].push(owner);
@@ -78,9 +85,10 @@ contract CRUD{
         uid,
         mac_address,
         owner,
-        crudStructs[uid].wallet,
-        crudStructs[uid].index,
-        price);
+        wallet,
+        price,
+        price / 10,
+        crudStructs[uid].index);
     return crudIndex.length-1;
   }
 
@@ -99,16 +107,12 @@ contract CRUD{
     crudIndex.length--;
     emit LogDel(
         uid,
-        mac,
-        crudStructs[uid].owner,
-        crudStructs[uid].wallet,
-        crudStructs[uid].index,
-        crudStructs[uid].price);
+        wallet);
     return rowToDelete;
   }
 
   function getByUID(uint256 uid) public view
-  returns(uint index, address owner, address wallet, string mac_address, uint price){
+  returns(uint index, address owner, address _wallet, uint price, string mac_address){
     require(exists(uid), "The ID does not exist");
     address _owner = crudStructs[uid].owner;
     require((_owner != address(0)), "The owner address is either empty or it does not exist");
@@ -116,12 +120,12 @@ contract CRUD{
       crudStructs[uid].index,
       _owner,
       crudStructs[uid].wallet,
-      crudStructs[uid].mac_address,
-      crudStructs[uid].price);
+      crudStructs[uid].price,
+      crudStructs[uid].mac_address);
   }
 
   function getByMacAddress(string mac) public view
-  returns(uint256 id, uint index, address owner, address wallet, uint price){
+  returns(uint256 id, uint index, address owner, address _wallet, uint price){
     require(exists_mac(mac), "The ID does not exist");
     uint256 uid = mac_to_uid[mac];
     return(
@@ -144,24 +148,30 @@ contract CRUD{
       crudStructs[uid].price);
   }
 
-  function changeOwnership(uint256 uid, address from, address to) public{
+  function changeOwnership(uint256 uid, address to, uint amount) public {
     require(exists(uid), "A token with that ID does not exist");
-    require(crudStructs[uid].owner == from
-            , "The sender of the request is not the owner of the device");
+    this.withdraw(uid, amount);
+    address from = crudStructs[uid].owner;
     crudStructs[uid].owner = to;
     historicalOwners[uid].push(to);
     emit LogChangeOwner(
         uid,
-        crudStructs[uid].mac_address,
         from,
-        to,
-        crudStructs[uid].wallet,
-        crudStructs[uid].index,
-        crudStructs[uid].price);
+        to);
   }
+
 
   function getCount() public view returns(uint count){
     return crudIndex.length;
+  }
+
+  function getAmount(uint uid) public view returns (uint _amount){
+    return crudStructs[uid].amount;
+  }
+
+  function withdraw(uint uid, uint amount) public{
+    require(crudStructs[uid].amount >= amount, "Cannot withdraw more than the maximum value");
+    crudStructs[uid].amount -= amount;
   }
 
   function getAtIndex(uint index) public view returns(uint256 uid){
@@ -170,6 +180,10 @@ contract CRUD{
   
   function getHistoricalOwners(uint256 uid) public view returns(address[] owners){
     return historicalOwners[uid];
+  }
+
+  function getDeviceWallet(uint uid) public view returns(address _wallet){
+    return crudStructs[uid].wallet;
   }
 
   function compareStrings (string a, string b) public pure returns (bool){

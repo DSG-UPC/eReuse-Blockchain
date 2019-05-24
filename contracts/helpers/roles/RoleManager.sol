@@ -22,6 +22,18 @@ contract RoleManager {
         return producers;
     }
 
+    function addProducer(address _producer) public {
+        producers.addProducer(_producer);
+    }
+    
+    function addConsumer(address _consumer) public {
+        consumers.addConsumer(_consumer);
+    }
+    
+    function addRecycler(address _recycler) public {
+        recyclers.addRecycler(_recycler);
+    }
+
     constructor() public {
         consumers = new ConsumerRole();
         producers = new ProducerRole();

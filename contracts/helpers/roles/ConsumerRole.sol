@@ -23,6 +23,7 @@ contract ConsumerRole {
   }
 
   function addConsumer(address account) public {
+    require(!isConsumer(account), "This account has already been registered as a consumer");
     _addConsumer(account);
   }
 

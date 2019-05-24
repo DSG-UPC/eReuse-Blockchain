@@ -45,6 +45,6 @@ contract EIP20Interface {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
     // solhint-disable-next-line no-simple-event-func-name
-    event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+    event Transfer(address _from, address _to, uint256 _value);
+    event Approval(address _owner, address _spender, uint256 _value);
 }
