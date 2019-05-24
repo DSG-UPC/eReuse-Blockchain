@@ -1,3 +1,5 @@
+/*jshint esversion: 8 */
+
 const MyERC721 = artifacts.require("MyERC721");
 const CRUD = artifacts.require('CRUD');
 const DAO = artifacts.require('DAO');
@@ -10,7 +12,7 @@ const Recyclers = artifacts.require('RecyclerRole');
 const minimist = require('minimist'),
     argv = minimist(process.argv.slice(2), {
         string: ['network']
-    })
+    });
 const network = argv.network;
 const MAC_ADDRESS = '37-ff-4e-16-bc-c8';
 
@@ -21,6 +23,7 @@ contract("Basic test with three roles and one device", async function (accounts)
         ProducerAccount = accounts[0];
         ConsumerAccount = accounts[1];
         RecyclerAccount = accounts[2];
+        DeviceAccount = accounts[3];
 
         token = await MyERC721.deployed();
         dao = await DAO.deployed();
@@ -47,11 +50,11 @@ contract("Basic test with three roles and one device", async function (accounts)
 
         // Minting the device
 
-        token_id = await token.mint_device.call(MAC_ADDRESS, {
+        token_id = await token.mint_device.call(MAC_ADDRESS, DeviceAccount, 100, {
             from: ProducerAccount
         });
 
-        await token.mint_device(MAC_ADDRESS, {
+        await token.mint_device(MAC_ADDRESS, DeviceAccount, 100, {
             from: ProducerAccount
         });
 
