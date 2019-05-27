@@ -58,7 +58,7 @@ contract("Basic test with three roles and one device", async function (accounts)
 
         // Minting the device
 
-        token_id = await token.mint_device.call(MAC_ADDRESS, DeviceAccount, 100, {
+        await token.mint_device.call(MAC_ADDRESS, DeviceAccount, 100, {
             from: ProducerAccount
         }).then(i => {
             token_id = i.toNumber();
@@ -90,7 +90,7 @@ contract("Basic test with three roles and one device", async function (accounts)
         result = await crud.getByUID.call(token_id);
         assert.equal(ProducerAccount, result.owner);
         
-        await recycleChain.rent(token_id, ConsumerAccount, {
+        await token.rent(token_id, ConsumerAccount, {
             from: ProducerAccount
         });
         
@@ -100,7 +100,7 @@ contract("Basic test with three roles and one device", async function (accounts)
         result = await crud.getByUID.call(token_id.toNumber());
         assert.equal(ConsumerAccount, result.owner);
 
-        await recycleChain.pass(token_id.toNumber(), ConsumerAccount2, {
+        await token.pass(token_id.toNumber(), ConsumerAccount2, {
             from: ConsumerAccount
         });
 
@@ -111,7 +111,7 @@ contract("Basic test with three roles and one device", async function (accounts)
         result = await crud.getByUID.call(token_id.toNumber());
         assert.equal(ConsumerAccount2, result.owner);
 
-        await recycleChain.pass(token_id.toNumber(), ConsumerAccount3, {
+        await token.pass(token_id.toNumber(), ConsumerAccount3, {
             from: ConsumerAccount2
         });
 
@@ -122,7 +122,7 @@ contract("Basic test with three roles and one device", async function (accounts)
         result = await crud.getByUID.call(token_id.toNumber());
         assert.equal(ConsumerAccount3, result.owner);
 
-        await recycleChain.pass(token_id.toNumber(), RecyclerAccount, {
+        await token.pass(token_id.toNumber(), RecyclerAccount, {
             from: ConsumerAccount3
         });
 
@@ -132,7 +132,7 @@ contract("Basic test with three roles and one device", async function (accounts)
         result = await crud.getByUID.call(token_id.toNumber());
         assert.equal(RecyclerAccount, result.owner);
 
-        await recycleChain.recycle(token_id.toNumber(), {
+        await token.recycle(token_id.toNumber(), {
             from: RecyclerAccount
         });
 
