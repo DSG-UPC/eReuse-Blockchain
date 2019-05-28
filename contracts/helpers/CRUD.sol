@@ -66,7 +66,7 @@ contract CRUD{
     return mac_to_uid[mac_address] != 0;
   }
 
-  function add(uint256 uid, string mac_address, address owner, address wallet, uint price) public returns(uint index) {
+  function add(uint256 uid, string mac_address, address owner, address wallet, uint price) public{
     require(!exists_mac(mac_address), "This MAC address already exists");
     require(!exists_wallet(wallet), "This wallet already exists");
     require(!exists(uid), "This id already exists");
@@ -87,12 +87,11 @@ contract CRUD{
         owner,
         wallet,
         price,
-        price / 10,
+        crudStructs[uid].amount,
         crudStructs[uid].index);
-    return crudIndex.length-1;
   }
 
-  function del(uint256 uid, address from) public returns(uint index){
+  function del(uint256 uid, address from) public{
     require(exists(uid), "The ID does not exists");
     require(crudStructs[uid].owner == from
             , "The sender of the request is not the owner of the device");
@@ -108,7 +107,6 @@ contract CRUD{
     emit LogDel(
         uid,
         wallet);
-    return rowToDelete;
   }
 
   function getByUID(uint256 uid) public view

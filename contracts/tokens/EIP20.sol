@@ -10,19 +10,14 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 contract EIP20 is EIP20Interface, Ownable {
 
     uint256 constant private MAX_UINT256 = 2**256 - 1;
-    //address constant private client = 0xC202251cabC1393f8Face351057666c43f9a432A;
-    //address constant private provider = 0x511b3EAFacD05220D463E0dD3ee40895699118A0;
+    event Transfer(address _from, address _to, uint256 _value);
+    event Approval(address _owner, address _spender, uint256 _value);
+    event Information(address from, address to, address sender, uint value);
     mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public allowed;
-    /*
-    NOTE:
-    The following variables are OPTIONAL vanities. One does not have to include them.
-    They allow one to customise the token contract & in no way influences the core functionality.
-    Some wallets/interfaces might not even bother to look at this information.
-    */
-    string public name;                   //fancy name: eg Simon Bucks
-    uint8 public decimals;                //How many decimals to show.
-    string public symbol;                 //An identifier: eg SBX
+    string public name;
+    uint8 public decimals;
+    string public symbol;
 
     modifier validDestination( address to ) {
         require(to != address(0x0), "The given address is not a valid destination");
@@ -36,14 +31,11 @@ contract EIP20 is EIP20Interface, Ownable {
         uint8 _decimalUnits,
         string _tokenSymbol
     ) public {
-        //balances[msg.sender] = _initialAmount;               // Give the creator all initial tokens
-        //balances[client] = _initialAmount/2;
-        //balances[provider] = _initialAmount/2;
         balances[msg.sender] = _initialAmount;
-        totalSupply = _initialAmount;                        // Update total supply
-        name = _tokenName;                                   // Set the name for display purposes
-        decimals = _decimalUnits;                            // Amount of decimals for display purposes
-        symbol = _tokenSymbol;                               // Set the symbol for display purposes
+        totalSupply = _initialAmount;
+        name = _tokenName;
+        decimals = _decimalUnits;
+        symbol = _tokenSymbol;
     }
     function transfer(address _to, uint256 _value)
       public
@@ -53,7 +45,7 @@ contract EIP20 is EIP20Interface, Ownable {
         require(balances[msg.sender] >= _value, "The sending account doesn't have enough funds");
         balances[msg.sender] -= _value;
         balances[_to] += _value;
-        emit Transfer(msg.sender, _to, _value); //solhint-disable-line indent, no-unused-vars
+        // emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
@@ -62,16 +54,16 @@ contract EIP20 is EIP20Interface, Ownable {
       validDestination(_to)
       returns (bool success)
     {
+        // emit Information(_from, _to, msg.sender, _value);
         // Use along with approve, only when we want to transfer from one account to a third account.
         uint256 allowance = allowed[_from][msg.sender];
-        require(balances[_from] >= _value && allowance >= _value,
-                                "Either the sending account doesn't have enough funds or the allowance is not enough");
+        require(balances[_from] >= _value && allowance >= _value, "Either the sending account doesn't have enough funds or the allowance is not enough");
         balances[_to] += _value;
         balances[_from] -= _value;
         if (allowance < MAX_UINT256) {
             allowed[_from][msg.sender] -= _value;
         }
-        emit Transfer(_from, _to, _value); //solhint-disable-line indent, no-unused-vars
+        // emit Transfer(_from, _to, _value);
         return true;
     }
 
@@ -81,7 +73,7 @@ contract EIP20 is EIP20Interface, Ownable {
 
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
-        emit Approval(msg.sender, _spender, _value); //solhint-disable-line indent, no-unused-vars
+        // emit Approval(msg.sender, _spender, _value);
         return true;
     }
 

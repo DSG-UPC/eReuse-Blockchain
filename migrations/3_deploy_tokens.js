@@ -21,7 +21,6 @@ module.exports = function (deployer, network, accounts) {
             erc721 = await deployer.deploy(MyERC721, 'GuifiDeviceToken', 'GDT',
               devices, erc20.address, manager.address);
             dao.setERC721(erc721.address);
-            await erc20.transfer(erc721.address, 100000);
             console.log('ERC721: ' + erc721.address);
           });
         });

@@ -1,6 +1,7 @@
 /*jshint esversion: 8 */
 
 const MyERC721 = artifacts.require("MyERC721");
+const ERC20 = artifacts.require('EIP20');
 const CRUD = artifacts.require('CRUD');
 const RoleManager = artifacts.require('RoleManager');
 const DAO = artifacts.require('DAO');
@@ -26,6 +27,7 @@ contract("Basic test with three roles and one device", async function (accounts)
         DeviceAccount = accounts[3];
 
         token = await MyERC721.deployed();
+        erc20 = await ERC20.deployed();
         dao = await DAO.deployed();
         cfact = await CrudFactory.deployed();
 
@@ -39,15 +41,15 @@ contract("Basic test with three roles and one device", async function (accounts)
             return manager_addr;
         }).then(async manager_addr => {
             manager = await RoleManager.at(manager_addr);
-            
+
             await manager.isConsumer(ConsumerAccount).then(i => {
                 assert.isTrue(i, 'Consumer account was not correctly added');
             });
-            
+
             await manager.isProducer(ProducerAccount).then(i => {
                 assert.isTrue(i, 'Producer account was not correctly added');
             });
-            
+
             await manager.isRecycler(RecyclerAccount).then(i => {
                 assert.isTrue(i, 'Recycler account was not correctly added');
             });
@@ -58,20 +60,38 @@ contract("Basic test with three roles and one device", async function (accounts)
 
         // Minting the device
 
-        await token.mint_device.call(MAC_ADDRESS, DeviceAccount, 100, {
-            from: ProducerAccount
-        }).then(i => {
-            token_id = i.toNumber();
-        });
-
-        await token.mint_device(MAC_ADDRESS, DeviceAccount, 100, {
-            from: ProducerAccount
-        });
-
         await token.getDevices().then(async (devices) => {
             return await CRUD.at(devices);
         }).then(i => {
             crud = i;
+        });
+
+        await crud.getCount.call().then(async count => {
+            token_id = await count.toNumber() + 1;
+        });
+        
+        await erc20.approve(token.address, price, {
+            from: ProducerAccount
+        });
+
+        // await erc20.transfer(token.address, price, {
+        //     from: ProducerAccount
+        // });
+        
+        // await erc20.balanceOf(ProducerAccount).then(i => {
+        //     console.log(`Balance of producer: ${i.toNumber()}`);
+        // });
+
+        // await erc20.balanceOf(token.address).then(i => {
+        //     console.log(`Balance erc721: ${i.toNumber()}`);
+        // });
+
+        // await erc20.allowance(ProducerAccount, token.address).then(i => {
+        //     console.log(`Allowance: ${i.toNumber()}`);
+        // });
+
+        await token.mint_device(MAC_ADDRESS, DeviceAccount, price, {
+            from: ProducerAccount
         });
 
         await crud.exists(token_id).then(i => {
@@ -89,18 +109,18 @@ contract("Basic test with three roles and one device", async function (accounts)
          */
         result = await crud.getByUID.call(token_id);
         assert.equal(ProducerAccount, result.owner);
-        
-        await token.rent(token_id, ConsumerAccount, {
+
+        await token.rent(token_id, ConsumerAccount, 1, {
             from: ProducerAccount
         });
-        
+
         /**
          * The current owner must be the first consumer
          */
-        result = await crud.getByUID.call(token_id.toNumber());
+        result = await crud.getByUID.call(token_id);
         assert.equal(ConsumerAccount, result.owner);
 
-        await token.pass(token_id.toNumber(), ConsumerAccount2, {
+        await token.pass(token_id, ConsumerAccount2, {
             from: ConsumerAccount
         });
 
