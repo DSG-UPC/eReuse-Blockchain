@@ -57,7 +57,8 @@ contract EIP20 is EIP20Interface, Ownable {
         // emit Information(_from, _to, msg.sender, _value);
         // Use along with approve, only when we want to transfer from one account to a third account.
         uint256 allowance = allowed[_from][msg.sender];
-        require(balances[_from] >= _value && allowance >= _value, "Either the sending account doesn't have enough funds or the allowance is not enough");
+        require(balances[_from] >= _value, "The sending account doesn't have enough funds");
+        require(allowance >= _value, "The allowance is not enough");
         balances[_to] += _value;
         balances[_from] -= _value;
         if (allowance < MAX_UINT256) {

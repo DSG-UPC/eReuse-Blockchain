@@ -41,7 +41,7 @@ contract MyERC721 is ERC721Full, ERC721Mintable, Ownable{
     string memory mac_address;
     (index, owner, device, price, mac_address) = devices.getByUID(uid);
     devices.del(uid, msg.sender);
-    _burn(owner, uid);
+    _burn(device, uid);
 
     // We need to transfer the investment to the recycler.
     uint amount = devices.getAmount(uid);
@@ -54,15 +54,10 @@ contract MyERC721 is ERC721Full, ERC721Mintable, Ownable{
     require(manager.isConsumer(destination), "The destination is not a consumer");
     
     devices.changeOwnership(uid, destination, benefit);
-
-    transferFrom(msg.sender, destination, uid);
-
     address _device = devices.getDeviceWallet(uid);
 
-    // We need to transfer the price of the device to the sender.
-
     devices.withdraw(uid, benefit);
-    // erc20.transferFrom(_device, msg.sender, benefit);
+    erc20.transferFrom(_device, msg.sender, benefit);
   }
 
   function requestProducerMint(address _producer) public {
@@ -86,25 +81,21 @@ contract MyERC721 is ERC721Full, ERC721Mintable, Ownable{
             , "The destination is not a consumer neither a recycler");
     
     devices.changeOwnership(uid, destination, benefit);
-    transferFrom(msg.sender, destination, uid);
-
     address _device = devices.getDeviceWallet(uid);
 
     // We need to transfer the initial investment from one consumer to another.
-
     erc20.transferFrom(_device, msg.sender, benefit);
   }
 
   function mint_device(string mac_address, address _device, uint price) public onlyProducer 
-  //returns (uint uid) 
   {
     require(!devices.exists_mac(mac_address), "A device with this MAC address already exists");
     uint id = devices.getCount() + 1;
     devices.add(id, mac_address, msg.sender, _device, price);
     _mint(_device, id);
     uint amount = price / 10;
+    
     erc20.transferFrom(msg.sender, _device, amount);
-    //return id;
   }
 
   modifier onlyProducer{
