@@ -82,6 +82,12 @@ contract("Basic test with three roles and one device", async function (accounts)
             from: ProducerAccount
         });
 
+
+        console.log('\n## BALANCES BEFORE MINTING THE DEVICE ##\n');
+        await printBalances(erc20, ProducerAccount, DeviceAccount, ConsumerAccount,
+            ConsumerAccount2, ConsumerAccount3, RecyclerAccount);
+
+
         await token.mint_device(MAC_ADDRESS, DeviceAccount, price, {
             from: ProducerAccount
         });
@@ -89,6 +95,7 @@ contract("Basic test with three roles and one device", async function (accounts)
         await crud.exists(token_id).then(i => {
             assert.isTrue(i, "The device was not minted correctly");
         });
+
 
         console.log('Succesfully minted the device');
 
@@ -102,6 +109,12 @@ contract("Basic test with three roles and one device", async function (accounts)
         await erc20.approve(token.address, price + 15, {
             from: ConsumerAccount
         });
+
+
+        console.log('\n## BALANCES BEFORE RENTING THE DEVICE ##\n');
+        await printBalances(erc20, ProducerAccount, DeviceAccount, ConsumerAccount,
+            ConsumerAccount2, ConsumerAccount3, RecyclerAccount);
+
 
         await token.rent(token_id, ConsumerAccount, price, {
             from: ProducerAccount
@@ -119,6 +132,12 @@ contract("Basic test with three roles and one device", async function (accounts)
             from: DeviceAccount
         });
 
+
+        console.log('\n## BALANCES BEFORE PASSING THE DEVICE (C1 to C2) ##\n');
+        await printBalances(erc20, ProducerAccount, DeviceAccount, ConsumerAccount,
+            ConsumerAccount2, ConsumerAccount3, RecyclerAccount);
+
+
         await token.pass(token_id, ConsumerAccount2, 1, {
             from: ConsumerAccount
         });
@@ -132,7 +151,13 @@ contract("Basic test with three roles and one device", async function (accounts)
         result = await crud.getByUID.call(token_id);
         assert.equal(ConsumerAccount2, result.owner);
 
-        await token.pass(token_id, ConsumerAccount3, 1, {
+
+        console.log('\n## BALANCES BEFORE PASSING THE DEVICE (C2 to C3) ##\n');
+        await printBalances(erc20, ProducerAccount, DeviceAccount, ConsumerAccount,
+            ConsumerAccount2, ConsumerAccount3, RecyclerAccount);
+
+
+        await token.pass(token_id, ConsumerAccount3, 3, {
             from: ConsumerAccount2
         });
 
@@ -144,7 +169,13 @@ contract("Basic test with three roles and one device", async function (accounts)
         result = await crud.getByUID.call(token_id);
         assert.equal(ConsumerAccount3, result.owner);
 
-        await token.pass(token_id, RecyclerAccount, 1, {
+
+        console.log('\n## BALANCES BEFORE PASSING THE DEVICE (C3 to Recycler) ##\n');
+        await printBalances(erc20, ProducerAccount, DeviceAccount, ConsumerAccount,
+            ConsumerAccount2, ConsumerAccount3, RecyclerAccount);
+
+
+        await token.pass(token_id, RecyclerAccount, 5, {
             from: ConsumerAccount3
         });
 
@@ -155,6 +186,12 @@ contract("Basic test with three roles and one device", async function (accounts)
          */
         result = await crud.getByUID.call(token_id);
         assert.equal(RecyclerAccount, result.owner);
+
+
+        console.log('\n## BALANCES BEFORE RECYCLING THE DEVICE ##\n');
+        await printBalances(erc20, ProducerAccount, DeviceAccount, ConsumerAccount,
+            ConsumerAccount2, ConsumerAccount3, RecyclerAccount);
+
 
         await token.recycle(token_id, {
             from: RecyclerAccount
@@ -175,24 +212,26 @@ contract("Basic test with three roles and one device", async function (accounts)
         owners = await crud.getHistoricalOwners.call(token_id);
         assert.equal(owners.length, 5);
 
-        console.log('\n');
-        await printBalances(erc20, ProducerAccount, ConsumerAccount,
+        console.log('\n## BALANCES AT THE END ##\n');
+        await printBalances(erc20, ProducerAccount, DeviceAccount, ConsumerAccount,
             ConsumerAccount2, ConsumerAccount3, RecyclerAccount);
     });
 
 });
-async function printBalances(erc20, ProducerAccount, ConsumerAccount,
+async function printBalances(erc20, ProducerAccount, DeviceAccount, ConsumerAccount,
     ConsumerAccount2, ConsumerAccount3, RecyclerAccount) {
 
     await erc20.balanceOf(ProducerAccount).then(i => { p = i; });
+    await erc20.balanceOf(DeviceAccount).then(i => { d = i; });
     await erc20.balanceOf(ConsumerAccount).then(i => { c1 = i; });
     await erc20.balanceOf(ConsumerAccount2).then(i => { c2 = i; });
     await erc20.balanceOf(ConsumerAccount3).then(i => { c3 = i; });
     await erc20.balanceOf(RecyclerAccount).then(i => { r = i; });
 
     console.log(`Producer balance: ${p}`);
+    console.log(`Device account balance: ${d}`);
     console.log(`Consumer1 balance: ${c1}`);
     console.log(`Consumer2 balance: ${c2}`);
     console.log(`Consumer3 balance: ${c3}`);
-    console.log(`Recycler balance: ${r}`);
+    console.log(`Recycler balance: ${r}\n\n\n`);
 }
