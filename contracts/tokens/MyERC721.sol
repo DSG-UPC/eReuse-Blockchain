@@ -53,11 +53,8 @@ contract MyERC721 is ERC721Full, ERC721Mintable, Ownable{
     require(destination != address(0), "The destination cannot be the 0 address");
     require(manager.isConsumer(destination), "The destination is not a consumer");
     
-    devices.changeOwnership(uid, destination, benefit);
-    address _device = devices.getDeviceWallet(uid);
-
-    devices.withdraw(uid, benefit);
-    erc20.transferFrom(_device, msg.sender, benefit);
+    devices.changeOwnership(uid, destination);
+    erc20.transferFrom(destination, msg.sender, benefit);
   }
 
   function requestProducerMint(address _producer) public {
@@ -80,7 +77,8 @@ contract MyERC721 is ERC721Full, ERC721Mintable, Ownable{
     require(manager.isConsumer(destination) || manager.isRecycler(destination)
             , "The destination is not a consumer neither a recycler");
     
-    devices.changeOwnership(uid, destination, benefit);
+    devices.changeOwnership(uid, destination);
+    devices.withdraw(uid, benefit);
     address _device = devices.getDeviceWallet(uid);
 
     // We need to transfer the initial investment from one consumer to another.

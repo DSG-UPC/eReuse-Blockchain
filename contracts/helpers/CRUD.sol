@@ -146,9 +146,8 @@ contract CRUD{
       crudStructs[uid].price);
   }
 
-  function changeOwnership(uint256 uid, address to, uint amount) public {
+  function changeOwnership(uint256 uid, address to) public {
     require(exists(uid), "A token with that ID does not exist");
-    this.withdraw(uid, amount);
     address from = crudStructs[uid].owner;
     crudStructs[uid].owner = to;
     historicalOwners[uid].push(to);

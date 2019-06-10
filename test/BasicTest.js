@@ -34,9 +34,8 @@ contract("Basic test with three roles and one device", async function (accounts)
         erc20 = await ERC20.deployed();
         dao = await DAO.deployed();
         cfact = await CrudFactory.deployed();
-        await erc20.transfer(DeviceAccount, price, {
-            from: ProducerAccount
-        });
+
+        await erc20.transfer(ConsumerAccount, price);
 
         console.log('Adding accounts to its corresponding role');
 
@@ -100,11 +99,11 @@ contract("Basic test with three roles and one device", async function (accounts)
         result = await crud.getByUID.call(token_id);
         assert.equal(ProducerAccount, result.owner);
 
-        await erc20.approve(token.address, price, {
-            from: DeviceAccount
+        await erc20.approve(token.address, price + 15, {
+            from: ConsumerAccount
         });
 
-        await token.rent(token_id, ConsumerAccount, 1, {
+        await token.rent(token_id, ConsumerAccount, price, {
             from: ProducerAccount
         });
 
@@ -115,6 +114,10 @@ contract("Basic test with three roles and one device", async function (accounts)
          */
         result = await crud.getByUID.call(token_id);
         assert.equal(ConsumerAccount, result.owner);
+
+        await erc20.approve(token.address, price / 10, {
+            from: DeviceAccount
+        });
 
         await token.pass(token_id, ConsumerAccount2, 1, {
             from: ConsumerAccount
