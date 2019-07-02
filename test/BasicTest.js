@@ -22,13 +22,13 @@ contract("Basic test with three roles and one device", async function (accounts)
 
 
         price = 150;
-
-        ProducerAccount = accounts[0];
-        ConsumerAccount = accounts[1];
-        RecyclerAccount = accounts[2];
-        DeviceAccount = accounts[3];
-        ConsumerAccount2 = accounts[4];
-        ConsumerAccount3 = accounts[5];
+        OwnerAccount = accounts[0]
+        ProducerAccount = accounts[1];
+        ConsumerAccount = accounts[2];
+        RecyclerAccount = accounts[3];
+        DeviceAccount = accounts[4];
+        ConsumerAccount2 = accounts[5];
+        ConsumerAccount3 = accounts[6];
 
         token = await MyERC721.deployed();
         erc20 = await ERC20.deployed();

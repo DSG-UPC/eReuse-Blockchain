@@ -5,7 +5,7 @@ const CRUDFactory = artifacts.require("CRUDFactory");
 const RoleManager = artifacts.require('RoleManager');
 
 module.exports = function (deployer, network, accounts) {
-  deployer.deploy(ERC20, 1000000, 'Reusecoin', 0, 'RCN')
+  deployer.deploy(ERC20, 1000000, 'Reusecoin', 0, 'RCN', {from:accounts[0]})
     .then(async function (erc20) {
       await DAO.deployed().then(function (instance) {
         dao = instance;
@@ -17,9 +17,9 @@ module.exports = function (deployer, network, accounts) {
           console.log('crudfactory: ' + crudfactory.address);
           devices = await crudfactory.getDevices.call();
           console.log(devices);
-          manager = await deployer.deploy(RoleManager).then(async (manager) => {
-            erc721 = await deployer.deploy(MyERC721, 'GuifiDeviceToken', 'GDT',
-              devices, erc20.address, manager.address);
+          manager = await deployer.deploy(RoleManager, {from:accounts[0]}).then(async (manager) => {
+            erc721 = await deployer.deploy(MyERC721, 'EREUSEDeviceToken', 'EDT',
+              devices, erc20.address, manager.address, {from:accounts[0]});
             dao.setERC721(erc721.address);
             console.log('ERC721: ' + erc721.address);
           });
