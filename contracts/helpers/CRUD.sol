@@ -5,9 +5,6 @@ pragma solidity ^0.4.25;
 * @dev see https://bitbucket.org/rhitchens2/soliditycrud
 */
 
-import 'contracts/helpers/roles/ProducerRole.sol';
-import 'contracts/helpers/roles/ConsumerRole.sol';
-import 'contracts/helpers/roles/RecyclerRole.sol';
 
 contract CRUDFactory{
 
