@@ -66,20 +66,20 @@ contract RoleManager is Ownable{
         itads.delMember(_itad);
     }
 
-    function isProducer(address _producer) public {
-        producers.isMember(_producer);
+    function isProducer(address _producer) public view returns(bool) {
+        return producers.isMember(_producer);
     }
 
-    function isConsumer(address _consumer) public {
-        consumers.isMember(_consumer);
+    function isConsumer(address _consumer) public view returns(bool) {
+        return consumers.isMember(_consumer);
     }
 
-    function isRecycler(address _recycler) public {
-        recyclers.isMember(_recycler);
+    function isRecycler(address _recycler) public view returns(bool) {
+        return recyclers.isMember(_recycler);
     }
 
-    function isItad(address _itad) public {
-        itads.isMember(_itad);
+    function isItad(address _itad) public view returns(bool) {
+        return itads.isMember(_itad);
     }
 
     modifier onlyProducer() {

@@ -2,7 +2,7 @@ pragma solidity ^0.4.25;
 
 import "contracts/helpers/CRUD.sol";
 import "contracts/tokens/EIP20Interface.sol";
-import "contracts/helpers/roles/Role.sol";
+import "contracts/helpers/roles/RoleManager.sol";
 import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol';
 import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Mintable.sol';
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
