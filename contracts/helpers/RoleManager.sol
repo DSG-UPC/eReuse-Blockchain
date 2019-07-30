@@ -8,13 +8,15 @@ import "openzeppelin-solidity/contracts/access/Roles.sol";
 contract RoleManager is Ownable{
     Role consumers;
     Role producers;
-    Role recyclers;
+    Role processors;
+    Role repairers;
     Role itads;
 
     constructor() public {
         consumers = new Role('comsumer');
         producers = new Role('producer');
-        recyclers = new Role('recycler');
+        processors = new Role('processor');
+        repairers = new Role('repairer');
         itads = new Role('itads');
     }
 
@@ -22,8 +24,8 @@ contract RoleManager is Ownable{
         return consumers;
     }
 
-    function getRecyclers() public view returns (Role addr){
-        return recyclers;
+    function getProcessors() public view returns (Role addr){
+        return processors;
     }
 
     function getProducers() public view returns (Role addr){
@@ -34,6 +36,11 @@ contract RoleManager is Ownable{
         return itads;
     }
 
+    function getRepairers() public view returns (Role addr){
+        return repairers;
+    }
+    //TODO Reduce code by add enums for the different Roels?
+
     function addProducer(address _producer) public onlyOwner {
         producers.addMember(_producer);
     }
@@ -42,12 +49,16 @@ contract RoleManager is Ownable{
         consumers.addMember(_consumer);
     }
 
-    function addRecycler(address _recycler) public onlyOwner {
-        recyclers.addMember(_recycler);
+    function addProcessor(address _processor) public onlyOwner {
+        processors.addMember(_processor);
     }
 
     function addItad(address _itad) public onlyOwner {
         itads.addMember(_itad);
+    }
+
+    function addRepairer(address _repairer) public onlyOwner {
+        itads.addMember(_repairer);
     }
 
     function delProducer(address _producer) public onlyOwner {
@@ -58,12 +69,16 @@ contract RoleManager is Ownable{
         consumers.delMember(_consumer);
     }
 
-    function delRecycler(address _recycler) public onlyOwner {
-        recyclers.delMember(_recycler);
+    function delProcessor(address _processor) public onlyOwner {
+        processors.delMember(_processor);
     }
 
     function delItad(address _itad) public onlyOwner {
         itads.delMember(_itad);
+    }
+
+    function delRepairer(address _repairer) public onlyOwner {
+        repairers.delMember(_repairer);
     }
 
     function isProducer(address _producer) public view returns(bool) {
@@ -74,32 +89,16 @@ contract RoleManager is Ownable{
         return consumers.isMember(_consumer);
     }
 
-    function isRecycler(address _recycler) public view returns(bool) {
-        return recyclers.isMember(_recycler);
+    function isProcessor(address _processor) public view returns(bool) {
+        return processors.isMember(_processor);
     }
 
     function isItad(address _itad) public view returns(bool) {
         return itads.isMember(_itad);
     }
 
-    modifier onlyProducer() {
-    require(producers.isMember(msg.sender), "The message sender is not a recycler");
-    _;
-    }
-
-    modifier onlyConsumer() {
-    require(consumers.isMember(msg.sender), "The message sender is not a recycler");
-    _;
-    }
-
-    modifier onlyRecycler() {
-    require(recyclers.isMember(msg.sender), "The message sender is not a recycler");
-    _;
-    }
-
-    modifier onlyItad() {
-    require(itads.isMember(msg.sender), "The message sender is not a recycler");
-    _;
+    function isRepairer(address _repairer) public view returns(bool) {
+        return repairers.isMember(_repairer);
     }
 }
 
@@ -127,11 +126,12 @@ contract Role is Ownable {
   }
 
   function addMember(address account) public onlyOwner {
-    require(!isMember(account), "This account has already been registered as a recycler");
+    require(!isMember(account), "This account has already been registered in this role");
     _addMember(account);
   }
 
   function delMember(address account) public onlyOwner {
+    require(!isMember(account), "This account has not been registered in this role");
     _delMember(account);
   }
 
