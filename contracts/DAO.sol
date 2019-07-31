@@ -6,7 +6,7 @@ import "contracts/DAOInterface.sol";
 contract DAO is Ownable {
   address public ERC20;
   address public ERC721;
-  address public Owners;
+  address public RoleManager;
   address public OracleQuery;
   address OracleResponse;
   address ReserveAccount;
@@ -54,13 +54,12 @@ contract DAO is Ownable {
     return ERC721;
   }
 
-  function getOwners() public view returns(address) {
-    return Owners;
+  function setRoleManager(address _address)  public onlyOwner {
+    RoleManager = _address;
   }
 
-  function setOwners(address _address) public onlyOwner returns(bool) {
-    Owners = _address;
-    return true;
+  function getRoleManager() public view returns (address) {
+    return RoleManager;
   }
 
 }

@@ -9,13 +9,11 @@ module.exports = {
       host: "localhost",
       port: 8545,
       network_id: "*",
-      from: '0x28b17326d08992f16d382db2923d0d8b4ff8adb0',
     },
     staging: {
       provider: ganacheWeb3.currentProvider,
       network_id: "7775",
       gas: 5876844,
-      // from: '0x28b17326d08992f16d382db2923d0d8b4ff8adb0',
       //from: "",
     },
   },
