@@ -9,7 +9,7 @@ let files = fs.readdirSync(COMPILED);
 
 function abiGen(fil){
     const name = fil.split(".")[0]
-    const command = `abigen --abi ${path.join(EXPORTED,fil)} --pkg main --type ${name} --out ${path.join(EXPORTED,fil+'.go')}`
+    const command = `abigen --abi ${path.join(EXPORTED,fil)} --pkg token --type ${name} --out ${path.join(EXPORTED,name+'.go')}`
     exec(command)
     .then( result => {
         if (result.stdout != '') console.log(result.stdout)
