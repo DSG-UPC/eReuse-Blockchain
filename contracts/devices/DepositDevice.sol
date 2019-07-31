@@ -24,67 +24,68 @@ contract DepositDevice is Ownable{
     }
     DevData data;
 
-    constructor (string _name, address _sender, uint _initialDeposit,  address _erc20,  address _erc721, address _roleManager ) 
+    constructor (string _name, address _sender, uint _initialDeposit,  address _erc20,  address _erc721, address _roleManager )
     public
-    {        
+    {
         roleManager = RoleManager(_roleManager);
-        erc721  = MyERC721(_erc721); 
+        erc721 = MyERC721(_erc721);
         erc20 = EIP20Interface(_erc20);
         data.name = _name;
         data.owner = _sender;
-        data.uid = address(this);
         data.value = _initialDeposit;
         transferOwnership(_sender);
     }
 
-    function mint(address _to) 
-    onlyOwner 
-    public 
+    function mint(address _to)
+    public
+    onlyOwner
     {
         require(roleManager.isRepairer(_to), "The destination is not a consumer");
         erc20.transferFrom(msg.sender, address(this), data.value);
-        erc721.mint(_to, address(this));
+        erc721.mint(_to, uint256(address(this)));
+        data.uid = uint256(address(this));
+        transferOwnership(msg.sender);
     }
 
-    function _transfer(address _from, address _to, uint valueSent) 
-    onlyOwner 
-    private {
+    function _transfer(address _from, address _to, uint valueSent)
+    private
+    onlyOwner
+    {
         require(_to != address(0), "The destination cannot be the 0 address");
-        erc721.transferFrom( _from, _to, address(this));
-        erc20.transferFrom( _from, _to, valueSent);
+        erc721.transferFrom(_from, _to, data.uid);
+        erc20.transferFrom(_from, _to, valueSent);
         transferOwnership(_to);
         data.owner = _to;
     }
 
-    function toRepair(uint256 uid, address _to, uint benefit)
-    onlyItad
+    function toRepair(address _to, uint benefit)
     public
+    onlyItad
     {
         require(roleManager.isRepairer(_to), "The destination is not a repairer");
         _transfer(msg.sender, _to, benefit);
     }
 
-    function toItad(uint256 uid, address _to, uint benefit)
+    function toItad(address _to, uint benefit)
     public
     {
         require(roleManager.isItad(_to),  "The destination is not an itad");
         _transfer(msg.sender, _to, benefit);
     }
 
-    function toRecycle(uint256 uid, address _to, uint benefit)
+    function toRecycle(address _to, uint benefit)
     public
     {
         require(roleManager.isProcessor(_to), "The destination is not a a recycler");
         _transfer(msg.sender, _to, benefit);
     }
 
-    function recycle(uint256 uid)
+    function recycle()
     public
     onlyItad
     {
-       
         erc20.transferFrom(address(this), msg.sender, address(this).balance);
-        erc721.burn(address(this));
+        erc721.burn(msg.sender, data.uid);
     }
 
 

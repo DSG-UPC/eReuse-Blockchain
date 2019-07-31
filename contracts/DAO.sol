@@ -54,7 +54,7 @@ contract DAO is Ownable {
     return ERC721;
   }
 
-   function setRoleManager(address _address)  public onlyOwner {
+  function setRoleManager(address _address)  public onlyOwner {
     RoleManager = _address;
   }
 

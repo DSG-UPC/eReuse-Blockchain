@@ -16,9 +16,9 @@ contract MyERC721 is ERC721Full, Ownable{
     _mint(_to, tokenId);
   }
 
-  function burn(address tokenId)
+  function burn(address sender, uint256 tokenId)
   public
   {
-    _burn(tokenId);
+    _burn(sender, tokenId);
   }
 }

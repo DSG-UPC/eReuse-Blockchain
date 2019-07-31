@@ -14,24 +14,27 @@ contract DeviceFactory is Ownable {
 
   constructor(address _daoAddress) public {
     daoAddress = _daoAddress;
-    DAOContract =  DAOInterface(daoAddress);
+    DAOContract = DAOInterface(daoAddress);
     erc20Address = DAOContract.getERC20();
     erc721Address = DAOContract.getERC721();
     roleManager = DAOContract.getRoleManager();
   }
 
 
-  function createDevice(string _name, uint _initValue) 
-  onlyOwner
+  function createDevice(string _name, uint _initValue)
   public
+  onlyOwner
   returns (address newContract)
   {
     newContract = new DepositDevice(_name,  msg.sender, _initValue, erc20Address ,erc721Address, erc20Address);
     return newContract;
   }
 
-  function kill() public {
-    if (msg.sender == Ownable.owner) selfdestruct(owner);
+  function kill()
+  public
+  onlyOwner
+  {
+    selfdestruct(owner());
   }
 
 }

@@ -22,4 +22,5 @@ contract DAOInterface {
 
   function getPricePerMB() public view returns(uint256);
 
+  function getRoleManager() public view returns(address);
 }

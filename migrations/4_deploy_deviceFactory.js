@@ -1,10 +1,11 @@
 const DeviceFactory = artifacts.require("DeviceFactory")
 const DAO = artifacts.require("DAO");
 
-module.exports = function (deployer, network, accounts) {
-    await DAO.deployed().then(function (instance) {
+module.exports = async function (deployer, network, accounts) {
+    await DAO.deployed()
+    .then(async function (instance) {
         dao = instance;
-        deployer.deploy(DeviceFactory, dao,  {from:accounts[0]})
+        await deployer.deploy(DeviceFactory, dao.address,  {from:accounts[0]})
         .then(async function (deviceFactory){
             console.log("Device Factory: " + deviceFactory.address);
         })
