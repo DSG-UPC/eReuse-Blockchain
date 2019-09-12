@@ -26,7 +26,7 @@ contract DeviceFactory is Ownable {
   onlyOwner
   returns (address newContract)
   {
-    newContract = new DepositDevice(_name,  msg.sender, _initValue, erc20Address ,erc721Address, erc20Address);
+    newContract = new DepositDevice(_name,  msg.sender, _initValue, erc20Address ,erc721Address, roleManager);
     return newContract;
   }
 
