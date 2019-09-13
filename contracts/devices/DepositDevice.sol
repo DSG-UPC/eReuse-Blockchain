@@ -4,16 +4,49 @@ import "../tokens/MyERC721.sol";
 import "contracts/tokens/EIP20Interface.sol";
 import "contracts/helpers/RoleManager.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "contracts/DAOInterface.sol";
+
 
 /**
  * @title Ereuse Device basic implementation
  */
-contract DepositDevice is Ownable{
+
+contract Offchainsig {
+
+    mapping(address=>uint256) internal nonces;
+
+    function nonceOf(address _owner)
+    public view returns (uint256) {
+        return nonces[_owner];
+    }
+
+    function _verify(
+        address _from,bytes memory _message,
+        bytes32 _r,bytes32 _s,uint8 _v
+    ) internal {
+        bytes32 hash = keccak256(abi.encodePacked(
+            byte(0x19),byte(0),
+            this,nonces[_from],
+            _message
+        ));
+
+        address from = ecrecover(hash,_v,_r,_s);
+        require(from==_from,"sender-address-does-not-match");
+        nonces[_from]++;
+    }
+
+}
+
+
+contract DepositDevice is Ownable, Offchainsig {
+    // parameters ----------------------------------------------------------------
     RoleManager roleManager;
     MyERC721 erc721;
     EIP20Interface erc20;
+    DAOInterface public DAOContract;
 
-    // Struct that mantains the basic values of the device
+    // types ----------------------------------------------------------------
+    //Struct that mantains the basic values of the device
     struct DevData {
         string name;
         uint256 uid;
@@ -22,24 +55,34 @@ contract DepositDevice is Ownable{
         address owner;
         uint state;
     }
+
+    // variables ----------------------------------------------------------------
     DevData data;
 
-    constructor (string _name, address _sender, uint _initialDeposit,  address _erc20,  address _erc721, address _roleManager )
+    constructor(string _name, address _sender, uint _initialDeposit, uint _daoAddress)
     public
     {
-        roleManager = RoleManager(_roleManager);
-        erc721 = MyERC721(_erc721);
-        erc20 = EIP20Interface(_erc20);
+        //daoAddress = _daoAddress;
+        DAOContract = DAOInterface(_daoAddress);
+        address erc20Address = DAOContract.getERC20();
+        address erc721Address = DAOContract.getERC721();
+        address roleManagerAddress = DAOContract.getRoleManager();
+        roleManager = RoleManager(roleManagerAddress);
+        erc721 = MyERC721(erc721Address);
+        erc20 = EIP20Interface(erc20Address);
         data.name = _name;
         data.owner = _sender;
         data.value = _initialDeposit;
         transferOwnership(_sender);
     }
 
-    function mint(address _to)
-    public
+    function mint(
+        address _to,
+        bytes32 _r, bytes32 _s, uint8 _v)
+    external
     onlyOwner
     {
+        _verify(msg.sender,abi.encodePacked(_to),_r,_s,_v);
         require(roleManager.isRepairer(_to), "The destination is not a consumer");
         erc20.transferFrom(msg.sender, address(this), data.value);
         erc721.mint(_to, uint256(address(this)));
@@ -47,21 +90,13 @@ contract DepositDevice is Ownable{
         transferOwnership(msg.sender);
     }
 
-    function _transfer(address _from, address _to, uint valueSent)
-    private
-    onlyOwner
-    {
-        require(_to != address(0), "The destination cannot be the 0 address");
-        erc721.transferFrom(_from, _to, data.uid);
-        erc20.transferFrom(_from, _to, valueSent);
-        transferOwnership(_to);
-        data.owner = _to;
-    }
-
-    function toRepair(address _to, uint benefit)
-    public
+    function toRepair(
+        address _to, uint benefit,
+        bytes32 _r, bytes32 _s, uint8 _v)
+    external
     onlyItad
     {
+        _verify(msg.sender,abi.encodePacked(_to, benefit),_r,_s,_v);
         require(roleManager.isRepairer(_to), "The destination is not a repairer");
         _transfer(msg.sender, _to, benefit);
     }
@@ -88,6 +123,20 @@ contract DepositDevice is Ownable{
         erc721.burn(msg.sender, data.uid);
     }
 
+    // internals ----------------------------------------------------------------
+
+    function _transfer(address _from, address _to, uint valueSent)
+    private
+    onlyOwner
+    {
+        require(_to != address(0), "The destination cannot be the 0 address");
+        erc721.transferFrom(_from, _to, data.uid);
+        erc20.transferFrom(_from, _to, valueSent);
+        transferOwnership(_to);
+        data.owner = _to;
+    }
+
+    // modifiers ----------------------------------------------------------------
 
     modifier onlyProducer{
         require(roleManager.isProducer(msg.sender), "This request was not originated by a Producer");
