@@ -11,6 +11,7 @@ contract RoleManager is Ownable{
     Role processors;
     Role repairers;
     Role itads;
+    Role notaries;
 
     constructor() public {
         consumers = new Role('comsumer');
@@ -18,7 +19,9 @@ contract RoleManager is Ownable{
         processors = new Role('processor');
         repairers = new Role('repairer');
         itads = new Role('itads');
+        notaries = new Role('notaries');
     }
+    // getters ----------------------------------------------------
 
     function getConsumers() public view returns (Role addr){
         return consumers;
@@ -39,8 +42,13 @@ contract RoleManager is Ownable{
     function getRepairers() public view returns (Role addr){
         return repairers;
     }
+
+    function getNotaries() public view returns (Role addr){
+        return notaries;
+    }
     //TODO Reduce code by add enums for the different Roels?
 
+    // add Member  ----------------------------------------------------
     function addProducer(address _producer) public onlyOwner {
         producers.addMember(_producer);
     }
@@ -61,6 +69,11 @@ contract RoleManager is Ownable{
         itads.addMember(_repairer);
     }
 
+    function addNotary(address _notary) public onlyOwner {
+        notaries.addMember(_notary);
+    }
+
+    // delete Member  ----------------------------------------------------
     function delProducer(address _producer) public onlyOwner {
         producers.delMember(_producer);
     }
@@ -81,6 +94,11 @@ contract RoleManager is Ownable{
         repairers.delMember(_repairer);
     }
 
+    function delNotary(address _notary) public onlyOwner {
+        notaries.delMember(_notary);
+    }
+
+    // check Member  ----------------------------------------------------
     function isProducer(address _producer) public view returns(bool) {
         return producers.isMember(_producer);
     }
@@ -99,6 +117,10 @@ contract RoleManager is Ownable{
 
     function isRepairer(address _repairer) public view returns(bool) {
         return repairers.isMember(_repairer);
+    }
+
+    function isNotary(address _notary) public view returns(bool) {
+        return notaries.isMember(_notary);
     }
 }
 

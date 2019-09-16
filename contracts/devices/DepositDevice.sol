@@ -68,6 +68,7 @@ contract DepositDevice is Ownable, Offchainsig {
         address erc721Address = DAOContract.getERC721();
         address roleManagerAddress = DAOContract.getRoleManager();
         roleManager = RoleManager(roleManagerAddress);
+        require(roleManager.isNotary(msg.sender), "This device contract was not created by a Notary");
         erc721 = MyERC721(erc721Address);
         erc20 = EIP20Interface(erc20Address);
         data.name = _name;
