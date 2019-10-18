@@ -14,7 +14,7 @@ contract RoleManager is Ownable{
     Role notaries;
 
     constructor() public {
-        consumers = new Role('comsumer');
+        consumers = new Role('consumer');
         producers = new Role('producer');
         processors = new Role('processor');
         repairers = new Role('repairer');
@@ -66,7 +66,7 @@ contract RoleManager is Ownable{
     }
 
     function addRepairer(address _repairer) public onlyOwner {
-        itads.addMember(_repairer);
+        repairers.addMember(_repairer);
     }
 
     function addNotary(address _notary) public onlyOwner {

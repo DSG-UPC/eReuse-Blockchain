@@ -22,7 +22,7 @@ contract("Basic test with three roles and one device", async function (accounts)
 
 
         price = 150;
-        OwnerAccount = accounts[0]
+        OwnerAccount = accounts[0];
         ProducerAccount = accounts[1];
         ConsumerAccount = accounts[2];
         RecyclerAccount = accounts[3];

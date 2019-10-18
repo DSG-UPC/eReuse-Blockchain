@@ -21,8 +21,8 @@ contract Offchainsig {
     }
 
     function _verify(
-        address _from,bytes memory _message,
-        bytes32 _r,bytes32 _s,uint8 _v
+        address _from, bytes memory _message,
+        bytes32 _r, bytes32 _s, uint8 _v
     ) internal {
         bytes32 hash = keccak256(abi.encodePacked(
             byte(0x19),byte(0),
@@ -34,9 +34,7 @@ contract Offchainsig {
         require(from==_from,"sender-address-does-not-match");
         nonces[_from]++;
     }
-
 }
-
 
 contract DepositDevice is Ownable, Offchainsig {
     // parameters ----------------------------------------------------------------
@@ -59,7 +57,7 @@ contract DepositDevice is Ownable, Offchainsig {
     // variables ----------------------------------------------------------------
     DevData data;
 
-    constructor(string _name, address _sender, uint _initialDeposit, uint _daoAddress)
+    constructor(string _name, address _sender, uint _initialDeposit, address _daoAddress)
     public
     {
         //daoAddress = _daoAddress;
@@ -68,13 +66,16 @@ contract DepositDevice is Ownable, Offchainsig {
         address erc721Address = DAOContract.getERC721();
         address roleManagerAddress = DAOContract.getRoleManager();
         roleManager = RoleManager(roleManagerAddress);
-        require(roleManager.isNotary(msg.sender), "This device contract was not created by a Notary");
         erc721 = MyERC721(erc721Address);
         erc20 = EIP20Interface(erc20Address);
         data.name = _name;
         data.owner = _sender;
         data.value = _initialDeposit;
         transferOwnership(_sender);
+    }
+
+    function getOwner() public view returns(address) {
+        return data.owner;
     }
 
     function mint(
@@ -84,7 +85,7 @@ contract DepositDevice is Ownable, Offchainsig {
     onlyOwner
     {
         _verify(msg.sender,abi.encodePacked(_to),_r,_s,_v);
-        require(roleManager.isRepairer(_to), "The destination is not a consumer");
+        require(roleManager.isConsumer(_to), "The destination is not a consumer");
         erc20.transferFrom(msg.sender, address(this), data.value);
         erc721.mint(_to, uint256(address(this)));
         data.uid = uint256(address(this));
@@ -112,7 +113,7 @@ contract DepositDevice is Ownable, Offchainsig {
     function toRecycle(address _to, uint benefit)
     public
     {
-        require(roleManager.isProcessor(_to), "The destination is not a a recycler");
+        require(roleManager.isProcessor(_to), "The destination is not a a processor");
         _transfer(msg.sender, _to, benefit);
     }
 

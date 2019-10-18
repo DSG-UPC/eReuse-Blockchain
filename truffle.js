@@ -13,7 +13,7 @@ module.exports = {
     staging: {
       provider: ganacheWeb3.currentProvider,
       network_id: "7775",
-      gas: 5876844,
+      gas: 6721975,
       //from: "",
     },
   },
