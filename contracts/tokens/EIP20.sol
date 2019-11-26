@@ -45,7 +45,7 @@ contract EIP20 is EIP20Interface, Ownable {
         require(balances[msg.sender] >= _value, "The sending account doesn't have enough funds");
         balances[msg.sender] -= _value;
         balances[_to] += _value;
-        // emit Transfer(msg.sender, _to, _value);
+        emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
@@ -64,7 +64,7 @@ contract EIP20 is EIP20Interface, Ownable {
         if (allowance < MAX_UINT256) {
             allowed[_from][msg.sender] -= _value;
         }
-        // emit Transfer(_from, _to, _value);
+        emit Transfer(_from, _to, _value);
         return true;
     }
 
@@ -74,7 +74,7 @@ contract EIP20 is EIP20Interface, Ownable {
 
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
-        // emit Approval(msg.sender, _spender, _value);
+        emit Approval(msg.sender, _spender, _value);
         return true;
     }
 

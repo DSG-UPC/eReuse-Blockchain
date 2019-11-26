@@ -8,6 +8,7 @@ contract DAO is Ownable {
   address public ERC721;
   address public RoleManager;
   address public OracleQuery;
+  address public DeviceFactory;
   address OracleResponse;
   address ReserveAccount;
   // uint256 public pricePerMB;
@@ -60,6 +61,14 @@ contract DAO is Ownable {
 
   function getRoleManager() public view returns (address) {
     return RoleManager;
+  }
+
+  function setDeviceFactory(address _address)  public onlyOwner {
+    DeviceFactory = _address;
+  }
+
+  function getDeviceFactory() public view returns (address) {
+    return DeviceFactory;
   }
 
 }

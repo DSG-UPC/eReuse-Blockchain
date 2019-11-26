@@ -1,6 +1,6 @@
 pragma solidity ^0.4.25;
 
-import "./DepositDevice.sol";
+import "contracts/devices/DepositDevice.sol";
 import "contracts/DAOInterface.sol";
 import "contracts/helpers/RoleManager.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -18,17 +18,36 @@ contract DeviceFactory {
     roleManager = RoleManager(roleManagerAddress);
   }
 
-  function createDevice(string _name, uint _initValue, address _owner)
-  public
-  returns (address newContract)
-  {
-    require(roleManager.isNotary(msg.sender), "This device contract was not created by a Notary");
+  function createDevice(string _name, uint _initValue, address _owner) public
+  returns (address newContract){
+    // require(roleManager.isNotary(msg.sender), "This device contract was not created by a Notary");
     newContract = new DepositDevice(_name,  _owner, _initValue, daoAddress);
     deployed_devices[_owner].push(newContract);
     return newContract;
   }
 
-  function getDeployedDevices() public view returns(address[]){
+  function transfer(address device) public{
+    DepositDevice d = DepositDevice(device);
+    address owner = d.getOwner();
+    d.transferDevice(msg.sender);
+    
+    deleteOwnership(owner, device);
+    deployed_devices[msg.sender].push(device);
+  }
+
+  function deleteOwnership(address owner, address device) internal{
+    uint length = deployed_devices[owner].length;
+    for(uint i = 0; i < length; i++){
+      if(deployed_devices[owner][i] == device){
+        deployed_devices[owner][i] = deployed_devices[owner][length - 1];
+        delete deployed_devices[owner][length - 1];
+        deployed_devices[owner].length--;
+        break;
+      }
+    }
+  }
+
+  function getDeployedDevices() public view returns(address[] devices){
     return deployed_devices[msg.sender];
   }
 
