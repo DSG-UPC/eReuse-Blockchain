@@ -5,6 +5,7 @@ import "contracts/tokens/EIP20Interface.sol";
 import "contracts/helpers/RoleManager.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "contracts/DAOInterface.sol";
+import "contracts/devices/DeliveryNote.sol";
 
 
 /**
@@ -48,12 +49,29 @@ contract DepositDevice is Ownable{
         _transferOwnership(_sender);
     }
 
-    function transferDevice(address _to) public{
+    function transferDevice(address _to)
+    public
+    onlyOwner
+    {
         // Return the deposit first of all
-        erc20.transfer(data.owner, data.deposit);
+        returnDeposit();
 
         data.owner = _to;
         _transferOwnership(_to);
+    }
+
+    function returnDeposit() public{
+        erc20.transfer(data.owner, data.deposit);
+    }
+
+    function addToDeliveryNote(address _deliveryNote)
+    public
+    onwlyOwner
+    {
+        DeliveryNote devNote = DeliveryNote(_deliveryNote);
+        devNote.addDevice(address(this), this.owner, deposit);
+        _transferOwnership(_deliveryNote);
+
     }
 
     function getOwner() public view returns(address) {
