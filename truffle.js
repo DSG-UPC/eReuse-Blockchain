@@ -9,6 +9,7 @@ module.exports = {
       host: "localhost",
       port: 8545,
       network_id: "*",
+      gas: 6721975,
     },
     staging: {
       provider: ganacheWeb3.currentProvider,

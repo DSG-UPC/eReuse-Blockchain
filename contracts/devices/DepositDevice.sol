@@ -5,7 +5,7 @@ import "contracts/tokens/EIP20Interface.sol";
 import "contracts/helpers/RoleManager.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "contracts/DAOInterface.sol";
-import "contracts/devices/DeliveryNote.sol";
+import "contracts/devices/DeliveryNoteInterface.sol";
 
 
 /**
@@ -32,6 +32,11 @@ contract DepositDevice is Ownable{
 
     // variables ----------------------------------------------------------------
     DevData data;
+
+
+    // events ----------------------------------------------------------------
+    event TestEv(address test);
+
 
     constructor(string _name, address _sender, uint _initialDeposit, address _daoAddress)
     public
@@ -66,12 +71,11 @@ contract DepositDevice is Ownable{
 
     function addToDeliveryNote(address _deliveryNote)
     public
-    onwlyOwner
+    onlyOwner
     {
-        DeliveryNote devNote = DeliveryNote(_deliveryNote);
-        devNote.addDevice(address(this), this.owner, deposit);
+        DeliveryNoteInterface devNote = DeliveryNoteInterface(_deliveryNote);
+        devNote.addDevice(address(this), this.owner(), data.deposit);
         _transferOwnership(_deliveryNote);
-
     }
 
     function getOwner() public view returns(address) {
