@@ -80,7 +80,7 @@ contract("Basic test with two owners and two device", async function (accounts) 
         device_addresses = await factory.getDeployedDevices({ from: accs.ownerA }).then(devices => {
             return devices;
         });
-        console.log(`Device addresses ${device_addresses}`);
+        // console.log(`Device addresses ${device_addresses}`);
 
 
         delivery_note = await DeliveryNote.new(accs.ownerB, dao.address, { from: accs.ownerA });
@@ -102,7 +102,17 @@ contract("Basic test with two owners and two device", async function (accounts) 
 
         /// ACCEPTING THE DELIVERY NOTE ///
 
-        // await delivery_note.acceptDeliveryNote({ from: accs.ownerB });
+        
+        console.log('Before accept delivery note');
+        await printBalances(erc20, accs);
+
+        await delivery_note.acceptDeliveryNote({ from: accs.ownerB });
+        devicesB = await factory.getDeployedDevices({ from: accs.ownerB });
+        console.log(devicesB);
+
+        console.log('Before accept delivery note');
+
+        await printBalances(erc20, accs);
 
     });
 
