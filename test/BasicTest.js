@@ -55,7 +55,7 @@ contract("Basic test with two owners and two device", async function (accounts) 
 
     // });
 
-    it("New device is created and ownerA transfers to ownerB (without delivery note)", async function () {
+    it("New device is created and ownerA transfers to ownerB through DeliveryNote)", async function () {
 
         price = 10;
 
