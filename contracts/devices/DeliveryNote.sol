@@ -4,10 +4,8 @@ import "contracts/devices/DepositDevice.sol";
 import "contracts/DAOInterface.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "contracts/tokens/EIP20Interface.sol";
-// import "contracts/devices/DeliveryNoteInterface.sol";
 
-// contract DeliveryNote is DeliveryNoteInterface,Ownable {
-    contract DeliveryNote is Ownable {
+contract DeliveryNote is Ownable {
     
     /*   Interfaces  */
     EIP20Interface erc20;
@@ -24,7 +22,7 @@ import "contracts/tokens/EIP20Interface.sol";
 
     /*   Events  */
     event DeviceAdded( address indexed _device);
-    event NoteEmitted(uint256 _deposit);
+    event NoteEmitted(string concept, uint256 _deposit);
 
 
     constructor(address _receiver, address _daoAddress)
@@ -59,7 +57,15 @@ import "contracts/tokens/EIP20Interface.sol";
     onlyOwner 
     {
         state = 1;
-        emit NoteEmitted(deposit);
+        emit NoteEmitted("Transfer", deposit);
+    }
+
+    function emitRecycleNote()
+    public
+    onlyOwner 
+    {
+        state = 2;
+        emit NoteEmitted("Recycle", 0);
     }
 
     function acceptDeliveryNote()
@@ -68,6 +74,14 @@ import "contracts/tokens/EIP20Interface.sol";
         require(state == 1, "The current Delivery Note cannot be accepted if it has not been sent yet.");
         require(msg.sender == receiver, "Only the originally defined receiver can accept a Delivery Note.");
         erc20.transferFrom(msg.sender, address(this), deposit);
+        transferDevices();
+    }
+
+    function acceptRecycling()
+    public
+    {
+        require(state == 2, "The current Delivery Note cannot be accepted if it has not been sent yet.");
+        require(msg.sender == receiver, "Only the originally defined receiver can accept a Delivery Note.");
         transferDevices();
     }
 
@@ -88,7 +102,11 @@ import "contracts/tokens/EIP20Interface.sol";
     {
         erc20.transfer(_device, _deposit);
         DepositDevice device = DepositDevice(_device);
-        device.transferDevice(receiver);
+        device.transferDevice(receiver, _deposit);
+    }
+
+    function kill() internal onlyOwner {
+        selfdestruct(msg.sender);
     }
 }
 

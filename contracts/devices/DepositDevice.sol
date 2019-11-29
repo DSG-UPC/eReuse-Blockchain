@@ -6,6 +6,7 @@ import "contracts/helpers/RoleManager.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "contracts/DAOInterface.sol";
 import "contracts/devices/DeliveryNoteInterface.sol";
+import "contracts/devices/DeviceFactoryInterface.sol";
 
 
 /**
@@ -18,6 +19,7 @@ contract DepositDevice is Ownable{
     MyERC721 erc721;
     EIP20Interface erc20;
     DAOInterface public DAOContract;
+    DeviceFactoryInterface factory;
 
     // types ----------------------------------------------------------------
     //Struct that mantains the basic values of the device
@@ -45,16 +47,18 @@ contract DepositDevice is Ownable{
         address erc20Address = DAOContract.getERC20();
         address erc721Address = DAOContract.getERC721();
         address roleManagerAddress = DAOContract.getRoleManager();
+        address d_factory = DAOContract.getDeviceFactory();
         roleManager = RoleManager(roleManagerAddress);
         erc721 = MyERC721(erc721Address);
         erc20 = EIP20Interface(erc20Address);
+        factory = DeviceFactoryInterface(d_factory);
         data.name = _name;
         data.owner = _sender;
         data.deposit = _initialDeposit;
         _transferOwnership(_sender);
     }
 
-    function transferDevice(address _to)
+    function transferDevice(address _to, uint _new_deposit)
     public
     onlyOwner
     {
@@ -62,6 +66,8 @@ contract DepositDevice is Ownable{
         returnDeposit();
 
         data.owner = _to;
+        data.deposit = _new_deposit;
+        factory.transfer(data.owner);
         transferOwnership(_to);
     }
 
@@ -75,7 +81,7 @@ contract DepositDevice is Ownable{
     {
         DeliveryNoteInterface devNote = DeliveryNoteInterface(_deliveryNote);
         devNote.addDevice(address(this), this.owner(), data.deposit);
-        
+
         data.owner = _deliveryNote;
         transferOwnership(_deliveryNote);
     }

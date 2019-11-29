@@ -26,13 +26,12 @@ contract DeviceFactory {
     return newContract;
   }
 
-  function transfer(address device) public{
-    DepositDevice d = DepositDevice(device);
+  function transfer(address _new_owner) public{
+    DepositDevice d = DepositDevice(msg.sender);
     address owner = d.getOwner();
-    d.transferDevice(msg.sender);
     
-    deleteOwnership(owner, device);
-    deployed_devices[msg.sender].push(device);
+    deleteOwnership(owner, msg.sender);
+    deployed_devices[_new_owner].push(msg.sender);
   }
 
   function deleteOwnership(address owner, address device) internal{
