@@ -62,7 +62,7 @@ contract DepositDevice is Ownable{
         returnDeposit();
 
         data.owner = _to;
-        _transferOwnership(_to);
+        transferOwnership(_to);
     }
 
     function returnDeposit() public{
@@ -75,7 +75,9 @@ contract DepositDevice is Ownable{
     {
         DeliveryNoteInterface devNote = DeliveryNoteInterface(_deliveryNote);
         devNote.addDevice(address(this), this.owner(), data.deposit);
-        _transferOwnership(_deliveryNote);
+        
+        data.owner = _deliveryNote;
+        transferOwnership(_deliveryNote);
     }
 
     function getOwner() public view returns(address) {

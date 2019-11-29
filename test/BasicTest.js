@@ -65,7 +65,7 @@ contract("Basic test with two owners and two device", async function (accounts) 
         };
         console.log(`OnwerA: ${accs['ownerA']}`);
         console.log(`OnwerB: ${accs['ownerB']}`);
-        
+
 
         token = await MyERC721.deployed();
         erc20 = await ERC20.deployed();
@@ -88,9 +88,11 @@ contract("Basic test with two owners and two device", async function (accounts) 
 
         delivery_note = await DeliveryNote.new(accs.ownerB, dao.address, { from: accs.ownerA });
         console.log(`Delivery Note: ${delivery_note.address}`);
-        // console.log(`Delivery note ${JSON.stringify(delivery_note)}`);
 
         /// ADDING EACH DEVICE TO THE NEW DELIVERY NOTE ///
+
+        console.log('Owners before adding to delivery note');
+        await printDeviceOwners(device_addresses);
 
         for (let addr of device_addresses) {
             let device_instance = await DepositDevice.at(addr);
@@ -105,7 +107,7 @@ contract("Basic test with two owners and two device", async function (accounts) 
 
         /// ACCEPTING THE DELIVERY NOTE ///
 
-        
+
         console.log('Before accept delivery note');
         await printBalances(erc20, accs);
         await printDeviceOwners(device_addresses);
@@ -132,8 +134,8 @@ async function printBalances(erc20, accounts) {
 
 async function printDeviceOwners(devices) {
     for (let i in devices) {
-        let device = await DepositDevice.at(devices[i])
-        let owner =  await device.getOwner.call()
+        let device = await DepositDevice.at(devices[i]);
+        let owner = await device.owner.call();
         console.log(`Device: ${devices[i]}\tOwner:${owner}`);
     }
 }

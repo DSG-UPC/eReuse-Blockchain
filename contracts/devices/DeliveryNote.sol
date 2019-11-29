@@ -40,14 +40,6 @@ import "contracts/tokens/EIP20Interface.sol";
         deposit = 0 ;
     }
 
-    function test()
-    public
-    view
-    returns(address)
-    {
-        return receiver;
-    }
-
     function addDevice(address _device, address _owner, uint256 _deposit)
     public
     {
@@ -96,7 +88,7 @@ import "contracts/tokens/EIP20Interface.sol";
     {
         erc20.transfer(_device, _deposit);
         DepositDevice device = DepositDevice(_device);
-        device.transferDevice(sender);
+        device.transferDevice(receiver);
     }
 }
 
