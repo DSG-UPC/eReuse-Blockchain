@@ -60,29 +60,33 @@ contract DeliveryNote is Ownable {
         emit NoteEmitted("Transfer", deposit);
     }
 
-    function emitRecycleNote()
-    public
-    onlyOwner 
-    {
-        state = 2;
-        emit NoteEmitted("Recycle", 0);
-    }
-
     function acceptDeliveryNote()
     public
+    onlyReceiver
+    validState(1)
     {
-        require(state == 1, "The current Delivery Note cannot be accepted if it has not been sent yet.");
-        require(msg.sender == receiver, "Only the originally defined receiver can accept a Delivery Note.");
         erc20.transferFrom(msg.sender, address(this), deposit);
         transferDevices();
     }
 
-    function acceptRecycling()
+    function acceptRecycle()
     public
+    onlyOwner
     {
-        require(state == 2, "The current Delivery Note cannot be accepted if it has not been sent yet.");
-        require(msg.sender == receiver, "Only the originally defined receiver can accept a Delivery Note.");
-        transferDevices();
+        state = 2;
+        emit NoteEmitted("Transfer", deposit);
+    }
+
+    function recycleDevices()
+    internal
+    validState(2)
+    {
+        while(num_devices > 0){
+            address current_device = devices[num_devices-1];
+            recycleDevice(current_device);
+            delete devices[num_devices-1];
+            num_devices--;
+        }
     }
 
     function transferDevices()
@@ -105,8 +109,27 @@ contract DeliveryNote is Ownable {
         device.transferDevice(receiver, _deposit);
     }
 
+    function recycleDevice(address _device)
+    internal
+    {
+        DepositDevice device = DepositDevice(_device);
+        device.recycle(msg.sender);
+    }
+
     function kill() internal onlyOwner {
         selfdestruct(msg.sender);
     }
-}
 
+
+    ///// ############     MODIFIERS     ########## ///////
+
+    modifier validState(uint _state){
+        require(state == _state, "The current Delivery Note is not the valid state.");
+        _;
+    }
+
+    modifier onlyReceiver(){
+        require(msg.sender == receiver, "Only the originally defined receiver can accept a Delivery Note.");
+        _;
+    }
+}

@@ -98,84 +98,10 @@ contract DepositDevice is Ownable{
         return data.deposit;
     }
 
-    function mint(address _to)
-    public
-    onlyOwner
-    {
-        require(roleManager.isConsumer(_to), "The destination is not a consumer");
-        erc20.transferFrom(msg.sender, address(this), data.deposit);
-        erc721.mint(_to, uint256(address(this)));
-        data.uid = uint256(address(this));
-        _transferOwnership(msg.sender);
-    }
-
-    function toRepair(address _to, uint benefit)
-    public
-    onlyItad
-    {
-        require(roleManager.isRepairer(_to), "The destination is not a repairer");
-        _transfer(msg.sender, _to, benefit);
-    }
-
-    function toItad(address _to, uint benefit)
+    function recycle(address _owner)
     public
     {
-        require(roleManager.isItad(_to),  "The destination is not an itad");
-        _transfer(msg.sender, _to, benefit);
-    }
-
-    function toRecycle(address _to, uint benefit)
-    public
-    {
-        require(roleManager.isProcessor(_to), "The destination is not a a processor");
-        _transfer(msg.sender, _to, benefit);
-    }
-
-    function recycle()
-    public
-    onlyItad
-    {
-        erc20.transferFrom(address(this), msg.sender, address(this).balance);
-        erc721.burn(msg.sender, data.uid);
-    }
-
-    // internals ----------------------------------------------------------------
-
-    function _transfer(address _from, address _to, uint valueSent)
-    private
-    onlyOwner
-    {
-        require(_to != address(0), "The destination cannot be the 0 address");
-        erc721.transferFrom(_from, _to, data.uid);
-        erc20.transferFrom(_from, _to, valueSent);
-        _transferOwnership(_to);
-        data.owner = _to;
-    }
-
-    // modifiers ----------------------------------------------------------------
-
-    modifier onlyProducer{
-        require(roleManager.isProducer(msg.sender), "This request was not originated by a Producer");
-        _;
-    }
-
-    modifier onlyConsumer{
-        require(roleManager.isConsumer(msg.sender), "This request was not originated by a Consumer");
-        _;
-    }
-
-    modifier onlyProcessor{
-        require(roleManager.isProcessor(msg.sender), "This request was not originated by a Processor");
-        _;
-    }
-
-    modifier onlyRepairer() {
-        require(roleManager.isRepairer(msg.sender), "This request was not originated by a Repairer");
-        _;
-    }
-
-    modifier onlyItad() {
-        require(roleManager.isItad(msg.sender), "This request was not originated by a Repairer");
-        _;
+        require(data.owner == _owner, "Only owner can recycle the device.");
+        returnDeposit();
     }
 }
