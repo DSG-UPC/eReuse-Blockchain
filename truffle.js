@@ -1,5 +1,6 @@
 const web3 = require('./web3');
 const ganacheWeb3 = require('./ganache-web3')
+// require('mocha-steps') // For sequential 'it' functions
 
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
@@ -23,5 +24,9 @@ module.exports = {
       //version: "./node_modules/solc",
       version: '0.4.25',
     }
-  }
+  },
+  mocha: {
+    useColors: true,
+    // require: 'mocha-steps'
+  },
 };
