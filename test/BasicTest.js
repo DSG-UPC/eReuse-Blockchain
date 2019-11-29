@@ -63,6 +63,9 @@ contract("Basic test with two owners and two device", async function (accounts) 
             'ownerA': accounts[1],
             'ownerB': accounts[2]
         };
+        console.log(`OnwerA: ${accs['ownerA']}`);
+        console.log(`OnwerB: ${accs['ownerB']}`);
+        
 
         token = await MyERC721.deployed();
         erc20 = await ERC20.deployed();
@@ -84,7 +87,7 @@ contract("Basic test with two owners and two device", async function (accounts) 
 
 
         delivery_note = await DeliveryNote.new(accs.ownerB, dao.address, { from: accs.ownerA });
-
+        console.log(`Delivery Note: ${delivery_note.address}`);
         // console.log(`Delivery note ${JSON.stringify(delivery_note)}`);
 
         /// ADDING EACH DEVICE TO THE NEW DELIVERY NOTE ///
