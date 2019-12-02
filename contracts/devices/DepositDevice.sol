@@ -72,7 +72,9 @@ contract DepositDevice is Ownable{
     }
 
     function returnDeposit() public{
-        erc20.transfer(data.owner, data.deposit);
+        if (data.deposit > 0){
+            erc20.transfer(data.owner, data.deposit);
+        }
     }
 
     function addToDeliveryNote(address _deliveryNote)

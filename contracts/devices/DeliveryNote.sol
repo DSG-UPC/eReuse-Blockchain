@@ -60,13 +60,36 @@ contract DeliveryNote is Ownable {
         emit NoteEmitted("Transfer", deposit);
     }
 
-    function acceptDeliveryNote()
+    function acceptDeliveryNote(uint _deposit)
     public
     onlyReceiver
     validState(1)
     {
+        deposit = _deposit;
         erc20.transferFrom(msg.sender, address(this), deposit);
         transferDevices();
+    }
+
+    function transferDevices()
+    internal
+    {
+        uint deposit_per_device = deposit / num_devices;
+        while(num_devices > 0){
+            address current_device = devices[num_devices-1];
+            transferDevice(current_device, deposit_per_device);
+            delete devices[num_devices-1];
+            num_devices--;
+        }
+    }
+
+    function transferDevice(address _device, uint _deposit)
+    internal
+    {
+        if (_deposit > 0){
+            erc20.transfer(_device, _deposit);
+        }
+        DepositDevice device = DepositDevice(_device);
+        device.transferDevice(receiver, _deposit);
     }
 
     function acceptRecycle()
@@ -87,26 +110,6 @@ contract DeliveryNote is Ownable {
             delete devices[num_devices-1];
             num_devices--;
         }
-    }
-
-    function transferDevices()
-    internal
-    {
-        uint deposit_per_device = deposit / num_devices;
-        while(num_devices > 0){
-            address current_device = devices[num_devices-1];
-            transferDevice(current_device, deposit_per_device);
-            delete devices[num_devices-1];
-            num_devices--;
-        }
-    }
-
-    function transferDevice(address _device, uint _deposit)
-    internal
-    {
-        erc20.transfer(_device, _deposit);
-        DepositDevice device = DepositDevice(_device);
-        device.transferDevice(receiver, _deposit);
     }
 
     function recycleDevice(address _device)
