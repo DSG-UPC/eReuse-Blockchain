@@ -30,14 +30,14 @@ contract DeviceFactory {
     DepositDevice d = DepositDevice(msg.sender);
     address owner = d.getOwner();
     
-    deleteOwnership(owner, msg.sender);
+    deleteOwnership(owner);
     deployed_devices[_new_owner].push(msg.sender);
   }
 
-  function deleteOwnership(address owner, address device) internal{
+  function deleteOwnership(address owner) internal{
     uint length = deployed_devices[owner].length;
     for(uint i = 0; i < length; i++){
-      if(deployed_devices[owner][i] == device){
+      if(deployed_devices[owner][i] == msg.sender){
         deployed_devices[owner][i] = deployed_devices[owner][length - 1];
         delete deployed_devices[owner][length - 1];
         deployed_devices[owner].length--;
@@ -46,7 +46,12 @@ contract DeviceFactory {
     }
   }
 
-  function getDeployedDevices() public view returns(address[] devices){
+  function recycle(address _owner) public{
+    deleteOwnership(_owner);
+  }
+
+  function getDeployedDevices() public view
+  returns(address[] _deployed_devices){
     return deployed_devices[msg.sender];
   }
 

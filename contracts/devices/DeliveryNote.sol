@@ -38,12 +38,19 @@ contract DeliveryNote is Ownable {
         deposit = 0 ;
     }
 
+    function getNumDevices() public view returns(uint _num_devices){
+        return num_devices;
+    }
+
     function addDevice(address _device, address _owner, uint256 _deposit)
     public
     {
-        require(_device == msg.sender, "The device itelf has to initiate the transaction.");
-        require(this.owner() == _owner, "Device that belong to onwers other that the DeliveryNote owner cannot be added.");
-        require(!devicesAdded[_device], "This device has already been added to the current Delivery Note.");
+        require(_device == msg.sender,
+                "The device itelf has to initiate the transaction.");
+        require(this.owner() == _owner,
+                "The received owner is not the real device owner");
+        require(!devicesAdded[_device],
+                "This device has already been added to the current Delivery Note.");
         devices.push(_device);
         devicesAdded[_device] = true;
         num_devices++;
@@ -54,7 +61,8 @@ contract DeliveryNote is Ownable {
 
     function emitDeliveryNote()
     public
-    onlyOwner 
+    onlyOwner
+    validState(0)
     {
         state = 1;
         emit NoteEmitted("Transfer", deposit);
@@ -74,11 +82,9 @@ contract DeliveryNote is Ownable {
     internal
     {
         uint deposit_per_device = deposit / num_devices;
-        while(num_devices > 0){
-            address current_device = devices[num_devices-1];
+        for(uint i = 0; i < num_devices; i++){
+            address current_device = devices[i];
             transferDevice(current_device, deposit_per_device);
-            delete devices[num_devices-1];
-            num_devices--;
         }
     }
 
@@ -94,14 +100,16 @@ contract DeliveryNote is Ownable {
 
     function acceptRecycle()
     public
-    onlyOwner
+    onlyReceiver
     {
         state = 2;
-        emit NoteEmitted("Transfer", deposit);
+        emit NoteEmitted("Recycle", deposit);
+        recycleDevices();
     }
 
     function recycleDevices()
     internal
+    onlyReceiver
     validState(2)
     {
         while(num_devices > 0){
@@ -110,6 +118,7 @@ contract DeliveryNote is Ownable {
             delete devices[num_devices-1];
             num_devices--;
         }
+        // kill();
     }
 
     function recycleDevice(address _device)
@@ -132,7 +141,8 @@ contract DeliveryNote is Ownable {
     }
 
     modifier onlyReceiver(){
-        require(msg.sender == receiver, "Only the originally defined receiver can accept a Delivery Note.");
+        require(msg.sender == receiver,
+                "Only the originally defined receiver can accept a Delivery Note.");
         _;
     }
 }

@@ -5,6 +5,7 @@ contract DeviceFactoryInterface {
     address public daoAddress;
 
     function transfer(address _new_owner) public;
-    function deleteOwnership(address owner, address device) internal;
+    function deleteOwnership(address owner) internal;
     function createDevice(string _name, uint _initValue, address _owner) public returns (address newContract);
+    function recycle(address _owner) public;
 }

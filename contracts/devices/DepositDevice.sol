@@ -74,6 +74,7 @@ contract DepositDevice is Ownable{
     function returnDeposit() public{
         if (data.deposit > 0){
             erc20.transfer(data.owner, data.deposit);
+            data.deposit = 0;
         }
     }
 
@@ -105,5 +106,11 @@ contract DepositDevice is Ownable{
     {
         require(data.owner == _owner, "Only owner can recycle the device.");
         returnDeposit();
+        factory.recycle(_owner);
+        // kill();
+    }
+
+    function kill() internal{
+        selfdestruct(msg.sender);
     }
 }

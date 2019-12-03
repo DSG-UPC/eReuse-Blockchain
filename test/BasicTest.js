@@ -17,7 +17,8 @@ const network = argv.network;
 
 contract("Basic test with two owners and two device", function (accounts) {
     const price = 10;
-    var erc20, dao, factory, delivery_note, device_addresses, deviceA, deviceB, devices, deposit_to_pay;
+    var erc20, dao, factory, delivery_note, device_addresses, deviceA, deviceB,
+        devices, deposit_to_pay;
 
     /// INITIALIZE ACCOUNTS ///
     const accs = {
@@ -39,7 +40,10 @@ contract("Basic test with two owners and two device", function (accounts) {
         console.log('\n\tTransfering Tokens...');
         /// TRANSFER TOKENS TO THE PARTICIPANTS
         for (let i in Object.values(accs)) {
-            await erc20.transfer(Object.values(accs)[i], 2 * price, { from: accounts[0] });
+            await erc20.transfer(Object.values(accs)[i], 2 * price,
+                {
+                    from: accounts[0]
+                });
         }
         await printOwnersBalances(erc20, accs);
     });
@@ -48,9 +52,10 @@ contract("Basic test with two owners and two device", function (accounts) {
         // console.log(`\t***Creates 2 devices and assigns them to msg.sender***`);
         await factory.createDevice("deviceA", 0, accs.ownerA);
         await factory.createDevice("deviceB", 0, accs.ownerA);
-        device_addresses = await factory.getDeployedDevices({ from: accs.ownerA }).then(devices => {
-            return devices;
-        });
+        device_addresses = await factory.getDeployedDevices(
+            { from: accs.ownerA }).then(devices => {
+                return devices;
+            });
         deviceA = await DepositDevice.at(device_addresses[0]);
         deviceB = await DepositDevice.at(device_addresses[1]);
         devices = {
@@ -60,7 +65,8 @@ contract("Basic test with two owners and two device", function (accounts) {
         // console.log(Object.keys(devices).length);
 
 
-        assert.equal(device_addresses.length, Object.keys(devices).length, "Devices length differ");
+        assert.equal(device_addresses.length, Object.keys(devices).length,
+            "Devices length differ");
         for (let i in devices) {
             // Check Device owner is OwnerA
             assert.equal(accs.ownerA, await devices[i].owner.call());
@@ -73,7 +79,8 @@ contract("Basic test with two owners and two device", function (accounts) {
 
     it("OwnerA transfers devices to DeliveryNote and emits it", async function () {
         /// CREATE FIRST DELIVERY NOTE
-        delivery_note = await DeliveryNote.new(accs.ownerB, dao.address, { from: accs.ownerA });
+        delivery_note = await DeliveryNote.new(accs.ownerB, dao.address,
+            { from: accs.ownerA });
         console.log(`\tDelivery Note: ${delivery_note.address}`);
 
         /// ADDING EACH DEVICE TO THE NEW DELIVERY NOTE ///
@@ -82,8 +89,8 @@ contract("Basic test with two owners and two device", function (accounts) {
 
         for (let addr of device_addresses) {
             let device_instance = await DepositDevice.at(addr);
-            // console.log(delivery_note.address, accs.ownerA);
-            await device_instance.addToDeliveryNote(delivery_note.address, { from: accs.ownerA, gas: 500000 });
+            await device_instance.addToDeliveryNote(delivery_note.address,
+                { from: accs.ownerA, gas: 500000 });
         }
 
         /// CREATING AND EMITTING THE DELIVERY NOTE ///
@@ -104,7 +111,6 @@ contract("Basic test with two owners and two device", function (accounts) {
         await printDeviceOwners(device_addresses);
 
         await delivery_note.acceptDeliveryNote(deposit_to_pay, { from: accs.ownerB });
-        // devicesB = await factory.getDeployedDevices({ from: accs.ownerB });
 
         console.log('\tAfter accept delivery note');
 
@@ -119,13 +125,41 @@ contract("Basic test with two owners and two device", function (accounts) {
             assert.equal(deviceTokens, price);
         }
         let ownerBTokens = web3.utils.toDecimal(await erc20.balanceOf(accs.ownerB));
-        console.log(20 - price * Object.keys(devices).length);
 
         // Check ownerB does not have the spent tokens
         assert.equal(ownerBTokens, 20 - price * Object.keys(devices).length);
-        
+
         await printOwnersBalances(erc20, accs);
         await printDevicesBalances(erc20, devices);
+        await printDeviceOwners(device_addresses);
+    });
+
+    it("Recycles the devices", async function () {
+        console.log('\tBefore accepting the recycling');
+        await printOwnersBalances(erc20, accs);
+        await printDeviceOwners(device_addresses);
+
+        await delivery_note.acceptRecycle({ from: accs.ownerB });
+
+        console.log('\n\tAfter accept recycling of devices');
+
+        await printDeviceOwners(device_addresses);
+
+        for (let i in accs) {
+            let deployed_devs = await factory.getDeployedDevices(
+                { from: accs[i] }).then(d => {
+                    return d;
+                });
+            assert.equal(deployed_devs.length, 0,
+                "Every owner should have 0 deployed devices");
+        }
+        let ownerBTokens = await web3.utils.toDecimal(await erc20.balanceOf(accs.ownerB));
+        console.log(ownerBTokens);
+
+        // Check ownerB does not have the spent tokens
+        assert.equal(ownerBTokens, price * Object.keys(devices).length);
+
+        await printOwnersBalances(erc20, accs);
         await printDeviceOwners(device_addresses);
     });
 
