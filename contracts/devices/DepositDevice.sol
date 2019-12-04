@@ -65,9 +65,9 @@ contract DepositDevice is Ownable{
         // Return the deposit first of all
         returnDeposit();
 
+        factory.transfer(_to);
         data.owner = _to;
         data.deposit = _new_deposit;
-        factory.transfer(data.owner);
         transferOwnership(_to);
     }
 
@@ -84,8 +84,6 @@ contract DepositDevice is Ownable{
     {
         DeliveryNoteInterface devNote = DeliveryNoteInterface(_deliveryNote);
         devNote.addDevice(address(this), this.owner(), data.deposit);
-
-        data.owner = _deliveryNote;
         transferOwnership(_deliveryNote);
     }
 
@@ -104,10 +102,10 @@ contract DepositDevice is Ownable{
     function recycle(address _owner)
     public
     {
-        require(data.owner == _owner, "Only owner can recycle the device.");
+        require(this.owner() == msg.sender, "Only owner can recycle the device.");
         returnDeposit();
         factory.recycle(_owner);
-        // kill();
+        kill();
     }
 
     function kill() internal{

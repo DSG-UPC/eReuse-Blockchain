@@ -26,6 +26,7 @@ contract("Basic test with two owners and two device", function (accounts) {
         'ownerB': accounts[2],
         'ownerC': accounts[3],
         'ownerD': accounts[4],
+        'recycler': accounts[5]
     };
     console.log('');
     Object.keys(accs).map(a => { console.log(`${a}: ${accs[a]}`); });
@@ -134,16 +135,40 @@ contract("Basic test with two owners and two device", function (accounts) {
         await printDeviceOwners(device_addresses);
     });
 
-    it("Recycles the devices", async function () {
+    it("Creates delivery note and recycles the devices", async function () {
         console.log('\tBefore accepting the recycling');
         await printOwnersBalances(erc20, accs);
         await printDeviceOwners(device_addresses);
+
+        delivery_note = await DeliveryNote.new(accs.recycler, dao.address,
+            { from: accs.ownerB });
+
+        console.log(`\n\tDelivery Note: ${delivery_note.address}`);
+
+        for (let addr of device_addresses) {
+            let device_instance = await DepositDevice.at(addr);
+            await device_instance.addToDeliveryNote(delivery_note.address,
+                { from: accs.ownerB, gas: 500000 });
+        }
 
         await delivery_note.acceptRecycle({ from: accs.ownerB });
 
         console.log('\n\tAfter accept recycling of devices');
 
-        await printDeviceOwners(device_addresses);
+        let counter_errors = 0;
+        for (let addr of device_addresses) {
+            try{
+                // We try to create instance of the devices
+                // with the already known address.
+                await DepositDevice.at(addr);
+
+            } catch(error){
+                // As the devices were removed from BC, this
+                // will raise an error.
+                counter_errors++;
+            }
+        }
+        assert.equal(counter_errors, 2, "The devices no longer belong to Blockchain");
 
         for (let i in accs) {
             let deployed_devs = await factory.getDeployedDevices(
@@ -151,16 +176,14 @@ contract("Basic test with two owners and two device", function (accounts) {
                     return d;
                 });
             assert.equal(deployed_devs.length, 0,
-                "Every owner should have 0 deployed devices");
+                `${i} should have 0 deployed devices`);
         }
         let ownerBTokens = await web3.utils.toDecimal(await erc20.balanceOf(accs.ownerB));
-        console.log(ownerBTokens);
 
         // Check ownerB does not have the spent tokens
         assert.equal(ownerBTokens, price * Object.keys(devices).length);
 
         await printOwnersBalances(erc20, accs);
-        await printDeviceOwners(device_addresses);
     });
 
 });

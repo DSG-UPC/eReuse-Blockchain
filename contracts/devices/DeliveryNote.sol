@@ -82,9 +82,11 @@ contract DeliveryNote is Ownable {
     internal
     {
         uint deposit_per_device = deposit / num_devices;
-        for(uint i = 0; i < num_devices; i++){
-            address current_device = devices[i];
+        while(num_devices > 0){
+            address current_device = devices[num_devices-1];
             transferDevice(current_device, deposit_per_device);
+            delete devices[num_devices-1];
+            num_devices--;
         }
     }
 
@@ -100,7 +102,8 @@ contract DeliveryNote is Ownable {
 
     function acceptRecycle()
     public
-    onlyReceiver
+    onlyOwner
+    validState(0)
     {
         state = 2;
         emit NoteEmitted("Recycle", deposit);
@@ -109,7 +112,6 @@ contract DeliveryNote is Ownable {
 
     function recycleDevices()
     internal
-    onlyReceiver
     validState(2)
     {
         while(num_devices > 0){
@@ -128,12 +130,13 @@ contract DeliveryNote is Ownable {
         device.recycle(msg.sender);
     }
 
-    function kill() internal onlyOwner {
+    function kill() internal onlyOwner
+    {
         selfdestruct(msg.sender);
     }
 
 
-    ///// ############     MODIFIERS     ########## ///////
+    /*   Modifiers  */
 
     modifier validState(uint _state){
         require(state == _state, "The current Delivery Note is not the valid state.");
