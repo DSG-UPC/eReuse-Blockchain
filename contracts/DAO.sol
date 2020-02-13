@@ -112,5 +112,4 @@ contract DAO is Ownable {
     function getDisposalProofs() public view returns (address) {
         return DisposalProofs;
     }
-
 }

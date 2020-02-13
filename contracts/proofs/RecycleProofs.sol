@@ -24,13 +24,13 @@ contract RecycleProofs is GenericProof {
     }
 
     function setProofData(
-        uint256 _hash,
         address device_addr,
         address owner,
         string collectionPoint,
         string date,
         string contact
     ) public {
+        uint256 _hash = generateHash();
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(collectionPoint, date, contact);
     }

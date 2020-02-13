@@ -25,13 +25,13 @@ contract DisposalProofs is GenericProof {
     }
 
     function setProofData(
-        uint256 _hash,
         address device_addr,
         address owner,
         address origin,
         address destination,
         uint256 deposit
     ) public {
+        uint256 _hash = generateHash();
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(origin, destination, deposit);
     }

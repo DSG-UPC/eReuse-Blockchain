@@ -25,13 +25,13 @@ contract DataWipeProofs is GenericProof {
     }
 
     function setProofData(
-        uint256 _hash,
         address device_addr,
         address owner,
         string erasureType,
         string date,
         bool erasureResult
     ) public {
+        uint256 _hash = generateHash();
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(erasureType, date, erasureResult);
     }

@@ -15,11 +15,9 @@ contract GenericProof {
         return 0;
     }
 
-    function setProof(
-        uint256 _hash,
-        address device_addr,
-        address owner
-    ) internal {
+    function setProof(uint256 _hash, address device_addr, address owner)
+        internal
+    {
         Proof memory p = Proof(block.number, device_addr, owner);
         proofs[_hash] = p;
     }

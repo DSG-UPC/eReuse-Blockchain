@@ -20,12 +20,12 @@ contract FunctionProofs is GenericProof {
     }
 
     function setProofData(
-        uint256 _hash,
         address device_addr,
         address owner,
         uint256 score,
         uint256 diskUsage
     ) public {
+        uint256 _hash = generateHash();
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(score, diskUsage);
     }
