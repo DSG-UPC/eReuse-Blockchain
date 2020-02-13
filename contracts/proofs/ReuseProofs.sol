@@ -12,10 +12,14 @@ contract ReuseProofs is GenericProof {
 
     function getProofData(uint256 _hash) public view {}
 
-    function setProofData(address device_addr, address owner) public {
+    function setProofData(address device_addr, address owner)
+        public
+        returns (uint256 _hash_)
+    {
         uint256 _hash = generateHash();
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData();
+        return _hash;
     }
 
 }

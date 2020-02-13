@@ -24,10 +24,11 @@ contract FunctionProofs is GenericProof {
         address owner,
         uint256 score,
         uint256 diskUsage
-    ) public {
+    ) public returns (uint256 _hash_) {
         uint256 _hash = generateHash();
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(score, diskUsage);
+        return _hash;
     }
 
 }

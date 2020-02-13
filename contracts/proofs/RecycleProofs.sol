@@ -29,10 +29,11 @@ contract RecycleProofs is GenericProof {
         string collectionPoint,
         string date,
         string contact
-    ) public {
+    ) public returns (uint256 _hash_) {
         uint256 _hash = generateHash();
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(collectionPoint, date, contact);
+        return _hash;
     }
 
 }
