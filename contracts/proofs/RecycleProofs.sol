@@ -7,11 +7,11 @@ contract RecycleProofs is GenericProof {
         string date;
         string contact;
     }
-    mapping(uint256 => ProofData) dataProofs;
+    mapping(bytes32 => ProofData) dataProofs;
 
     constructor() public GenericProof() {}
 
-    function getProofData(uint256 _hash)
+    function getProofData(bytes32 _hash)
         public
         view
         returns (string _collectionPoint, string _date, string _contact)
@@ -29,8 +29,8 @@ contract RecycleProofs is GenericProof {
         string collectionPoint,
         string date,
         string contact
-    ) public returns (uint256 _hash_) {
-        uint256 _hash = generateHash();
+    ) public returns (bytes32 _hash_) {
+        bytes32 _hash = generateHash(device_addr);
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(collectionPoint, date, contact);
         return _hash;

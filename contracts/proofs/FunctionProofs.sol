@@ -7,11 +7,11 @@ contract FunctionProofs is GenericProof {
         uint256 diskUsage;
     }
 
-    mapping(uint256 => ProofData) dataProofs;
+    mapping(bytes32 => ProofData) dataProofs;
 
     constructor() public GenericProof() {}
 
-    function getProofData(uint256 _hash)
+    function getProofData(bytes32 _hash)
         public
         view
         returns (uint256 _score, uint256 _diskUsage)
@@ -24,8 +24,8 @@ contract FunctionProofs is GenericProof {
         address owner,
         uint256 score,
         uint256 diskUsage
-    ) public returns (uint256 _hash_) {
-        uint256 _hash = generateHash();
+    ) public returns (bytes32 _hash_) {
+        bytes32 _hash = generateHash(device_addr);
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(score, diskUsage);
         return _hash;

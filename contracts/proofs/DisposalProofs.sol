@@ -8,11 +8,11 @@ contract DisposalProofs is GenericProof {
         uint256 deposit;
     }
 
-    mapping(uint256 => ProofData) dataProofs;
+    mapping(bytes32 => ProofData) dataProofs;
 
     constructor() public GenericProof() {}
 
-    function getProofData(uint256 _hash)
+    function getProofData(bytes32 _hash)
         public
         view
         returns (address _origin, address _destination, uint256 deposit)
@@ -30,8 +30,8 @@ contract DisposalProofs is GenericProof {
         address origin,
         address destination,
         uint256 deposit
-    ) public returns (uint256 _hash_) {
-        uint256 _hash = generateHash();
+    ) public returns (bytes32 _hash_) {
+        bytes32 _hash = generateHash(device_addr);
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(origin, destination, deposit);
         return _hash;

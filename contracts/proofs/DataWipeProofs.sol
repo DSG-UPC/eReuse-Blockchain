@@ -8,11 +8,11 @@ contract DataWipeProofs is GenericProof {
         bool erasureResult;
     }
 
-    mapping(uint256 => ProofData) dataProofs;
+    mapping(bytes32 => ProofData) dataProofs;
 
     constructor() public GenericProof() {}
 
-    function getProofData(uint256 _hash)
+    function getProofData(bytes32 _hash)
         public
         view
         returns (string _erasureType, string _date, bool _erasureResult)
@@ -30,8 +30,8 @@ contract DataWipeProofs is GenericProof {
         string erasureType,
         string date,
         bool erasureResult
-    ) public returns (uint256 _hash_){
-        uint256 _hash = generateHash();
+    ) public returns (bytes32 _hash_){
+        bytes32 _hash = generateHash(device_addr);
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(erasureType, date, erasureResult);
         return _hash;

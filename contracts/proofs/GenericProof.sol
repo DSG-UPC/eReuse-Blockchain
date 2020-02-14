@@ -7,22 +7,22 @@ contract GenericProof {
         address owner;
     }
 
-    mapping(uint256 => Proof) proofs;
+    mapping(bytes32 => Proof) proofs;
 
     constructor() public {}
 
-    function generateHash() public view returns (uint256 _hash) {
-        return 0;
+    function generateHash(address device_addr) public view returns (bytes32 _hash) {
+        return keccak256(abi.encodePacked(block.number, device_addr));
     }
 
-    function setProof(uint256 _hash, address device_addr, address owner)
+    function setProof(bytes32 _hash, address device_addr, address owner)
         internal
     {
         Proof memory p = Proof(block.number, device_addr, owner);
         proofs[_hash] = p;
     }
 
-    function getProof(uint256 _hash)
+    function getProof(bytes32 _hash)
         public
         view
         returns (uint256 block_number, address device_id, address owner)
