@@ -89,7 +89,17 @@ contract DepositDevice is Ownable {
         proofs["function"].push(_hash);
     }
 
+    function getProofs(string proofType)
+        public
+        view
+        returns (bytes32[] _hashes)
+    {
+        return proofs[proofType];
+    }
+
     function getFunctionProof(bytes32 _hash)
+        public
+        view
         returns (uint256 _score, uint256 _diskUsage)
     {
         address proofAddress = DAOContract.getFunctionProofs();
@@ -116,6 +126,8 @@ contract DepositDevice is Ownable {
     }
 
     function getDisposalProof(bytes32 _hash)
+        public
+        view
         returns (address _origin, address _destination, uint256 _deposit)
     {
         address proofAddress = DAOContract.getDisposalProofs();
@@ -142,6 +154,8 @@ contract DepositDevice is Ownable {
     }
 
     function getDataWipeProof(bytes32 _hash)
+        public
+        view
         returns (string _erasureType, string _date, bool _erasureResult)
     {
         address proofAddress = DAOContract.getDataWipeProofs();
@@ -162,7 +176,7 @@ contract DepositDevice is Ownable {
         proofs["reuse"].push(_hash);
     }
 
-    function getReuseProof(bytes32 _hash) {
+    function getReuseProof(bytes32 _hash) public view {
         address proofAddress = DAOContract.getReuseProofs();
         ReuseProofs proofsContract = ReuseProofs(proofAddress);
         proofsContract.getProofData(_hash);
@@ -186,6 +200,8 @@ contract DepositDevice is Ownable {
     }
 
     function getRecycleProof(bytes32 _hash)
+        public
+        view
         returns (string _collectionPoint, string _date, string _contact)
     {
         address proofAddress = DAOContract.getRecycleProofs();
