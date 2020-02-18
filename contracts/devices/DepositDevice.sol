@@ -77,14 +77,19 @@ contract DepositDevice is Ownable {
         transferOwnership(_to);
     }
 
-    function generateFunctionProof(uint256 score, uint256 diskUsage) public {
+    function generateFunctionProof(
+        uint256 score,
+        uint256 diskUsage,
+        string algorithmVersion
+    ) public {
         address proofAddress = DAOContract.getFunctionProofs();
         FunctionProofs proofsContract = FunctionProofs(proofAddress);
         bytes32 _hash = proofsContract.setProofData(
             address(this),
             this.owner(),
             score,
-            diskUsage
+            diskUsage,
+            algorithmVersion
         );
         proofs["function"].push(_hash);
     }
@@ -100,12 +105,14 @@ contract DepositDevice is Ownable {
     function getFunctionProof(bytes32 _hash)
         public
         view
-        returns (uint256 _score, uint256 _diskUsage)
+        returns (uint256 _score, uint256 _diskUsage, string _algorithmVersion)
     {
         address proofAddress = DAOContract.getFunctionProofs();
         FunctionProofs proofsContract = FunctionProofs(proofAddress);
-        var (score, diskUsage) = proofsContract.getProofData(_hash);
-        return (score, diskUsage);
+        var (score, diskUsage, algorithmVersion) = proofsContract.getProofData(
+            _hash
+        );
+        return (score, diskUsage, algorithmVersion);
     }
 
     function generateDisposalProof(
@@ -166,26 +173,29 @@ contract DepositDevice is Ownable {
         return (erasureType, date, erasureResult);
     }
 
-    function generateReuseProof() public {
+    function generateReuseProof(uint256 price) public {
         address proofAddress = DAOContract.getReuseProofs();
         ReuseProofs proofsContract = ReuseProofs(proofAddress);
         bytes32 _hash = proofsContract.setProofData(
             address(this),
-            this.owner()
+            this.owner(),
+            price
         );
         proofs["reuse"].push(_hash);
     }
 
-    function getReuseProof(bytes32 _hash) public view {
+    function getReuseProof(bytes32 _hash) public view returns (uint256 _price) {
         address proofAddress = DAOContract.getReuseProofs();
         ReuseProofs proofsContract = ReuseProofs(proofAddress);
-        proofsContract.getProofData(_hash);
+        uint256 price = proofsContract.getProofData(_hash);
+        return price;
     }
 
     function generateRecycleProof(
         string collectionPoint,
         string date,
-        string contact
+        string contact,
+        string ticket
     ) public {
         address proofAddress = DAOContract.getRecycleProofs();
         RecycleProofs proofsContract = RecycleProofs(proofAddress);
@@ -194,7 +204,8 @@ contract DepositDevice is Ownable {
             this.owner(),
             collectionPoint,
             date,
-            contact
+            contact,
+            ticket
         );
         proofs["recycle"].push(_hash);
     }
@@ -202,14 +213,18 @@ contract DepositDevice is Ownable {
     function getRecycleProof(bytes32 _hash)
         public
         view
-        returns (string _collectionPoint, string _date, string _contact)
+        returns (
+            string _collectionPoint,
+            string _date,
+            string _contact,
+            string _ticket
+        )
     {
         address proofAddress = DAOContract.getRecycleProofs();
         RecycleProofs proofsContract = RecycleProofs(proofAddress);
-        var (collectionPoint, date, contact) = proofsContract.getProofData(
-            _hash
-        );
-        return (collectionPoint, date, contact);
+        var (collectionPoint, date, contact, ticket) = proofsContract
+            .getProofData(_hash);
+        return (collectionPoint, date, contact, ticket);
     }
 
     function returnDeposit() internal {

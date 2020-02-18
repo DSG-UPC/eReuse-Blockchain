@@ -27,9 +27,10 @@ contract("Basic test to generate proofs", function (accounts) {
     it("Generates proof of function", async function () {
         let score = 10;
         let usage = 20;
+        let version = "v2.0"
 
         device = await DepositDevice.at(device_address);
-        await device.generateFunctionProof(score, usage);
+        await device.generateFunctionProof(score, usage, version);
 
         let proofs = await device.getProofs("function");
 
@@ -38,16 +39,18 @@ contract("Basic test to generate proofs", function (accounts) {
         await device.getFunctionProof.call(proofs[0]).then(result => {
             assert.equal(score, result['0']);
             assert.equal(usage, result['1']);
+            assert.equal(version, result['2']);
         })
     });
 
     it("Generates proof of recycling", async function () {
-        let collection_point = "Recicla2";
+        let collection_point = "Donalo";
         let date = new Date().toLocaleString();
         let contact = "John";
+        let ticket = "1276541765134875";
 
         device = await DepositDevice.at(device_address);
-        await device.generateRecycleProof(collection_point, date, contact);
+        await device.generateRecycleProof(collection_point, date, contact, ticket);
 
         let proofs = await device.getProofs("recycle");
 
@@ -57,22 +60,23 @@ contract("Basic test to generate proofs", function (accounts) {
             assert.equal(collection_point, result['0']);
             assert.equal(date, result['1']);
             assert.equal(contact, result['2']);
+            assert.equal(ticket, result['3']);
         })
     });
 
     it("Generates proof of reuse", async function () {
-        // let reu_proof = await proof_factory.generateReuse().then(result => {
-        //     return extractProofAddress(result);
-        // });
+        let price = 50;
 
-        // await proofs.addProof(web3.utils.toChecksumAddress(device), proof_types.REUSE
-        //     , web3.utils.toChecksumAddress(reu_proof));
+        device = await DepositDevice.at(device_address);
+        await device.generateReuseProof(price);
 
-        // proofs.getProof(web3.utils.toChecksumAddress(device)
-        //     , proof_types.REUSE).then(result => {
-        //         assert.notEqual(result, null);
-        //         assert.equal(result, reu_proof);
-        //     });
+        let proofs = await device.getProofs("reuse");
+
+        assert.equal(proofs.length, 1);
+
+        device.getReuseProof.call(proofs[0]).then(result => {
+            assert.equal(price, result);
+        })
     });
 
     it("Generates proof of disposal", async function () {
