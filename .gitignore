@@ -1,5 +1,9 @@
 .vscode/*
 
+build/*
+
+go/*
+
 # Logs
 logs
 *.log
