@@ -11,6 +11,9 @@ contract DeviceFactory {
   RoleManager roleManager;
   mapping(address => address[]) deployed_devices;
 
+  //-------  EVENTS  -------//
+    event DeviceCreated(address _deviceAddress);
+
   constructor(address _daoAddress) public {
     daoAddress = _daoAddress;
     dao = DAOInterface(daoAddress);
@@ -23,6 +26,7 @@ contract DeviceFactory {
   {
     DepositDevice newContract = new DepositDevice(_name, _owner, _initValue, daoAddress);
     deployed_devices[_owner].push(newContract);
+    emit DeviceCreated(newContract);
     return newContract;
   }
 
