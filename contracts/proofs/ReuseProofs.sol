@@ -18,7 +18,7 @@ contract ReuseProofs is GenericProof {
         public
         returns (bytes32 _hash_)
     {
-        bytes32 _hash = generateHash(device_addr);
+        bytes32 _hash = generateHash(device_addr, "reuse");
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(price);
         return _hash;

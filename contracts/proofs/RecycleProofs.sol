@@ -42,7 +42,7 @@ contract RecycleProofs is GenericProof {
         string ticket,
         string gpsLocation
     ) public returns (bytes32 _hash_) {
-        bytes32 _hash = generateHash(device_addr);
+        bytes32 _hash = generateHash(device_addr, "recycle");
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(
             collectionPoint,

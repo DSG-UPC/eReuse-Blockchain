@@ -31,7 +31,7 @@ contract DataWipeProofs is GenericProof {
         string date,
         bool erasureResult
     ) public returns (bytes32 _hash_){
-        bytes32 _hash = generateHash(device_addr);
+        bytes32 _hash = generateHash(device_addr, "wipe");
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(erasureType, date, erasureResult);
         return _hash;

@@ -109,10 +109,7 @@ contract DepositDevice is Ownable {
     {
         address proofAddress = DAOContract.getFunctionProofs();
         FunctionProofs proofsContract = FunctionProofs(proofAddress);
-        var (score, diskUsage, algorithmVersion) = proofsContract.getProofData(
-            _hash
-        );
-        return (score, diskUsage, algorithmVersion);
+        return proofsContract.getProofData(_hash);
     }
 
     function generateDisposalProof(
@@ -146,9 +143,7 @@ contract DepositDevice is Ownable {
     {
         address proofAddress = DAOContract.getDisposalProofs();
         DisposalProofs proofsContract = DisposalProofs(proofAddress);
-        var (origin, destination, deposit, residual) = proofsContract
-            .getProofData(_hash);
-        return (origin, destination, deposit, residual);
+        return proofsContract.getProofData(_hash);
     }
 
     function generateDataWipeProof(
@@ -175,10 +170,7 @@ contract DepositDevice is Ownable {
     {
         address proofAddress = DAOContract.getDataWipeProofs();
         DataWipeProofs proofsContract = DataWipeProofs(proofAddress);
-        var (erasureType, date, erasureResult) = proofsContract.getProofData(
-            _hash
-        );
-        return (erasureType, date, erasureResult);
+        return proofsContract.getProofData(_hash);
     }
 
     function generateReuseProof(uint256 price) public {
@@ -195,8 +187,9 @@ contract DepositDevice is Ownable {
     function getReuseProof(bytes32 _hash) public view returns (uint256 _price) {
         address proofAddress = DAOContract.getReuseProofs();
         ReuseProofs proofsContract = ReuseProofs(proofAddress);
-        uint256 price = proofsContract.getProofData(_hash);
-        return price;
+        // uint256 price = proofsContract.getProofData(_hash);
+        // return price;
+        return proofsContract.getProofData(_hash);
     }
 
     function generateRecycleProof(
@@ -233,9 +226,7 @@ contract DepositDevice is Ownable {
     {
         address proofAddress = DAOContract.getRecycleProofs();
         RecycleProofs proofsContract = RecycleProofs(proofAddress);
-        var (collectionPoint, date, contact, ticket, gpsLocation) = proofsContract
-            .getProofData(_hash);
-        return (collectionPoint, date, contact, ticket, gpsLocation);
+        return proofsContract.getProofData(_hash);
     }
 
     function returnDeposit() internal {

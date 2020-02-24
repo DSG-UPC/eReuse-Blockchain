@@ -39,7 +39,7 @@ contract DisposalProofs is GenericProof {
         uint256 deposit,
         bool residual
     ) public returns (bytes32 _hash_) {
-        bytes32 _hash = generateHash(device_addr);
+        bytes32 _hash = generateHash(device_addr, "disposal");
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(origin, destination, deposit, residual);
         return _hash;

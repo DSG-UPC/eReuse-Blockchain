@@ -31,7 +31,7 @@ contract FunctionProofs is GenericProof {
         uint256 diskUsage,
         string algorithmVersion
     ) public returns (bytes32 _hash_) {
-        bytes32 _hash = generateHash(device_addr);
+        bytes32 _hash = generateHash(device_addr, "function");
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(score, diskUsage, algorithmVersion);
         return _hash;
