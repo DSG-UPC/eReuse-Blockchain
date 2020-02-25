@@ -9,11 +9,7 @@ contract DAO is Ownable {
     address public RoleManager;
     address public OracleQuery;
     address public DeviceFactory;
-    address public DataWipeProofs;
-    address public FunctionProofs;
-    address public RecycleProofs;
-    address public ReuseProofs;
-    address public DisposalProofs;
+    address public ProofsHandler;
     address OracleResponse;
     address ReserveAccount;
     // uint256 public pricePerMB;
@@ -73,43 +69,12 @@ contract DAO is Ownable {
         return DeviceFactory;
     }
 
-    function setDataWipeProofs(address _address) public onlyOwner {
-        DataWipeProofs = _address;
+    function setProofsHandler(address _address) public onlyOwner {
+        ProofsHandler = _address;
     }
 
-    function getDataWipeProofs() public view returns (address) {
-        return DataWipeProofs;
+    function getProofsHandler() public view returns (address) {
+        return ProofsHandler;
     }
 
-    function setFunctionProofs(address _address) public onlyOwner {
-        FunctionProofs = _address;
-    }
-
-    function getFunctionProofs() public view returns (address) {
-        return FunctionProofs;
-    }
-
-    function setReuseProofs(address _address) public onlyOwner {
-        ReuseProofs = _address;
-    }
-
-    function getReuseProofs() public view returns (address) {
-        return ReuseProofs;
-    }
-
-    function setRecycleProofs(address _address) public onlyOwner {
-        RecycleProofs = _address;
-    }
-
-    function getRecycleProofs() public view returns (address) {
-        return RecycleProofs;
-    }
-
-    function setDisposalProofs(address _address) public onlyOwner {
-        DisposalProofs = _address;
-    }
-
-    function getDisposalProofs() public view returns (address) {
-        return DisposalProofs;
-    }
 }

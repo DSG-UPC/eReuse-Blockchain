@@ -53,5 +53,4 @@ contract RecycleProofs is GenericProof {
         );
         return _hash;
     }
-
 }

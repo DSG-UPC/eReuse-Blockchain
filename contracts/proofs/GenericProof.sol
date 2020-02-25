@@ -11,7 +11,11 @@ contract GenericProof {
 
     constructor() public {}
 
-    function generateHash(address device_addr, string proof_type) public view returns (bytes32 _hash) {
+    function generateHash(address device_addr, string proof_type)
+        public
+        view
+        returns (bytes32 _hash)
+    {
         return keccak256(abi.encodePacked(block.number, device_addr, proof_type));
     }
 

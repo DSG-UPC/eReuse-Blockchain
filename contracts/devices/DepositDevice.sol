@@ -3,14 +3,9 @@ pragma solidity ^0.4.25;
 import "contracts/DAOInterface.sol";
 import "contracts/tokens/MyERC721.sol";
 import "contracts/tokens/EIP20Interface.sol";
-import "contracts/helpers/RoleManager.sol";
 import "contracts/devices/DeliveryNoteInterface.sol";
 import "contracts/devices/DeviceFactoryInterface.sol";
-import "contracts/proofs/DataWipeProofs.sol";
-import "contracts/proofs/FunctionProofs.sol";
-import "contracts/proofs/DisposalProofs.sol";
-import "contracts/proofs/RecycleProofs.sol";
-import "contracts/proofs/ReuseProofs.sol";
+import "contracts/proofs/ProofsHandler.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /**
@@ -19,11 +14,11 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract DepositDevice is Ownable {
     // parameters -----------------------------------------------------------
-    RoleManager roleManager;
     MyERC721 erc721;
     EIP20Interface erc20;
     DAOInterface public DAOContract;
     DeviceFactoryInterface factory;
+    ProofsHandler handler;
     mapping(string => bytes32[]) proofs;
 
     // types ----------------------------------------------------------------
@@ -37,7 +32,7 @@ contract DepositDevice is Ownable {
         uint256 state;
     }
 
-    // variables ----------------------------------------------------------------
+    // variables -------------------------------------------------------------
     DevData data;
 
     // events ----------------------------------------------------------------
@@ -52,12 +47,12 @@ contract DepositDevice is Ownable {
         DAOContract = DAOInterface(_daoAddress);
         address erc20Address = DAOContract.getERC20();
         address erc721Address = DAOContract.getERC721();
-        address roleManagerAddress = DAOContract.getRoleManager();
-        address d_factory = DAOContract.getDeviceFactory();
-        roleManager = RoleManager(roleManagerAddress);
+        address dFactory = DAOContract.getDeviceFactory();
+        address pHandler = DAOContract.getProofsHandler();
         erc721 = MyERC721(erc721Address);
         erc20 = EIP20Interface(erc20Address);
-        factory = DeviceFactoryInterface(d_factory);
+        factory = DeviceFactoryInterface(dFactory);
+        handler = ProofsHandler(pHandler);
         data.name = _name;
         data.owner = _sender;
         data.deposit = _initialDeposit;
@@ -77,23 +72,6 @@ contract DepositDevice is Ownable {
         transferOwnership(_to);
     }
 
-    function generateFunctionProof(
-        uint256 score,
-        uint256 diskUsage,
-        string algorithmVersion
-    ) public {
-        address proofAddress = DAOContract.getFunctionProofs();
-        FunctionProofs proofsContract = FunctionProofs(proofAddress);
-        bytes32 _hash = proofsContract.setProofData(
-            address(this),
-            this.owner(),
-            score,
-            diskUsage,
-            algorithmVersion
-        );
-        proofs["function"].push(_hash);
-    }
-
     function getProofs(string proofType)
         public
         view
@@ -102,14 +80,27 @@ contract DepositDevice is Ownable {
         return proofs[proofType];
     }
 
+    function generateFunctionProof(
+        uint256 score,
+        uint256 diskUsage,
+        string algorithmVersion
+    ) public {
+        bytes32 functionHash = handler.generateFunctionProof(
+            address(this),
+            this.owner(),
+            score,
+            diskUsage,
+            algorithmVersion
+        );
+        proofs["function"].push(functionHash);
+    }
+
     function getFunctionProof(bytes32 _hash)
         public
         view
         returns (uint256 _score, uint256 _diskUsage, string _algorithmVersion)
     {
-        address proofAddress = DAOContract.getFunctionProofs();
-        FunctionProofs proofsContract = FunctionProofs(proofAddress);
-        return proofsContract.getProofData(_hash);
+        return handler.getFunctionProof(_hash);
     }
 
     function generateDisposalProof(
@@ -118,9 +109,7 @@ contract DepositDevice is Ownable {
         uint256 deposit,
         bool residual
     ) public {
-        address proofAddress = DAOContract.getDisposalProofs();
-        DisposalProofs proofsContract = DisposalProofs(proofAddress);
-        bytes32 _hash = proofsContract.setProofData(
+        bytes32 _hash = handler.generateDisposalProof(
             address(this),
             this.owner(),
             origin,
@@ -141,9 +130,7 @@ contract DepositDevice is Ownable {
             bool _residual
         )
     {
-        address proofAddress = DAOContract.getDisposalProofs();
-        DisposalProofs proofsContract = DisposalProofs(proofAddress);
-        return proofsContract.getProofData(_hash);
+        return handler.getDisposalProof(_hash);
     }
 
     function generateDataWipeProof(
@@ -151,9 +138,7 @@ contract DepositDevice is Ownable {
         string date,
         bool erasureResult
     ) public {
-        address proofAddress = DAOContract.getDataWipeProofs();
-        DataWipeProofs proofsContract = DataWipeProofs(proofAddress);
-        bytes32 _hash = proofsContract.setProofData(
+        bytes32 _hash = handler.generateDataWipeProof(
             address(this),
             this.owner(),
             erasureType,
@@ -168,15 +153,11 @@ contract DepositDevice is Ownable {
         view
         returns (string _erasureType, string _date, bool _erasureResult)
     {
-        address proofAddress = DAOContract.getDataWipeProofs();
-        DataWipeProofs proofsContract = DataWipeProofs(proofAddress);
-        return proofsContract.getProofData(_hash);
+        return handler.getDataWipeProof(_hash);
     }
 
     function generateReuseProof(uint256 price) public {
-        address proofAddress = DAOContract.getReuseProofs();
-        ReuseProofs proofsContract = ReuseProofs(proofAddress);
-        bytes32 _hash = proofsContract.setProofData(
+        bytes32 _hash = handler.generateReuseProof(
             address(this),
             this.owner(),
             price
@@ -185,11 +166,7 @@ contract DepositDevice is Ownable {
     }
 
     function getReuseProof(bytes32 _hash) public view returns (uint256 _price) {
-        address proofAddress = DAOContract.getReuseProofs();
-        ReuseProofs proofsContract = ReuseProofs(proofAddress);
-        // uint256 price = proofsContract.getProofData(_hash);
-        // return price;
-        return proofsContract.getProofData(_hash);
+        return handler.getReuseProof(_hash);
     }
 
     function generateRecycleProof(
@@ -199,9 +176,7 @@ contract DepositDevice is Ownable {
         string ticket,
         string gpsLocation
     ) public {
-        address proofAddress = DAOContract.getRecycleProofs();
-        RecycleProofs proofsContract = RecycleProofs(proofAddress);
-        bytes32 _hash = proofsContract.setProofData(
+        bytes32 _hash = handler.generateRecycleProof(
             address(this),
             this.owner(),
             collectionPoint,
@@ -224,9 +199,7 @@ contract DepositDevice is Ownable {
             string _gpsLocation
         )
     {
-        address proofAddress = DAOContract.getRecycleProofs();
-        RecycleProofs proofsContract = RecycleProofs(proofAddress);
-        return proofsContract.getProofData(_hash);
+        return handler.getRecycleProof(_hash);
     }
 
     function returnDeposit() internal {
@@ -261,10 +234,5 @@ contract DepositDevice is Ownable {
         );
         returnDeposit();
         factory.recycle(_owner);
-        kill();
-    }
-
-    function kill() internal {
-        selfdestruct(msg.sender);
     }
 }

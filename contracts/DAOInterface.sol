@@ -4,6 +4,7 @@ contract DAOInterface {
     address public ERC20;
     address public ERC721;
     address public Owners;
+    address public ProofsHandler;
     address public OracleQuery;
     address public OracleResponse;
     uint256 public pricePerMB;
@@ -26,14 +27,5 @@ contract DAOInterface {
 
     function getDeviceFactory() public view returns (address);
 
-    function getDataWipeProofs() public view returns (address);
-
-    function getFunctionProofs() public view returns (address);
-
-    function getReuseProofs() public view returns (address);
-
-    function getRecycleProofs() public view returns (address);
-
-    function getDisposalProofs() public view returns (address);
-
+    function getProofsHandler() public view returns (address);
 }
