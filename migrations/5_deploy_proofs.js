@@ -14,23 +14,23 @@ module.exports = async (deployer, network, accounts) => {
         .then(async function (handler) {
             await deployer.deploy(DataWipeProofs, { from: accounts[0] })
                 .then(async function (proofs) {
-                    handler.setDataWipeProofs(proofs.address);
+                   await handler.setDataWipeProofs(proofs.address);
                 });
             await deployer.deploy(DisposalProofs, { from: accounts[0] })
                 .then(async function (proofs) {
-                    handler.setDisposalProofs(proofs.address);
+                    await handler.setDisposalProofs(proofs.address);
                 });
             await deployer.deploy(ReuseProofs, { from: accounts[0] })
                 .then(async function (proofs) {
-                    handler.setReuseProofs(proofs.address);
+                    await handler.setReuseProofs(proofs.address);
                 });
             await deployer.deploy(RecycleProofs, { from: accounts[0] })
                 .then(async function (proofs) {
-                    handler.setRecycleProofs(proofs.address);
+                    await handler.setRecycleProofs(proofs.address);
                 });
             await deployer.deploy(FunctionProofs, { from: accounts[0] })
                 .then(async function (proofs) {
-                    handler.setFunctionProofs(proofs.address);
+                    await handler.setFunctionProofs(proofs.address);
                 });
         });
 };
