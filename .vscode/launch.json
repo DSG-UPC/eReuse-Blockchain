@@ -5,11 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "run tests",
+            "name": "run ProofsTest",
             "type": "node",
             "request": "launch",
             "program": "${workspaceRoot}/node_modules/truffle/build/cli.bundled.js",
-            "args": ["test"],
+            "args": ["test", "test/ProofsTest.js"],
             "cwd": "${workspaceRoot}",
             "outFiles": [
                 "${workspaceRoot}/test/**/*"
