@@ -4,8 +4,9 @@ import "contracts/proofs/FunctionProofs.sol";
 import "contracts/proofs/DisposalProofs.sol";
 import "contracts/proofs/RecycleProofs.sol";
 import "contracts/proofs/ReuseProofs.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract ProofsHandler {
+contract ProofsHandler  is Ownable  {
     DataWipeProofs private dataWipeProofs;
     FunctionProofs private functionProofs;
     DisposalProofs private disposalProofs;
@@ -16,23 +17,23 @@ contract ProofsHandler {
 
     // -------------- SETTERS FOR PROOFS --------------- //
 
-    function setDataWipeProofs(address proofs) public {
+    function setDataWipeProofs(address proofs) public onlyOwner {
         dataWipeProofs = DataWipeProofs(proofs);
     }
 
-    function setFunctionProofs(address proofs) public {
+    function setFunctionProofs(address proofs) public onlyOwner {
         functionProofs = FunctionProofs(proofs);
     }
 
-    function setDisposalProofs(address proofs) public {
+    function setDisposalProofs(address proofs) public onlyOwner {
         disposalProofs = DisposalProofs(proofs);
     }
 
-    function setRecycleProofs(address proofs) public {
+    function setRecycleProofs(address proofs) public onlyOwner {
         recycleProofs = RecycleProofs(proofs);
     }
 
-    function setReuseProofs(address proofs) public {
+    function setReuseProofs(address proofs) public onlyOwner {
         reuseProofs = ReuseProofs(proofs);
     }
 
