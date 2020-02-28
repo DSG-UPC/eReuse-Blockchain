@@ -1,5 +1,6 @@
 const DeviceFactory = artifacts.require('DeviceFactory');
 const DepositDevice = artifacts.require('DepositDevice');
+const ProofsHandler = artifacts.require('ProofsHandler');
 const assert = require('assert');
 const web3 = require('web3');
 
@@ -16,6 +17,7 @@ contract("Basic test for block_number", function (accounts) {
     before(async function () {
         console.log('\t**BEFORE**');
         device_factory = await DeviceFactory.deployed();
+        handler = await ProofsHandler.deployed();
 
         await device_factory.createDevice("device", 0, accounts[0]);
 
@@ -37,16 +39,45 @@ contract("Basic test for block_number", function (accounts) {
         await device.generateFunctionProof(score, diskUsage,
             algorithmVersion, { from: accounts[0], gas: 6721975 });
 
-        let proofs = await device.getProofs("function");
+        let hashes = await device.getProofs("function");
 
-        let first_proof = await device.getProof(proofs[0], "function");
-        let second_proof = await device.getProof(proofs[1], "function");
+        // TESTING FOR PROOF BC INFO (BLOCK_NUM, OWNER, DEVICE_ADDRESS)
+
+        let first_proof = await device.getProof(hashes[0], "function");
+        let second_proof = await device.getProof(hashes[1], "function");
 
         assert.notEqual(first_proof.block_number, second_proof.block_number);
-    });
 
+        let handler_first = await handler.getFunctionProof(hashes[0]);
+        let handler_second = await handler.getFunctionProof(hashes[1]);
+
+        assert.equal(first_proof.block_number.words[0], handler_first.block_number.words[0]);
+        assert.equal(first_proof.device_id, handler_first.device_id);
+        assert.equal(first_proof.owner, handler_first.owner);
+
+        assert.equal(second_proof.block_number.words[0], handler_second.block_number.words[0]);
+        assert.equal(second_proof.device_id, handler_second.device_id);
+        assert.equal(second_proof.owner, handler_second.owner);
+
+
+        // TESTING FOR PROOF DATA (SCORE, USAGE, ALGORITHM)
+
+        first_proof = await device.getFunctionProof(hashes[0]);
+        second_proof = await device.getFunctionProof(hashes[1]);
+
+        handler_first = await handler.getFunctionProofData(hashes[0]);
+        handler_second = await handler.getFunctionProofData(hashes[1]);
+
+        assert.equal(first_proof.score, handler_first.score);
+        assert.equal(first_proof.diskUsage, handler_first.diskUsage);
+        assert.equal(first_proof.algorithmVersion, handler_first.algorithmVersion);
+
+        assert.equal(second_proof.score, handler_second.score);
+        assert.equal(second_proof.diskUsage, handler_second.diskUsage);
+        assert.equal(second_proof.algorithmVersion, handler_second.algorithmVersion);
+    });
 });
 
-function extractProofAddress(receipt) {
-    return receipt.logs[0].args.proof
+function extractEvents(receipt) {
+    return receipt.logs[0].args
 }
