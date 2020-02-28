@@ -1,5 +1,4 @@
 const DeviceFactory = artifacts.require('DeviceFactory');
-const ProofFactory = artifacts.require('ProofFactory');
 const Proofs = artifacts.require('Proofs');
 const assert = require('assert');
 const web3 = require('web3');
@@ -17,8 +16,6 @@ contract("Basic test for block_number", function (accounts) {
     before(async function () {
         console.log('\t**BEFORE**');
         device_factory = await DeviceFactory.deployed();
-        proof_factory = await ProofFactory.deployed();
-        proofs = await Proofs.deployed();
         proof_types = {
             WIPE: 0,
             FUNCTION: 1,
@@ -29,7 +26,7 @@ contract("Basic test for block_number", function (accounts) {
 
         await device_factory.createDevice("device", 0, accounts[0]);
 
-        device = await device_factory.getDeployedDevices(
+        deviceAddress = await device_factory.getDeployedDevices(
             { from: accounts[0] }).then(devices => {
                 return devices[0];
             });
@@ -37,21 +34,14 @@ contract("Basic test for block_number", function (accounts) {
 
     it("Generates proof of function", async function () {
         let score = 10;
-        let usage = 20;
+        let diskUsage = 20;
+        let algorithmVersion = 'v3.1';
 
-        let f_proof = await proof_factory.generateFunction(score, usage).then(result => {
-            console.log(result);
-            return extractProofAddress(result);
-        });
+        let device = await DepositDevice.at(deviceAddress);
+        let hash = await device.generateFunctionProof(score, diskUsage,
+            algorithmVersion, { from: accounts[0] });
 
-        await proofs.addProof(web3.utils.toChecksumAddress(device)
-            , proof_types.FUNCTION, web3.utils.toChecksumAddress(f_proof));
-
-        proofs.getProof(web3.utils.toChecksumAddress(device)
-            , proof_types.FUNCTION).then(result => {
-                assert.notEqual(result, null);
-                assert.equal(result, f_proof);
-            });
+        let = await device.getFunctionProof(hash);
     });
 
 });

@@ -37,9 +37,9 @@ contract("Basic test to generate proofs", function (accounts) {
         assert.equal(proofs.length, 1);
 
         await device.getFunctionProof.call(proofs[0]).then(result => {
-            assert.equal(score, result['0']);
-            assert.equal(usage, result['1']);
-            assert.equal(version, result['2']);
+            assert.equal(score, result['3']);
+            assert.equal(usage, result['4']);
+            assert.equal(version, result['5']);
         })
     });
 
@@ -58,11 +58,11 @@ contract("Basic test to generate proofs", function (accounts) {
         assert.equal(proofs.length, 1);
 
         device.getRecycleProof.call(proofs[0]).then(result => {
-            assert.equal(collection_point, result['0']);
-            assert.equal(date, result['1']);
-            assert.equal(contact, result['2']);
-            assert.equal(ticket, result['3']);
-            assert.equal(gpsLocation, result['4']);
+            assert.equal(collection_point, result['3']);
+            assert.equal(date, result['4']);
+            assert.equal(contact, result['5']);
+            assert.equal(ticket, result['6']);
+            assert.equal(gpsLocation, result['7']);
         })
     });
 
@@ -77,7 +77,7 @@ contract("Basic test to generate proofs", function (accounts) {
         assert.equal(proofs.length, 1);
 
         device.getReuseProof.call(proofs[0]).then(result => {
-            assert.equal(price, result);
+            assert.equal(origin, result['3']);
         })
     });
 
@@ -96,10 +96,10 @@ contract("Basic test to generate proofs", function (accounts) {
         assert.equal(proofs.length, 1);
 
         device.getDisposalProof.call(proofs[0]).then(result => {
-            assert.equal(origin, result['0']);
-            assert.equal(destination, result['1']);
-            assert.equal(deposit, result['2']);
-            assert.equal(isResidual, result['3']);
+            assert.equal(origin, result['3']);
+            assert.equal(destination, result['4']);
+            assert.equal(deposit, result['5']);
+            assert.equal(isResidual, result['6']);
         })
     });
 
@@ -116,9 +116,9 @@ contract("Basic test to generate proofs", function (accounts) {
         assert.equal(proofs.length, 1);
 
         device.getDataWipeProof.call(proofs[0]).then(result => {
-            assert.equal(erasure_type, result['0']);
-            assert.equal(date, result['1']);
-            assert.equal(result, result['2']);
+            assert.equal(erasure_type, result['3']);
+            assert.equal(date, result['4']);
+            assert.equal(result, result['5']);
         })
     });
 

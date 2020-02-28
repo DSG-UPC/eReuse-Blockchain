@@ -15,7 +15,11 @@ contract FunctionProofs is GenericProof {
     function getProofData(bytes32 _hash)
         public
         view
-        returns (uint256 _score, uint256 _diskUsage, string algorithmVersion)
+        returns (
+            uint256 _score,
+            uint256 _diskUsage,
+            string algorithmVersion
+        )
     {
         return (
             dataProofs[_hash].score,

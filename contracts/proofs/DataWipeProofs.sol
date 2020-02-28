@@ -15,7 +15,11 @@ contract DataWipeProofs is GenericProof {
     function getProofData(bytes32 _hash)
         public
         view
-        returns (string _erasureType, string _date, bool _erasureResult)
+        returns (
+            string _erasureType,
+            string _date,
+            bool _erasureResult
+        )
     {
         return (
             dataProofs[_hash].erasureType,
@@ -30,7 +34,7 @@ contract DataWipeProofs is GenericProof {
         string erasureType,
         string date,
         bool erasureResult
-    ) public returns (bytes32 _hash_){
+    ) public returns (bytes32 _hash_) {
         bytes32 _hash = generateHash(device_addr, "wipe");
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(erasureType, date, erasureResult);

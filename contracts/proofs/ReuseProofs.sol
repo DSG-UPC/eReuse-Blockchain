@@ -11,7 +11,7 @@ contract ReuseProofs is GenericProof {
     constructor() public GenericProof() {}
 
     function getProofData(bytes32 _hash) public view returns (uint256 _price) {
-        return dataProofs[_hash].price;
+        return (dataProofs[_hash].price);
     }
 
     function setProofData(address device_addr, address owner, uint256 price)
