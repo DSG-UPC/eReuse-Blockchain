@@ -36,33 +36,33 @@ contract("Basic test to generate proofs", function (accounts) {
 
         assert.equal(proofs.length, 1);
 
-        await device.getFunctionProof.call(proofs[0]).then(result => {
-            assert.equal(score, result['3']);
-            assert.equal(usage, result['4']);
-            assert.equal(version, result['5']);
+        device.getFunctionProof.call(proofs[0]).then(result => {
+            assert.equal(score, web3.utils.toDecimal(result['score']));
+            assert.equal(usage, web3.utils.toDecimal(result['diskUsage']));
+            assert.equal(version, result['algorithmVersion']);
         })
     });
 
     it("Generates proof of recycling", async function () {
-        let collection_point = "Donalo";
+        let collectionPoint = "Donalo";
         let date = new Date().toLocaleString();
         let contact = "John";
         let ticket = "1276541765134875";
         let gpsLocation = "(37.700421688980136, -81.84535319999998)";
 
         device = await DepositDevice.at(device_address);
-        await device.generateRecycleProof(collection_point, date, contact, ticket, gpsLocation);
+        await device.generateRecycleProof(collectionPoint, date, contact, ticket, gpsLocation);
 
         let proofs = await device.getProofs("recycle");
 
         assert.equal(proofs.length, 1);
 
         device.getRecycleProof.call(proofs[0]).then(result => {
-            assert.equal(collection_point, result['3']);
-            assert.equal(date, result['4']);
-            assert.equal(contact, result['5']);
-            assert.equal(ticket, result['6']);
-            assert.equal(gpsLocation, result['7']);
+            assert.equal(collectionPoint, result['collectionPoint']);
+            assert.equal(date, result['date']);
+            assert.equal(contact, result['contact']);
+            assert.equal(ticket, result['ticket']);
+            assert.equal(gpsLocation, result['gpsLocation']);
         })
     });
 
@@ -77,7 +77,8 @@ contract("Basic test to generate proofs", function (accounts) {
         assert.equal(proofs.length, 1);
 
         device.getReuseProof.call(proofs[0]).then(result => {
-            assert.equal(origin, result['3']);
+            console.log();
+            assert.equal(price, web3.utils.toDecimal(result));
         })
     });
 
@@ -85,40 +86,39 @@ contract("Basic test to generate proofs", function (accounts) {
         let origin = accounts[1];
         let destination = accounts[2];
         let deposit = 10;
-        let isResidual = false;
+        let residual = false;
 
         device = await DepositDevice.at(device_address);
         await device.generateDisposalProof(web3.utils.toChecksumAddress(origin)
-            , web3.utils.toChecksumAddress(destination), deposit, isResidual);
+            , web3.utils.toChecksumAddress(destination), deposit, residual);
 
         let proofs = await device.getProofs("disposal");
 
         assert.equal(proofs.length, 1);
-
         device.getDisposalProof.call(proofs[0]).then(result => {
-            assert.equal(origin, result['3']);
-            assert.equal(destination, result['4']);
-            assert.equal(deposit, result['5']);
-            assert.equal(isResidual, result['6']);
+            assert.equal(origin, result['origin']);
+            assert.equal(destination, result['destination']);
+            assert.equal(deposit, web3.utils.toDecimal(result['deposit']));
+            assert.equal(residual, result['residual']);
         })
     });
 
     it("Generates proof of data wipe", async function () {
-        let erasure_type = "QuickErase";
+        let erasureType = "QuickErase";
         let date = new Date().toLocaleString();
-        let result = true;
+        let erasureResult = true;
 
         device = await DepositDevice.at(device_address);
-        await device.generateDataWipeProof(erasure_type, date, result);
+        await device.generateDataWipeProof(erasureType, date, erasureResult);
 
         let proofs = await device.getProofs("wipe");
 
         assert.equal(proofs.length, 1);
 
-        device.getDataWipeProof.call(proofs[0]).then(result => {
-            assert.equal(erasure_type, result['3']);
-            assert.equal(date, result['4']);
-            assert.equal(result, result['5']);
+        await device.getDataWipeProof.call(proofs[0]).then(result => {
+            assert.equal(erasureType, result['erasureType']);
+            assert.equal(date, result['date']);
+            assert.equal(erasureResult, result['erasureResult']);
         })
     });
 

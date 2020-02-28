@@ -164,7 +164,7 @@ contract ProofsHandler is Ownable {
     function getFunctionProofData(bytes32 _hash)
         public
         view
-        returns (uint256 _score, uint256 _diskUsage, string _algorithmVersion)
+        returns (uint256 score, uint256 diskUsage, string algorithmVersion)
     {
         return functionProofs.getProofData(_hash);
     }
@@ -181,10 +181,10 @@ contract ProofsHandler is Ownable {
         public
         view
         returns (
-            address _origin,
-            address _destination,
-            uint256 _deposit,
-            bool _residual
+            address origin,
+            address destination,
+            uint256 deposit,
+            bool residual
         )
     {
         return disposalProofs.getProofData(_hash);
@@ -201,7 +201,7 @@ contract ProofsHandler is Ownable {
     function getDataWipeProofData(bytes32 _hash)
         public
         view
-        returns (string _erasureType, string _date, bool _erasureResult)
+        returns (string erasureType, string date, bool erasureResult)
     {
         return dataWipeProofs.getProofData(_hash);
     }
@@ -218,11 +218,11 @@ contract ProofsHandler is Ownable {
         public
         view
         returns (
-            string _collectionPoint,
-            string _date,
-            string _contact,
-            string _ticket,
-            string _gpsLocation
+            string collectionPoint,
+            string date,
+            string contact,
+            string ticket,
+            string gpsLocation
         )
     {
         return recycleProofs.getProofData(_hash);

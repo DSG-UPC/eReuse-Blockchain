@@ -75,7 +75,7 @@ contract DepositDevice is Ownable {
     function getProofs(string proofType)
         public
         view
-        returns (bytes32[] _hashes)
+        returns (bytes32[] hashes)
     {
         return proofs[proofType];
     }
@@ -93,21 +93,21 @@ contract DepositDevice is Ownable {
         uint256 diskUsage,
         string algorithmVersion
     ) public returns (bytes32 _hash) {
-        bytes32 functionHash = handler.generateFunctionProof(
+        _hash = handler.generateFunctionProof(
             address(this),
             this.owner(),
             score,
             diskUsage,
             algorithmVersion
         );
-        proofs["function"].push(functionHash);
-        return functionHash;
+        proofs["function"].push(_hash);
+        return _hash;
     }
 
     function getFunctionProof(bytes32 _hash)
         public
         view
-        returns (uint256 _score, uint256 _diskUsage, string _algorithmVersion)
+        returns (uint256 score, uint256 diskUsage, string algorithmVersion)
     {
         return handler.getFunctionProofData(_hash);
     }
@@ -118,7 +118,7 @@ contract DepositDevice is Ownable {
         uint256 deposit,
         bool residual
     ) public returns (bytes32 _hash) {
-        bytes32 disposalHash = handler.generateDisposalProof(
+        _hash = handler.generateDisposalProof(
             address(this),
             this.owner(),
             origin,
@@ -126,18 +126,18 @@ contract DepositDevice is Ownable {
             deposit,
             residual
         );
-        proofs["disposal"].push(disposalHash);
-        return disposalHash;
+        proofs["disposal"].push(_hash);
+        return _hash;
     }
 
     function getDisposalProof(bytes32 _hash)
         public
         view
         returns (
-            address _origin,
-            address _destination,
-            uint256 _deposit,
-            bool _residual
+            address origin,
+            address destination,
+            uint256 deposit,
+            bool residual
         )
     {
         return handler.getDisposalProofData(_hash);
@@ -148,21 +148,21 @@ contract DepositDevice is Ownable {
         string date,
         bool erasureResult
     ) public returns (bytes32 _hash) {
-        bytes32 wipeHash = handler.generateDataWipeProof(
+        _hash = handler.generateDataWipeProof(
             address(this),
             this.owner(),
             erasureType,
             date,
             erasureResult
         );
-        proofs["wipe"].push(wipeHash);
-        return wipeHash;
+        proofs["wipe"].push(_hash);
+        return _hash;
     }
 
     function getDataWipeProof(bytes32 _hash)
         public
         view
-        returns (string _erasureType, string _date, bool _erasureResult)
+        returns (string erasureType, string date, bool erasureResult)
     {
         return handler.getDataWipeProofData(_hash);
     }
@@ -177,7 +177,7 @@ contract DepositDevice is Ownable {
         return reuseHash;
     }
 
-    function getReuseProof(bytes32 _hash) public view returns (uint256 _price) {
+    function getReuseProof(bytes32 _hash) public view returns (uint256 price) {
         return handler.getReuseProofData(_hash);
     }
 
@@ -188,7 +188,7 @@ contract DepositDevice is Ownable {
         string ticket,
         string gpsLocation
     ) public returns (bytes32 _hash) {
-        bytes32 recycleHash = handler.generateRecycleProof(
+        _hash = handler.generateRecycleProof(
             address(this),
             this.owner(),
             collectionPoint,
@@ -197,19 +197,19 @@ contract DepositDevice is Ownable {
             ticket,
             gpsLocation
         );
-        proofs["recycle"].push(recycleHash);
-        return recycleHash;
+        proofs["recycle"].push(_hash);
+        return _hash;
     }
 
     function getRecycleProof(bytes32 _hash)
         public
         view
         returns (
-            string _collectionPoint,
-            string _date,
-            string _contact,
-            string _ticket,
-            string _gpsLocation
+            string collectionPoint,
+            string date,
+            string contact,
+            string ticket,
+            string gpsLocation
         )
     {
         return handler.getRecycleProofData(_hash);
@@ -228,15 +228,15 @@ contract DepositDevice is Ownable {
         transferOwnership(_deliveryNote);
     }
 
-    function getOwner() public view returns (address) {
+    function getOwner() public view returns (address owner) {
         return data.owner;
     }
 
-    function getName() public view returns (string) {
+    function getName() public view returns (string name) {
         return data.name;
     }
 
-    function getDeposit() public view returns (uint256) {
+    function getDeposit() public view returns (uint256 deposit) {
         return data.deposit;
     }
 

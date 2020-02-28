@@ -17,10 +17,10 @@ contract DisposalProofs is GenericProof {
         public
         view
         returns (
-            address _origin,
-            address _destination,
-            uint256 _deposit,
-            bool _residual
+            address origin,
+            address destination,
+            uint256 deposit,
+            bool residual
         )
     {
         return (
@@ -38,8 +38,8 @@ contract DisposalProofs is GenericProof {
         address destination,
         uint256 deposit,
         bool residual
-    ) public returns (bytes32 _hash_) {
-        bytes32 _hash = generateHash(device_addr, "disposal");
+    ) public returns (bytes32 _hash) {
+        _hash = generateHash(device_addr, "disposal");
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(origin, destination, deposit, residual);
         return _hash;

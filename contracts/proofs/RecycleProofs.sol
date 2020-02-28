@@ -17,9 +17,9 @@ contract RecycleProofs is GenericProof {
         public
         view
         returns (
-            string _collectionPoint,
-            string _date,
-            string _contact,
+            string collectionPoint,
+            string date,
+            string contact,
             string ticket,
             string gpsLocation
         )
