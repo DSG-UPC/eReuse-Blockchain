@@ -45,7 +45,7 @@ contract ProofsHandler is Ownable {
         uint256 score,
         uint256 diskUsage,
         string algorithmVersion
-    ) public returns (bytes32 hash) {
+    ) public returns (bytes32 _hash) {
         return
             functionProofs.setProofData(
                 deviceAddress,
