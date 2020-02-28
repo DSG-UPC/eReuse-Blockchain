@@ -68,12 +68,12 @@ contract("Basic test for block_number", function (accounts) {
         handler_first = await handler.getFunctionProofData(hashes[0]);
         handler_second = await handler.getFunctionProofData(hashes[1]);
 
-        assert.equal(first_proof.score, handler_first.score);
-        assert.equal(first_proof.diskUsage, handler_first.diskUsage);
+        assert.equal(web3.utils.toDecimal(first_proof.score), web3.utils.toDecimal(handler_first.score));
+        assert.equal(web3.utils.toDecimal(first_proof.diskUsage), web3.utils.toDecimal(handler_first.diskUsage));
         assert.equal(first_proof.algorithmVersion, handler_first.algorithmVersion);
 
-        assert.equal(second_proof.score, handler_second.score);
-        assert.equal(second_proof.diskUsage, handler_second.diskUsage);
+        assert.equal(web3.utils.toDecimal(second_proof.score), web3.utils.toDecimal(handler_second.score));
+        assert.equal(web3.utils.toDecimal(second_proof.diskUsage), web3.utils.toDecimal(handler_second.diskUsage));
         assert.equal(second_proof.algorithmVersion, handler_second.algorithmVersion);
     });
 });
