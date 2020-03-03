@@ -31,14 +31,15 @@ contract("Test for block_number", function (accounts) {
         let score = 10;
         let diskUsage = 20;
         let algorithmVersion = 'v3.1';
+        let proofAuthor = accounts[1]
         let proofType = "function";
 
         let device = await DepositDevice.at(deviceAddress);
 
         await device.generateFunctionProof(score, diskUsage,
-            algorithmVersion, { from: accounts[0], gas: 6721975 });
+            algorithmVersion, proofAuthor, { from: accounts[0], gas: 6721975 });
         await device.generateFunctionProof(score, diskUsage,
-            algorithmVersion, { from: accounts[0], gas: 6721975 });
+            algorithmVersion, proofAuthor, { from: accounts[0], gas: 6721975 });
 
         let hashes = await device.getProofs(proofType);
 
@@ -84,13 +85,15 @@ contract("Test for block_number", function (accounts) {
         let erasureType = "complete_erasure";
         let date = new Date().toDateString();
         let erasureResult = true;
+        let proofAuthor = accounts[1];
+
         let proofType = "wipe";
         let device = await DepositDevice.at(deviceAddress);
 
         await device.generateDataWipeProof(erasureType, date, erasureResult,
-            { from: accounts[0], gas: 6721975 });
+            proofAuthor, { from: accounts[0], gas: 6721975 });
         await device.generateDataWipeProof(erasureType, date, erasureResult,
-            { from: accounts[0], gas: 6721975 });
+            proofAuthor, { from: accounts[0], gas: 6721975 });
 
         let hashes = await device.getProofs(proofType);
 

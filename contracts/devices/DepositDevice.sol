@@ -91,14 +91,16 @@ contract DepositDevice is Ownable {
     function generateFunctionProof(
         uint256 score,
         uint256 diskUsage,
-        string algorithmVersion
+        string algorithmVersion,
+        address proofAuthor
     ) public returns (bytes32 _hash) {
         _hash = handler.generateFunctionProof(
             address(this),
             this.owner(),
             score,
             diskUsage,
-            algorithmVersion
+            algorithmVersion,
+            proofAuthor
         );
         proofs["function"].push(_hash);
         return _hash;
@@ -107,7 +109,12 @@ contract DepositDevice is Ownable {
     function getFunctionProof(bytes32 _hash)
         public
         view
-        returns (uint256 score, uint256 diskUsage, string algorithmVersion)
+        returns (
+            uint256 score,
+            uint256 diskUsage,
+            string algorithmVersion,
+            address proofAuthor
+        )
     {
         return handler.getFunctionProofData(_hash);
     }
@@ -146,14 +153,16 @@ contract DepositDevice is Ownable {
     function generateDataWipeProof(
         string erasureType,
         string date,
-        bool erasureResult
+        bool erasureResult,
+        address proofAuthor
     ) public returns (bytes32 _hash) {
         _hash = handler.generateDataWipeProof(
             address(this),
             this.owner(),
             erasureType,
             date,
-            erasureResult
+            erasureResult,
+            proofAuthor
         );
         proofs["wipe"].push(_hash);
         return _hash;
@@ -162,7 +171,12 @@ contract DepositDevice is Ownable {
     function getDataWipeProof(bytes32 _hash)
         public
         view
-        returns (string erasureType, string date, bool erasureResult)
+        returns (
+            string erasureType,
+            string date,
+            bool erasureResult,
+            address proofAuthor
+        )
     {
         return handler.getDataWipeProofData(_hash);
     }

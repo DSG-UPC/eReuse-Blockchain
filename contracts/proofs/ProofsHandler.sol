@@ -44,7 +44,8 @@ contract ProofsHandler is Ownable {
         address owner,
         uint256 score,
         uint256 diskUsage,
-        string algorithmVersion
+        string algorithmVersion,
+        address proofAuthor
     ) public returns (bytes32 _hash) {
         return
             functionProofs.setProofData(
@@ -52,7 +53,8 @@ contract ProofsHandler is Ownable {
                 owner,
                 score,
                 diskUsage,
-                algorithmVersion
+                algorithmVersion,
+                proofAuthor
             );
     }
 
@@ -80,7 +82,8 @@ contract ProofsHandler is Ownable {
         address owner,
         string erasureType,
         string date,
-        bool erasureResult
+        bool erasureResult,
+        address proofAuthor
     ) public returns (bytes32 _hash) {
         return
             dataWipeProofs.setProofData(
@@ -88,7 +91,8 @@ contract ProofsHandler is Ownable {
                 owner,
                 erasureType,
                 date,
-                erasureResult
+                erasureResult,
+                proofAuthor
             );
     }
 
@@ -177,7 +181,12 @@ contract ProofsHandler is Ownable {
     function getFunctionProofData(bytes32 _hash)
         public
         view
-        returns (uint256 score, uint256 diskUsage, string algorithmVersion)
+        returns (
+            uint256 score,
+            uint256 diskUsage,
+            string algorithmVersion,
+            address proofAuthor
+        )
     {
         return functionProofs.getProofData(_hash);
     }
@@ -214,7 +223,7 @@ contract ProofsHandler is Ownable {
     function getDataWipeProofData(bytes32 _hash)
         public
         view
-        returns (string erasureType, string date, bool erasureResult)
+        returns (string erasureType, string date, bool erasureResult, address proofAuthor)
     {
         return dataWipeProofs.getProofData(_hash);
     }

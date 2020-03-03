@@ -6,6 +6,7 @@ contract DataWipeProofs is GenericProof {
         string erasureType;
         string date;
         bool erasureResult;
+        address proofAuthor;
     }
 
     mapping(bytes32 => ProofData) dataProofs;
@@ -15,12 +16,18 @@ contract DataWipeProofs is GenericProof {
     function getProofData(bytes32 _hash)
         public
         view
-        returns (string erasureType, string date, bool erasureResult)
+        returns (
+            string erasureType,
+            string date,
+            bool erasureResult,
+            address proofAuthor
+        )
     {
         return (
             dataProofs[_hash].erasureType,
             dataProofs[_hash].date,
-            dataProofs[_hash].erasureResult
+            dataProofs[_hash].erasureResult,
+            dataProofs[_hash].proofAuthor
         );
     }
 
@@ -29,11 +36,17 @@ contract DataWipeProofs is GenericProof {
         address owner,
         string erasureType,
         string date,
-        bool erasureResult
+        bool erasureResult,
+        address proofAuthor
     ) public returns (bytes32 _hash) {
         _hash = generateHash(device_addr, "wipe");
         setProof(_hash, device_addr, owner);
-        dataProofs[_hash] = ProofData(erasureType, date, erasureResult);
+        dataProofs[_hash] = ProofData(
+            erasureType,
+            date,
+            erasureResult,
+            proofAuthor
+        );
         return _hash;
     }
 }
