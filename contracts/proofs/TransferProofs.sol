@@ -1,12 +1,12 @@
 pragma solidity ^0.4.25;
 import "contracts/proofs/GenericProof.sol";
 
-contract DisposalProofs is GenericProof {
+contract TransferProofs is GenericProof {
     struct ProofData {
-        address origin;
-        address destination;
+        address supplier;
+        address receiver;
         uint256 deposit;
-        bool isResidual;
+        bool isWaste;
     }
 
     mapping(bytes32 => ProofData) dataProofs;
@@ -17,31 +17,31 @@ contract DisposalProofs is GenericProof {
         public
         view
         returns (
-            address origin,
-            address destination,
+            address supplier,
+            address receiver,
             uint256 deposit,
-            bool residual
+            bool isWaste
         )
     {
         return (
-            dataProofs[_hash].origin,
-            dataProofs[_hash].destination,
+            dataProofs[_hash].supplier,
+            dataProofs[_hash].receiver,
             dataProofs[_hash].deposit,
-            dataProofs[_hash].isResidual
+            dataProofs[_hash].isWaste
         );
     }
 
     function setProofData(
         address device_addr,
         address owner,
-        address origin,
-        address destination,
+        address supplier,
+        address receiver,
         uint256 deposit,
-        bool residual
+        bool isWaste
     ) public returns (bytes32 _hash) {
-        _hash = generateHash(device_addr, "disposal");
+        _hash = generateHash(device_addr, "transfer");
         setProof(_hash, device_addr, owner);
-        dataProofs[_hash] = ProofData(origin, destination, deposit, residual);
+        dataProofs[_hash] = ProofData(supplier, receiver, deposit, isWaste);
         return _hash;
     }
 }

@@ -112,35 +112,35 @@ contract DepositDevice is Ownable {
         return handler.getFunctionProofData(_hash);
     }
 
-    function generateDisposalProof(
-        address origin,
-        address destination,
+    function generateTransferProof(
+        address supplier,
+        address receiver,
         uint256 deposit,
-        bool residual
+        bool isWaste
     ) public returns (bytes32 _hash) {
-        _hash = handler.generateDisposalProof(
+        _hash = handler.generateTransferProof(
             address(this),
             this.owner(),
-            origin,
-            destination,
+            supplier,
+            receiver,
             deposit,
-            residual
+            isWaste
         );
-        proofs["disposal"].push(_hash);
+        proofs["transfer"].push(_hash);
         return _hash;
     }
 
-    function getDisposalProof(bytes32 _hash)
+    function getTransferProof(bytes32 _hash)
         public
         view
         returns (
-            address origin,
-            address destination,
+            address supplier,
+            address receiver,
             uint256 deposit,
-            bool residual
+            bool isWaste
         )
     {
-        return handler.getDisposalProofData(_hash);
+        return handler.getTransferProofData(_hash);
     }
 
     function generateDataWipeProof(
@@ -167,17 +167,37 @@ contract DepositDevice is Ownable {
         return handler.getDataWipeProofData(_hash);
     }
 
-    function generateReuseProof(uint256 price) public returns (bytes32 _hash) {
+    function generateReuseProof(
+        string receiverSegment,
+        string idReceipt,
+        address supplier,
+        address receiver,
+        uint256 price
+    ) public returns (bytes32 _hash) {
         bytes32 reuseHash = handler.generateReuseProof(
             address(this),
             this.owner(),
+            receiverSegment,
+            idReceipt,
+            supplier,
+            receiver,
             price
         );
         proofs["reuse"].push(reuseHash);
         return reuseHash;
     }
 
-    function getReuseProof(bytes32 _hash) public view returns (uint256 price) {
+    function getReuseProof(bytes32 _hash)
+        public
+        view
+        returns (
+            string receiverSegment,
+            string idReceipt,
+            address supplier,
+            address receiver,
+            uint256 price
+        )
+    {
         return handler.getReuseProofData(_hash);
     }
 

@@ -1,7 +1,7 @@
 pragma solidity ^0.4.25;
 import "contracts/proofs/DataWipeProofs.sol";
 import "contracts/proofs/FunctionProofs.sol";
-import "contracts/proofs/DisposalProofs.sol";
+import "contracts/proofs/TransferProofs.sol";
 import "contracts/proofs/RecycleProofs.sol";
 import "contracts/proofs/ReuseProofs.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -9,7 +9,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 contract ProofsHandler is Ownable {
     DataWipeProofs private dataWipeProofs;
     FunctionProofs private functionProofs;
-    DisposalProofs private disposalProofs;
+    TransferProofs private transferProofs;
     RecycleProofs private recycleProofs;
     ReuseProofs private reuseProofs;
 
@@ -25,8 +25,8 @@ contract ProofsHandler is Ownable {
         functionProofs = FunctionProofs(proofs);
     }
 
-    function setDisposalProofs(address proofs) public onlyOwner {
-        disposalProofs = DisposalProofs(proofs);
+    function setTransferProofs(address proofs) public onlyOwner {
+        transferProofs = TransferProofs(proofs);
     }
 
     function setRecycleProofs(address proofs) public onlyOwner {
@@ -56,22 +56,22 @@ contract ProofsHandler is Ownable {
             );
     }
 
-    function generateDisposalProof(
+    function generateTransferProof(
         address deviceAddress,
         address owner,
-        address origin,
-        address destination,
+        address supplier,
+        address receiver,
         uint256 deposit,
-        bool residual
+        bool isWaste
     ) public returns (bytes32 _hash) {
         return
-            disposalProofs.setProofData(
+            transferProofs.setProofData(
                 deviceAddress,
                 owner,
-                origin,
-                destination,
+                supplier,
+                receiver,
                 deposit,
-                residual
+                isWaste
             );
     }
 
@@ -95,9 +95,22 @@ contract ProofsHandler is Ownable {
     function generateReuseProof(
         address deviceAddress,
         address owner,
+        string receiverSegment,
+        string idReceipt,
+        address supplier,
+        address receiver,
         uint256 price
     ) public returns (bytes32 _hash) {
-        return reuseProofs.setProofData(deviceAddress, owner, price);
+        return
+            reuseProofs.setProofData(
+                deviceAddress,
+                owner,
+                receiverSegment,
+                idReceipt,
+                supplier,
+                receiver,
+                price
+            );
     }
 
     function generateRecycleProof(
@@ -140,9 +153,9 @@ contract ProofsHandler is Ownable {
             return getDataWipeProof(_hash);
         } else if (
             keccak256(abi.encodePacked(proofType)) ==
-            keccak256(abi.encodePacked("disposal"))
+            keccak256(abi.encodePacked("transfer"))
         ) {
-            return getDisposalProof(_hash);
+            return getTransferProof(_hash);
         } else if (
             keccak256(abi.encodePacked(proofType)) ==
             keccak256(abi.encodePacked("recycle"))
@@ -169,25 +182,25 @@ contract ProofsHandler is Ownable {
         return functionProofs.getProofData(_hash);
     }
 
-    function getDisposalProof(bytes32 _hash)
+    function getTransferProof(bytes32 _hash)
         public
         view
         returns (uint256 block_number, address device_id, address owner)
     {
-        return disposalProofs.getProof(_hash);
+        return transferProofs.getProof(_hash);
     }
 
-    function getDisposalProofData(bytes32 _hash)
+    function getTransferProofData(bytes32 _hash)
         public
         view
         returns (
-            address origin,
-            address destination,
+            address supplier,
+            address receiver,
             uint256 deposit,
-            bool residual
+            bool isWaste
         )
     {
-        return disposalProofs.getProofData(_hash);
+        return transferProofs.getProofData(_hash);
     }
 
     function getDataWipeProof(bytes32 _hash)
@@ -239,7 +252,13 @@ contract ProofsHandler is Ownable {
     function getReuseProofData(bytes32 _hash)
         public
         view
-        returns (uint256 price)
+        returns (
+            string receiverSegment,
+            string idReceipt,
+            address supplier,
+            address receiver,
+            uint256 price
+        )
     {
         return reuseProofs.getProofData(_hash);
     }

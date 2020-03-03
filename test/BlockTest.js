@@ -52,30 +52,29 @@ contract("Test for block_number", function (accounts) {
             handler_first, handler_second);
 
         let first_proof_block = await web3.eth.getBlock(web3.utils.toDecimal(first_proof.block_number));
-        console.log(first_proof_block);
     });
 
-    it("Generates proof of Disposal", async function () {
-        let origin = accounts[1];
-        let destination = accounts[2];
+    it("Generates proof of Transfer", async function () {
+        let supplier = accounts[1];
+        let receiver = accounts[2];
         let deposit = 20;
-        let isResidual = false;
+        let isWaste = false;
 
-        let proofType = "disposal";
+        let proofType = "transfer";
         let device = await DepositDevice.at(deviceAddress);
 
-        await device.generateDisposalProof(origin, destination,
-            deposit, isResidual, { from: accounts[0], gas: 6721975 });
-        await device.generateDisposalProof(origin, destination,
-            deposit, isResidual, { from: accounts[0], gas: 6721975 });
+        await device.generateTransferProof(supplier, receiver,
+            deposit, isWaste, { from: accounts[0], gas: 6721975 });
+        await device.generateTransferProof(supplier, receiver,
+            deposit, isWaste, { from: accounts[0], gas: 6721975 });
 
         let hashes = await device.getProofs(proofType);
 
         let first_proof = await device.getProof(hashes[0], proofType);
         let second_proof = await device.getProof(hashes[1], proofType);
 
-        let handler_first = await handler.getDisposalProof(hashes[0]);
-        let handler_second = await handler.getDisposalProof(hashes[1]);
+        let handler_first = await handler.getTransferProof(hashes[0]);
+        let handler_second = await handler.getTransferProof(hashes[1]);
 
         assert_blockchain(first_proof, second_proof,
             handler_first, handler_second);
@@ -126,20 +125,25 @@ contract("Test for block_number", function (accounts) {
 
         let handler_first = await handler.getRecycleProof(hashes[0]);
         let handler_second = await handler.getRecycleProof(hashes[1]);
-        
+
         assert_blockchain(first_proof, second_proof,
             handler_first, handler_second);
     });
 
     it("Generates proof of Reuse", async function () {
         let price = 10;
+        let receiverSegment = "segment1";
+        let idReceipt = "1876323hh823";
+        let supplier = accounts[1];
+        let receiver = accounts[2];
+
         let proofType = "reuse"
         let device = await DepositDevice.at(deviceAddress);
 
-        await device.generateReuseProof(price,
-            { from: accounts[0], gas: 6721975 });
-        await device.generateReuseProof(price,
-            { from: accounts[0], gas: 6721975 });
+        await device.generateReuseProof(receiverSegment, idReceipt, supplier,
+            receiver, price, { from: accounts[0], gas: 6721975 });
+        await device.generateReuseProof(receiverSegment, idReceipt, supplier,
+            receiver, price, { from: accounts[0], gas: 6721975 });
 
         let hashes = await device.getProofs(proofType);
 

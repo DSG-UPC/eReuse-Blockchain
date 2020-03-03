@@ -56,30 +56,30 @@ contract("Basic test for block_number", function (accounts) {
         assert.equal(second_proof.algorithmVersion, algorithmVersion);
     });
 
-    it("Generates proof of Disposal", async function () {
-        let origin = accounts[1];
-        let destination = accounts[2];
+    it("Generates proof of Transfer", async function () {
+        let supplier = accounts[1];
+        let receiver = accounts[2];
         let deposit = 20;
-        let isResidual = false;
-        let proofType = "disposal";
+        let isWaste = false;
+        let proofType = "transfer";
 
         let device = await DepositDevice.at(deviceAddress);
 
-        await device.generateDisposalProof(origin, destination,
-            deposit, isResidual, { from: accounts[0], gas: 6721975 });
-        await device.generateDisposalProof(origin, destination,
-            deposit, isResidual, { from: accounts[0], gas: 6721975 });
+        await device.generateTransferProof(supplier, receiver,
+            deposit, isWaste, { from: accounts[0], gas: 6721975 });
+        await device.generateTransferProof(supplier, receiver,
+            deposit, isWaste, { from: accounts[0], gas: 6721975 });
 
         let hashes = await device.getProofs(proofType);
 
         assert.equal(hashes.length, 2)
 
-        first_proof = await device.getDisposalProof(hashes[0]);
-        second_proof = await device.getDisposalProof(hashes[1]);
+        first_proof = await device.getTransferProof(hashes[0]);
+        second_proof = await device.getTransferProof(hashes[1]);
 
-        assert.equal(web3.utils.toChecksumAddress(first_proof.origin), origin);
-        assert.equal(web3.utils.toChecksumAddress(first_proof.destination),
-            destination);
+        assert.equal(web3.utils.toChecksumAddress(first_proof.supplier), supplier);
+        assert.equal(web3.utils.toChecksumAddress(first_proof.receiver),
+            receiver);
         assert.equal(web3.utils.toDecimal(first_proof.deposit), deposit);
     });
 
@@ -149,14 +149,18 @@ contract("Basic test for block_number", function (accounts) {
 
     it("Generates proof of Reuse", async function () {
         let price = 10;
-        let proofType = "reuse"
+        let receiverSegment = "segment1";
+        let idReceipt = "1876323hh823";
+        let supplier = accounts[1];
+        let receiver = accounts[2];
 
+        let proofType = "reuse"
         let device = await DepositDevice.at(deviceAddress);
 
-        await device.generateReuseProof(price,
-            { from: accounts[0], gas: 6721975 });
-        await device.generateReuseProof(price,
-            { from: accounts[0], gas: 6721975 });
+        await device.generateReuseProof(receiverSegment, idReceipt, supplier,
+            receiver, price, { from: accounts[0], gas: 6721975 });
+        await device.generateReuseProof(receiverSegment, idReceipt, supplier,
+            receiver, price, { from: accounts[0], gas: 6721975 });
 
         let hashes = await device.getProofs(proofType);
 
@@ -165,9 +169,21 @@ contract("Basic test for block_number", function (accounts) {
         first_proof = await device.getReuseProof(hashes[0]);
         second_proof = await device.getReuseProof(hashes[1]);
 
-        assert.equal(web3.utils.toDecimal(first_proof), price);
+        assert.equal(web3.utils.toDecimal(first_proof.price), price);
+        assert.equal(first_proof.receiverSegment, receiverSegment);
+        assert.equal(first_proof.idReceipt, idReceipt);
+        assert.equal(web3.utils.toChecksumAddress(first_proof.supplier),
+            web3.utils.toChecksumAddress(supplier));
+        assert.equal(web3.utils.toChecksumAddress(first_proof.receiver),
+            web3.utils.toChecksumAddress(receiver));
 
-        assert.equal(web3.utils.toDecimal(second_proof), price);
+        assert.equal(web3.utils.toDecimal(second_proof.price), price);
+        assert.equal(second_proof.receiverSegment, receiverSegment);
+        assert.equal(second_proof.idReceipt, idReceipt);
+        assert.equal(web3.utils.toChecksumAddress(second_proof.supplier),
+            web3.utils.toChecksumAddress(supplier));
+        assert.equal(web3.utils.toChecksumAddress(second_proof.receiver),
+            web3.utils.toChecksumAddress(receiver));
     });
 });
 

@@ -2,7 +2,7 @@ const DAO = artifacts.require("DAO");
 const ProofsHandler = artifacts.require("ProofsHandler");
 
 const DataWipeProofs = artifacts.require("DataWipeProofs");
-const DisposalProofs = artifacts.require("DisposalProofs");
+const TransferProofs = artifacts.require("TransferProofs");
 const ReuseProofs = artifacts.require("ReuseProofs");
 const RecycleProofs = artifacts.require("RecycleProofs");
 const FunctionProofs = artifacts.require("FunctionProofs");
@@ -15,9 +15,9 @@ module.exports = async (deployer, network, accounts) => {
                 .then(async function (proofs) {
                     await handler.setDataWipeProofs(proofs.address);
                 });
-            await deployer.deploy(DisposalProofs, { from: accounts[0] })
+            await deployer.deploy(TransferProofs, { from: accounts[0] })
                 .then(async function (proofs) {
-                    await handler.setDisposalProofs(proofs.address);
+                    await handler.setTransferProofs(proofs.address);
                 });
             await deployer.deploy(ReuseProofs, { from: accounts[0] })
                 .then(async function (proofs) {
