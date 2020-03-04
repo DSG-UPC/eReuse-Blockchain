@@ -10,7 +10,7 @@ const minimist = require('minimist'),
     });
 const network = argv.network;
 
-contract("Test for block_number", function (accounts) {
+contract("Test for generic proof data", function (accounts) {
     var device_factory;
     console.log('');
 
@@ -18,6 +18,18 @@ contract("Test for block_number", function (accounts) {
         console.log('\t**BEFORE**');
         device_factory = await DeviceFactory.deployed();
         handler = await ProofsHandler.deployed();
+    });
+
+    it("Generates two proofs with distinct type for the same device", async function () {
+        let supplier = accounts[1];
+        let receiver = accounts[2];
+        let deposit = 10;
+        let isWaste = true;
+
+        let score = 8;
+        let diskUsage = 20;
+        let algorithm = "v3"
+        let proofAuthor = accounts[3]
 
         await device_factory.createDevice("device", 0, accounts[0]);
 
@@ -25,139 +37,83 @@ contract("Test for block_number", function (accounts) {
             { from: accounts[0] }).then(devices => {
                 return devices[0];
             });
+        let device = await DepositDevice.at(deviceAddress);
+
+        await device.generateFunctionProof(score, diskUsage, algorithm,
+            proofAuthor, { from: accounts[0], gas: 6721975 });
+        await device.generateTransferProof(supplier, receiver, deposit,
+            isWaste, { from: accounts[0], gas: 6721975 });
+
+        // let function_hash = await device.getProofs("function");
+        // let transfer_hash = await device.getProofs("transfer");
+
+        // let first_proof = await device.getProof(function_hash[0], "function");
+        // let second_proof = await device.getProof(transfer_hash[0], "transfer");
+
+        // console.log(`First proof: ${web3.utils.toDecimal(first_proof.block_number)}`);
+        // console.log(`Second proof: ${web3.utils.toDecimal(second_proof.block_number)}`);
     });
 
-    it("Generates proof of Function", async function () {
-        let score = 10;
+    it("Generates two proofs of the same type for two distinct devices", async function () {
+        let score = 8;
         let diskUsage = 20;
-        let algorithmVersion = 'v3.1';
-        let proofAuthor = accounts[1]
+        let algorithm = "v3"
+        let proofAuthor = accounts[3]
         let proofType = "function";
 
-        let device = await DepositDevice.at(deviceAddress);
+        await device_factory.createDevice("device", 0, accounts[0]);
+        await device_factory.createDevice("device1", 0, accounts[0]);
 
-        await device.generateFunctionProof(score, diskUsage,
-            algorithmVersion, proofAuthor, { from: accounts[0], gas: 6721975 });
-        await device.generateFunctionProof(score, diskUsage,
-            algorithmVersion, proofAuthor, { from: accounts[0], gas: 6721975 });
+        let deviceAddresses = await device_factory.getDeployedDevices(
+            { from: accounts[0] }).then(devices => {
+                return devices;
+            });
+        let device1 = await DepositDevice.at(deviceAddresses[0]);
+        let device2 = await DepositDevice.at(deviceAddresses[1]);
 
-        let hashes = await device.getProofs(proofType);
-
-        let first_proof = await device.getProof(hashes[0], proofType);
-        let second_proof = await device.getProof(hashes[1], proofType);
-
-        let handler_first = await handler.getFunctionProof(hashes[0]);
-        let handler_second = await handler.getFunctionProof(hashes[1]);
-
-        assert_blockchain(first_proof, second_proof,
-            handler_first, handler_second);
-
-        let first_proof_block = await web3.eth.getBlock(web3.utils.toDecimal(first_proof.block_number));
-    });
-
-    it("Generates proof of Transfer", async function () {
-        let supplier = accounts[1];
-        let receiver = accounts[2];
-        let deposit = 20;
-        let isWaste = false;
-
-        let proofType = "transfer";
-        let device = await DepositDevice.at(deviceAddress);
-
-        await device.generateTransferProof(supplier, receiver,
-            deposit, isWaste, { from: accounts[0], gas: 6721975 });
-        await device.generateTransferProof(supplier, receiver,
-            deposit, isWaste, { from: accounts[0], gas: 6721975 });
-
-        let hashes = await device.getProofs(proofType);
-
-        let first_proof = await device.getProof(hashes[0], proofType);
-        let second_proof = await device.getProof(hashes[1], proofType);
-
-        let handler_first = await handler.getTransferProof(hashes[0]);
-        let handler_second = await handler.getTransferProof(hashes[1]);
-
-        assert_blockchain(first_proof, second_proof,
-            handler_first, handler_second);
-    });
-
-    it("Generates proof of Data Wipe", async function () {
-        let erasureType = "complete_erasure";
-        let date = new Date().toDateString();
-        let erasureResult = true;
-        let proofAuthor = accounts[1];
-
-        let proofType = "wipe";
-        let device = await DepositDevice.at(deviceAddress);
-
-        await device.generateDataWipeProof(erasureType, date, erasureResult,
+        await device1.generateFunctionProof(score, diskUsage, algorithm,
             proofAuthor, { from: accounts[0], gas: 6721975 });
-        await device.generateDataWipeProof(erasureType, date, erasureResult,
+        await device2.generateFunctionProof(score, diskUsage, algorithm,
+            proofAuthor, { from: accounts[0], gas: 6721975 });
+
+        // let hashes1 = await device1.getProofs(proofType);
+        // let hashes2 = await device2.getProofs(proofType);
+
+        // let first_proof = await device1.getProof(hashes1[0], proofType);
+        // let second_proof = await device2.getProof(hashes2[0], proofType);
+
+        // console.log(`First proof: ${web3.utils.toDecimal(first_proof.block_number)}`);
+        // console.log(`Second proof: ${web3.utils.toDecimal(second_proof.block_number)}`);
+    });
+
+    it("Gets the transactions from some block", async function () {
+        let score = 8;
+        let diskUsage = 20;
+        let algorithm = "v3"
+        let proofAuthor = accounts[3]
+        let proofType = "function";
+
+        await device_factory.createDevice("device", 0, accounts[0]);
+
+        let deviceAddress = await device_factory.getDeployedDevices(
+            { from: accounts[0] }).then(devices => {
+                return devices[0];
+            });
+        let device = await DepositDevice.at(deviceAddress);
+
+        await device.generateFunctionProof(score, diskUsage, algorithm,
             proofAuthor, { from: accounts[0], gas: 6721975 });
 
         let hashes = await device.getProofs(proofType);
 
         let first_proof = await device.getProof(hashes[0], proofType);
-        let second_proof = await device.getProof(hashes[1], proofType);
-
-        let handler_first = await handler.getDataWipeProof(hashes[0]);
-        let handler_second = await handler.getDataWipeProof(hashes[1]);
-
-        assert_blockchain(first_proof, second_proof,
-            handler_first, handler_second);
-    });
-
-    it("Generates proof of Recycle", async function () {
-        let collectionPoint = "Recicla2";
-        let date = new Date().toDateString();
-        let contact = "John";
-        let ticket = "2187463785273jhcd";
-        let gpsLocation = "41.3851, 2.1734";
-        let proofType = "recycle"
-        let device = await DepositDevice.at(deviceAddress);
-
-        await device.generateRecycleProof(collectionPoint, date, contact,
-            ticket, gpsLocation, { from: accounts[0], gas: 6721975 });
-        await device.generateRecycleProof(collectionPoint, date, contact,
-            ticket, gpsLocation, { from: accounts[0], gas: 6721975 });
-
-        let hashes = await device.getProofs(proofType);
-
-        let first_proof = await device.getProof(hashes[0], proofType);
-        let second_proof = await device.getProof(hashes[1], proofType);
-
-        let handler_first = await handler.getRecycleProof(hashes[0]);
-        let handler_second = await handler.getRecycleProof(hashes[1]);
-
-        assert_blockchain(first_proof, second_proof,
-            handler_first, handler_second);
-    });
-
-    it("Generates proof of Reuse", async function () {
-        let price = 10;
-        let receiverSegment = "segment1";
-        let idReceipt = "1876323hh823";
-        let supplier = accounts[1];
-        let receiver = accounts[2];
-
-        let proofType = "reuse"
-        let device = await DepositDevice.at(deviceAddress);
-
-        await device.generateReuseProof(receiverSegment, idReceipt, supplier,
-            receiver, price, { from: accounts[0], gas: 6721975 });
-        await device.generateReuseProof(receiverSegment, idReceipt, supplier,
-            receiver, price, { from: accounts[0], gas: 6721975 });
-
-        let hashes = await device.getProofs(proofType);
-
-        let first_proof = await device.getProof(hashes[0], proofType);
-        let second_proof = await device.getProof(hashes[1], proofType);
-
-        let handler_first = await handler.getReuseProof(hashes[0]);
-        let handler_second = await handler.getReuseProof(hashes[1]);
-
-        assert_blockchain(first_proof, second_proof,
-            handler_first, handler_second);
+        let block_number = await web3.utils.toDecimal(first_proof.block_number);
+        for (i of [2, 1, 0, -1, -2]) {
+            let block = await web3.eth.getBlock(block_number + i);
+            let receipt = await web3.eth.getTransactionReceipt(block.transactions[0]);
+            printAddresses(accounts[0], block_number - i, device_factory,
+                handler, device, receipt)
+        }
     });
 });
 
@@ -165,17 +121,13 @@ function extractEvents(receipt) {
     return receipt.logs[0].args
 }
 
-function assert_blockchain(first_proof, second_proof, handler_first, handler_second) {
-    assert.notEqual(web3.utils.toDecimal(first_proof.block_number),
-        web3.utils.toDecimal(second_proof.block_number));
-
-    assert.equal(web3.utils.toDecimal(first_proof.block_number),
-        web3.utils.toDecimal(handler_first.block_number));
-    assert.equal(first_proof.device_id, handler_first.device_id);
-    assert.equal(first_proof.owner, handler_first.owner);
-
-    assert.equal(web3.utils.toDecimal(second_proof.block_number),
-        web3.utils.toDecimal(handler_second.block_number));
-    assert.equal(second_proof.device_id, handler_second.device_id);
-    assert.equal(second_proof.owner, handler_second.owner);
+function printAddresses(account, block_number, device_factory, handler, device,
+                                                                    receipt) {
+    console.log(`FOR BLOCK_NUMBER ${block_number}\n`)
+    console.log(`Account: ${account}`);
+    console.log(`DeviceFactory: ${device_factory.address}`);
+    console.log(`Device: ${device.address}`);
+    console.log(`Handler: ${handler.address}`);
+    console.log(`Receipt from: ${receipt.from}`);
+    console.log(`Receipt to: ${receipt.to}\n\n\n`);
 }

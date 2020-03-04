@@ -25,6 +25,17 @@
             "outFiles": [
                 "${workspaceRoot}/test/**/*"
             ],
+          },
+          {
+            "name": "run GenericProofTest",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceRoot}/node_modules/truffle/build/cli.bundled.js",
+            "args": ["test", "test/GenericProofTest.js"],
+            "cwd": "${workspaceRoot}",
+            "outFiles": [
+                "${workspaceRoot}/test/**/*"
+            ],
           }
     ]
 }
