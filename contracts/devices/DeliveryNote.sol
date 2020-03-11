@@ -72,6 +72,7 @@ contract DeliveryNote is Ownable {
     onlyOwner
     {
         require(currentState == 0, "The current Delivery Note is not the valid state.");
+        require(num_devices>0, "This deliveryNote has 0 devices");
         setState(1);
         emit NoteEmitted("Transfer", deposit);
     }
@@ -81,6 +82,7 @@ contract DeliveryNote is Ownable {
     onlyReceiver
     {
         require(currentState == 1, "The current Delivery Note is not the valid state.");
+        require(num_devices>0, "This deliveryNote has 0 devices");
         deposit = _deposit;
         erc20.transferFrom(msg.sender, address(this), deposit);
         transferDevices();
