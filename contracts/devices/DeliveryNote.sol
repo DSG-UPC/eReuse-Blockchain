@@ -46,6 +46,22 @@ contract DeliveryNote is Ownable {
         return currentState;
     }
 
+    function getSender() public view onlyOwner returns(address s) {
+        return sender;
+    }
+
+    function getReceiver() public view onlyOwner returns(address r) {
+        return receiver;
+    }
+
+    function getDeposit() public view onlyOwner returns(uint d) {
+        return deposit;
+    }
+
+    function getDevices() public view onlyOwner returns(address[] d) {
+        return devices;
+    }
+
     function setState(uint _state) public {
         currentState = _state;
     }
