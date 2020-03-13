@@ -37,6 +37,7 @@ contract DepositDevice is Ownable {
 
     // events ----------------------------------------------------------------
     event TestEv(address test);
+    event proofGenerated(bytes32 proofHash);
 
     constructor(
         string _name,
@@ -93,8 +94,8 @@ contract DepositDevice is Ownable {
         uint256 diskUsage,
         string algorithmVersion,
         address proofAuthor
-    ) public returns (bytes32 _hash) {
-        _hash = handler.generateFunctionProof(
+    ) public{
+        bytes32 proofHash = handler.generateFunctionProof(
             address(this),
             this.owner(),
             score,
@@ -102,8 +103,8 @@ contract DepositDevice is Ownable {
             algorithmVersion,
             proofAuthor
         );
-        proofs["function"].push(_hash);
-        return _hash;
+        proofs["function"].push(proofHash);
+        emit proofGenerated(proofHash);
     }
 
     function getFunctionProof(bytes32 _hash)
@@ -124,8 +125,8 @@ contract DepositDevice is Ownable {
         address receiver,
         uint256 deposit,
         bool isWaste
-    ) public returns (bytes32 _hash) {
-        _hash = handler.generateTransferProof(
+    ) public {
+        bytes32 proofHash = handler.generateTransferProof(
             address(this),
             this.owner(),
             supplier,
@@ -133,8 +134,8 @@ contract DepositDevice is Ownable {
             deposit,
             isWaste
         );
-        proofs["transfer"].push(_hash);
-        return _hash;
+        proofs["transfer"].push(proofHash);
+        emit proofGenerated(proofHash);
     }
 
     function getTransferProof(bytes32 _hash)
@@ -155,8 +156,8 @@ contract DepositDevice is Ownable {
         string date,
         bool erasureResult,
         address proofAuthor
-    ) public returns (bytes32 _hash) {
-        _hash = handler.generateDataWipeProof(
+    ) public {
+        bytes32 proofHash = handler.generateDataWipeProof(
             address(this),
             this.owner(),
             erasureType,
@@ -164,8 +165,8 @@ contract DepositDevice is Ownable {
             erasureResult,
             proofAuthor
         );
-        proofs["wipe"].push(_hash);
-        return _hash;
+        proofs["wipe"].push(proofHash);
+        emit proofGenerated(proofHash);
     }
 
     function getDataWipeProof(bytes32 _hash)
@@ -187,8 +188,8 @@ contract DepositDevice is Ownable {
         address supplier,
         address receiver,
         uint256 price
-    ) public returns (bytes32 _hash) {
-        bytes32 reuseHash = handler.generateReuseProof(
+    ) public {
+        bytes32 proofHash = handler.generateReuseProof(
             address(this),
             this.owner(),
             receiverSegment,
@@ -197,8 +198,8 @@ contract DepositDevice is Ownable {
             receiver,
             price
         );
-        proofs["reuse"].push(reuseHash);
-        return reuseHash;
+        proofs["reuse"].push(proofHash);
+        emit proofGenerated(proofHash);
     }
 
     function getReuseProof(bytes32 _hash)
@@ -221,8 +222,8 @@ contract DepositDevice is Ownable {
         string contact,
         string ticket,
         string gpsLocation
-    ) public returns (bytes32 _hash) {
-        _hash = handler.generateRecycleProof(
+    ) public {
+        bytes32 proofHash = handler.generateRecycleProof(
             address(this),
             this.owner(),
             collectionPoint,
@@ -231,8 +232,8 @@ contract DepositDevice is Ownable {
             ticket,
             gpsLocation
         );
-        proofs["recycle"].push(_hash);
-        return _hash;
+        proofs["recycle"].push(proofHash);
+        emit proofGenerated(proofHash);
     }
 
     function getRecycleProof(bytes32 _hash)
