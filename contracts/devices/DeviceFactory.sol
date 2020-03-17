@@ -12,7 +12,8 @@ contract DeviceFactory {
   mapping(address => address[]) deployed_devices;
 
   //-------  EVENTS  -------//
-    event DeviceCreated(address _deviceAddress);
+  event DeviceCreated(address _deviceAddress);
+  event Transferencia(address cur_owner, address new_owner, address device);
 
   constructor(address _daoAddress) public {
     daoAddress = _daoAddress;
@@ -30,12 +31,9 @@ contract DeviceFactory {
     return newContract;
   }
 
-  function transfer(address _new_owner) public {
-    DepositDevice d = DepositDevice(msg.sender);
-    address owner = d.getOwner();
-
-    deleteOwnership(owner);
-    deployed_devices[_new_owner].push(msg.sender);
+  function transfer(address current_owner, address new_owner) public {
+    deleteOwnership(current_owner);
+    deployed_devices[new_owner].push(msg.sender);
   }
 
   function deleteOwnership(address owner) internal {

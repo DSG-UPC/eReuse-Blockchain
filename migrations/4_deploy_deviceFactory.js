@@ -7,7 +7,7 @@ module.exports = async (deployer, network, accounts) => {
             dao = instance;
             await deployer.deploy(DeviceFactory, dao.address, { from: accounts[0] })
                 .then(async function (deviceFactory) {
-                    dao.setDeviceFactory(deviceFactory.address);
+                    await dao.setDeviceFactory(deviceFactory.address);
                 });
         });
 };

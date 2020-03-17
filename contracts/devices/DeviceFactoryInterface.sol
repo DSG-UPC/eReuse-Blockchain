@@ -4,7 +4,7 @@ contract DeviceFactoryInterface {
     mapping(address => address[]) deployed_devices;
     address public daoAddress;
 
-    function transfer(address _new_owner) public;
+    function transfer(address current_owner, address _new_owner) public;
     function deleteOwnership(address owner) internal;
     function createDevice(string _name, uint256 _initValue, address _owner)
         public
