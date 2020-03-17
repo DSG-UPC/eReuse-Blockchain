@@ -67,7 +67,7 @@ contract DepositDevice is Ownable {
         // Return the deposit first of all
         returnDeposit();
 
-        factory.transfer(_to);
+        factory.transfer(data.owner,_to);
         data.owner = _to;
         data.deposit = _new_deposit;
         transferOwnership(_to);
