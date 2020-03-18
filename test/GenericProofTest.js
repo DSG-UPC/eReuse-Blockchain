@@ -32,7 +32,7 @@ contract("Test for generic proof data", function (accounts) {
         let diskUsage = 20;
         let algorithmVersion = 'v3.1';
         let proofAuthor = accounts[1]
-        let proofType = "function";
+        let proofType = "ProofFunction";
 
         let device = await DepositDevice.at(deviceAddress);
 
@@ -51,8 +51,6 @@ contract("Test for generic proof data", function (accounts) {
 
         assert_blockchain(first_proof, second_proof,
             handler_first, handler_second);
-
-        let first_proof_block = await web3.eth.getBlock(web3.utils.toDecimal(first_proof.block_number));
     });
 
     it("Generates proof of Transfer and retrieves the correct data", async function () {
@@ -61,7 +59,7 @@ contract("Test for generic proof data", function (accounts) {
         let deposit = 20;
         let isWaste = false;
 
-        let proofType = "transfer";
+        let proofType = "ProofTransfer";
         let device = await DepositDevice.at(deviceAddress);
 
         await device.generateTransferProof(supplier, receiver,
@@ -87,7 +85,7 @@ contract("Test for generic proof data", function (accounts) {
         let erasureResult = true;
         let proofAuthor = accounts[1];
 
-        let proofType = "wipe";
+        let proofType = "ProofDataWipe";
         let device = await DepositDevice.at(deviceAddress);
 
         await device.generateDataWipeProof(erasureType, date, erasureResult,
@@ -113,13 +111,15 @@ contract("Test for generic proof data", function (accounts) {
         let contact = "John";
         let ticket = "2187463785273jhcd";
         let gpsLocation = "41.3851, 2.1734";
-        let proofType = "recycle"
+        let recyclerCode = "12u3276b3"
+
+        let proofType = "ProofRecycling"
         let device = await DepositDevice.at(deviceAddress);
 
         await device.generateRecycleProof(collectionPoint, date, contact,
-            ticket, gpsLocation, { from: accounts[0], gas: 6721975 });
+            ticket, gpsLocation, recyclerCode, { from: accounts[0], gas: 6721975 });
         await device.generateRecycleProof(collectionPoint, date, contact,
-            ticket, gpsLocation, { from: accounts[0], gas: 6721975 });
+            ticket, gpsLocation, recyclerCode, { from: accounts[0], gas: 6721975 });
 
         let hashes = await device.getProofs(proofType);
 
@@ -140,7 +140,7 @@ contract("Test for generic proof data", function (accounts) {
         let supplier = accounts[1];
         let receiver = accounts[2];
 
-        let proofType = "reuse"
+        let proofType = "ProofReuse"
         let device = await DepositDevice.at(deviceAddress);
 
         await device.generateReuseProof(receiverSegment, idReceipt, supplier,

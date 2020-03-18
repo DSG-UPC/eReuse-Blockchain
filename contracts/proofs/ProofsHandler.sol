@@ -124,7 +124,8 @@ contract ProofsHandler is Ownable {
         string date,
         string contact,
         string ticket,
-        string gpsLocation
+        string gpsLocation,
+        string recyclerCode
     ) public returns (bytes32 _hash) {
         return
             recycleProofs.setProofData(
@@ -134,8 +135,19 @@ contract ProofsHandler is Ownable {
                 date,
                 contact,
                 ticket,
-                gpsLocation
+                gpsLocation,
+                recyclerCode
             );
+    }
+
+    function compareProofTypes(string original, string expected)
+        private
+        pure
+        returns (bool result)
+    {
+        return
+            keccak256(abi.encodePacked(original)) ==
+            keccak256(abi.encodePacked(expected));
     }
 
     // -------------- GETTERS FOR PROOFS --------------- //
@@ -145,25 +157,13 @@ contract ProofsHandler is Ownable {
         view
         returns (uint256 block_number, address device_id, address owner)
     {
-        if (
-            keccak256(abi.encodePacked(proofType)) ==
-            keccak256(abi.encodePacked("function"))
-        ) {
+        if (compareProofTypes(proofType, "ProofFunction")) {
             return getFunctionProof(_hash);
-        } else if (
-            keccak256(abi.encodePacked(proofType)) ==
-            keccak256(abi.encodePacked("wipe"))
-        ) {
+        } else if (compareProofTypes(proofType, "ProofDataWipe")) {
             return getDataWipeProof(_hash);
-        } else if (
-            keccak256(abi.encodePacked(proofType)) ==
-            keccak256(abi.encodePacked("transfer"))
-        ) {
+        } else if (compareProofTypes(proofType, "ProofTransfer")) {
             return getTransferProof(_hash);
-        } else if (
-            keccak256(abi.encodePacked(proofType)) ==
-            keccak256(abi.encodePacked("recycle"))
-        ) {
+        } else if (compareProofTypes(proofType, "ProofRecycling")) {
             return getRecycleProof(_hash);
         } else {
             return getReuseProof(_hash);
@@ -223,7 +223,12 @@ contract ProofsHandler is Ownable {
     function getDataWipeProofData(bytes32 _hash)
         public
         view
-        returns (string erasureType, string date, bool erasureResult, address proofAuthor)
+        returns (
+            string erasureType,
+            string date,
+            bool erasureResult,
+            address proofAuthor
+        )
     {
         return dataWipeProofs.getProofData(_hash);
     }
@@ -244,7 +249,8 @@ contract ProofsHandler is Ownable {
             string date,
             string contact,
             string ticket,
-            string gpsLocation
+            string gpsLocation,
+            string recyclerCode
         )
     {
         return recycleProofs.getProofData(_hash);

@@ -39,7 +39,7 @@ contract DataWipeProofs is GenericProof {
         bool erasureResult,
         address proofAuthor
     ) public returns (bytes32 _hash) {
-        _hash = generateHash(device_addr, "wipe");
+        _hash = generateHash(device_addr, "ProofDataWipe");
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(
             erasureType,

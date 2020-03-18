@@ -103,7 +103,7 @@ contract DepositDevice is Ownable {
             algorithmVersion,
             proofAuthor
         );
-        proofs["function"].push(proofHash);
+        proofs["ProofFunction"].push(proofHash);
         emit proofGenerated(proofHash);
     }
 
@@ -134,7 +134,7 @@ contract DepositDevice is Ownable {
             deposit,
             isWaste
         );
-        proofs["transfer"].push(proofHash);
+        proofs["ProofTransfer"].push(proofHash);
         emit proofGenerated(proofHash);
     }
 
@@ -165,7 +165,7 @@ contract DepositDevice is Ownable {
             erasureResult,
             proofAuthor
         );
-        proofs["wipe"].push(proofHash);
+        proofs["ProofDataWipe"].push(proofHash);
         emit proofGenerated(proofHash);
     }
 
@@ -198,7 +198,7 @@ contract DepositDevice is Ownable {
             receiver,
             price
         );
-        proofs["reuse"].push(proofHash);
+        proofs["ProofReuse"].push(proofHash);
         emit proofGenerated(proofHash);
     }
 
@@ -221,7 +221,8 @@ contract DepositDevice is Ownable {
         string date,
         string contact,
         string ticket,
-        string gpsLocation
+        string gpsLocation,
+        string recyclerCode
     ) public {
         bytes32 proofHash = handler.generateRecycleProof(
             address(this),
@@ -230,9 +231,10 @@ contract DepositDevice is Ownable {
             date,
             contact,
             ticket,
-            gpsLocation
+            gpsLocation,
+            recyclerCode
         );
-        proofs["recycle"].push(proofHash);
+        proofs["ProofRecycling"].push(proofHash);
         emit proofGenerated(proofHash);
     }
 
@@ -244,7 +246,8 @@ contract DepositDevice is Ownable {
             string date,
             string contact,
             string ticket,
-            string gpsLocation
+            string gpsLocation,
+            string recyclerCode
         )
     {
         return handler.getRecycleProofData(_hash);

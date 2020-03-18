@@ -43,15 +43,6 @@ contract("Test for generic proof data", function (accounts) {
             proofAuthor, { from: accounts[0], gas: 6721975 });
         await device.generateTransferProof(supplier, receiver, deposit,
             isWaste, { from: accounts[0], gas: 6721975 });
-
-        // let function_hash = await device.getProofs("function");
-        // let transfer_hash = await device.getProofs("transfer");
-
-        // let first_proof = await device.getProof(function_hash[0], "function");
-        // let second_proof = await device.getProof(transfer_hash[0], "transfer");
-
-        // console.log(`First proof: ${web3.utils.toDecimal(first_proof.block_number)}`);
-        // console.log(`Second proof: ${web3.utils.toDecimal(second_proof.block_number)}`);
     });
 
     it("Generates two proofs of the same type for two distinct devices", async function () {
@@ -59,7 +50,6 @@ contract("Test for generic proof data", function (accounts) {
         let diskUsage = 20;
         let algorithm = "v3"
         let proofAuthor = accounts[3]
-        let proofType = "function";
 
         await device_factory.createDevice("device", 0, accounts[0]);
         await device_factory.createDevice("device1", 0, accounts[0]);
@@ -75,15 +65,6 @@ contract("Test for generic proof data", function (accounts) {
             proofAuthor, { from: accounts[0], gas: 6721975 });
         await device2.generateFunctionProof(score, diskUsage, algorithm,
             proofAuthor, { from: accounts[0], gas: 6721975 });
-
-        // let hashes1 = await device1.getProofs(proofType);
-        // let hashes2 = await device2.getProofs(proofType);
-
-        // let first_proof = await device1.getProof(hashes1[0], proofType);
-        // let second_proof = await device2.getProof(hashes2[0], proofType);
-
-        // console.log(`First proof: ${web3.utils.toDecimal(first_proof.block_number)}`);
-        // console.log(`Second proof: ${web3.utils.toDecimal(second_proof.block_number)}`);
     });
 
     it("Gets the transactions from some block", async function () {
@@ -91,7 +72,7 @@ contract("Test for generic proof data", function (accounts) {
         let diskUsage = 20;
         let algorithm = "v3"
         let proofAuthor = accounts[3]
-        let proofType = "function";
+        let proofType = "ProofFunction";
 
         await device_factory.createDevice("device", 0, accounts[0]);
 

@@ -32,7 +32,7 @@ contract("Basic test for block_number", function (accounts) {
         let diskUsage = 20;
         let algorithmVersion = 'v3.1';
         let proofAuthor = accounts[1]
-        let proofType = "function";
+        let proofType = "ProofFunction";
 
         let device = await DepositDevice.at(deviceAddress);
 
@@ -66,7 +66,7 @@ contract("Basic test for block_number", function (accounts) {
         let receiver = accounts[2];
         let deposit = 20;
         let isWaste = false;
-        let proofType = "transfer";
+        let proofType = "ProofTransfer";
 
         let device = await DepositDevice.at(deviceAddress);
 
@@ -93,7 +93,7 @@ contract("Basic test for block_number", function (accounts) {
         let date = new Date().toDateString();
         let erasureResult = true;
         let proofAuthor = accounts[1];
-        let proofType = "wipe";
+        let proofType = "ProofDataWipe";
 
         let device = await DepositDevice.at(deviceAddress);
 
@@ -128,14 +128,15 @@ contract("Basic test for block_number", function (accounts) {
         let contact = "John";
         let ticket = "2187463785273jhcd";
         let gpsLocation = "41.3851, 2.1734";
-        let proofType = "recycle"
+        let recyclerCode = "12u3276b3"
+        let proofType = "ProofRecycling"
 
         let device = await DepositDevice.at(deviceAddress);
 
         await device.generateRecycleProof(collectionPoint, date, contact,
-            ticket, gpsLocation, { from: accounts[0], gas: 6721975 });
+            ticket, gpsLocation, recyclerCode, { from: accounts[0], gas: 6721975 });
         await device.generateRecycleProof(collectionPoint, date, contact,
-            ticket, gpsLocation, { from: accounts[0], gas: 6721975 });
+            ticket, gpsLocation, recyclerCode, { from: accounts[0], gas: 6721975 });
 
         let hashes = await device.getProofs(proofType);
 
@@ -149,12 +150,14 @@ contract("Basic test for block_number", function (accounts) {
         assert.equal(first_proof.contact, contact);
         assert.equal(first_proof.ticket, ticket);
         assert.equal(first_proof.gpsLocation, gpsLocation);
+        assert.equal(first_proof.recyclerCode, recyclerCode);
 
         assert.equal(second_proof.collectionPoint, collectionPoint);
         assert.equal(second_proof.date, date);
         assert.equal(second_proof.contact, contact);
         assert.equal(second_proof.ticket, ticket);
         assert.equal(second_proof.gpsLocation, gpsLocation);
+        assert.equal(second_proof.recyclerCode, recyclerCode);
     });
 
     it("Generates proof of Reuse", async function () {
@@ -164,7 +167,7 @@ contract("Basic test for block_number", function (accounts) {
         let supplier = accounts[1];
         let receiver = accounts[2];
 
-        let proofType = "reuse"
+        let proofType = "ProofReuse"
         let device = await DepositDevice.at(deviceAddress);
 
         await device.generateReuseProof(receiverSegment, idReceipt, supplier,

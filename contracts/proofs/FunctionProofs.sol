@@ -39,7 +39,7 @@ contract FunctionProofs is GenericProof {
         string algorithmVersion,
         address proofAuthor
     ) public returns (bytes32 _hash) {
-        _hash = generateHash(device_addr, "function");
+        _hash = generateHash(device_addr, "ProofFunction");
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(
             score,
