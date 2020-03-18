@@ -28,8 +28,8 @@ contract("Test for generic proof data", function (accounts) {
         let receiver = accounts[2];
         let deposit = 10;
 
-        await device_factory.createDevice("device", 0, sender);
-        await device_factory.createDevice("device2", 0, sender);
+        await device_factory.createDevice("device", 0, sender, 0);
+        await device_factory.createDevice("device2", 0, sender, 1);
 
         let devices = await device_factory.getDeployedDevices(
             { from: sender }).then(devices => {

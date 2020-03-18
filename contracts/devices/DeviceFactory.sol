@@ -22,10 +22,10 @@ contract DeviceFactory {
     roleManager = RoleManager(roleManagerAddress);
   }
 
-  function createDevice(string _name, uint256 _initValue, address _owner)
+  function createDevice(string _name, uint256 _initValue, address _owner, uint256 _uid)
     public returns(address _device)
   {
-    DepositDevice newContract = new DepositDevice(_name, _owner, _initValue, daoAddress);
+    DepositDevice newContract = new DepositDevice(_name, _owner, _initValue, daoAddress, _uid);
     deployed_devices[_owner].push(newContract);
     emit DeviceCreated(newContract);
     return newContract;

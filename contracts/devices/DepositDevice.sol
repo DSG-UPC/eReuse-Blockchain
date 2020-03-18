@@ -43,7 +43,8 @@ contract DepositDevice is Ownable {
         string _name,
         address _sender,
         uint256 _initialDeposit,
-        address _daoAddress
+        address _daoAddress,
+        uint256 _uid
     ) public {
         DAOContract = DAOInterface(_daoAddress);
         address erc20Address = DAOContract.getERC20();
@@ -57,6 +58,7 @@ contract DepositDevice is Ownable {
         data.name = _name;
         data.owner = _sender;
         data.deposit = _initialDeposit;
+        data.uid = _uid;
         _transferOwnership(_sender);
     }
 
@@ -276,6 +278,10 @@ contract DepositDevice is Ownable {
 
     function getDeposit() public view returns (uint256 deposit) {
         return data.deposit;
+    }
+
+    function getUid() public view returns (uint256 uid) {
+        return data.uid;
     }
 
     function recycle(address _owner) public {
