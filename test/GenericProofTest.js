@@ -19,7 +19,7 @@ contract("Test for generic proof data", function (accounts) {
         device_factory = await DeviceFactory.deployed();
         handler = await ProofsHandler.deployed();
 
-        await device_factory.createDevice("device", 0, accounts[0], 0);
+        await device_factory.createDevice(0, 0, accounts[0]);
 
         deviceAddress = await device_factory.getDeployedDevices(
             { from: accounts[0] }).then(devices => {

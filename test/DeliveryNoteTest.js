@@ -27,9 +27,11 @@ contract("Test for generic proof data", function (accounts) {
         let sender = accounts[1];
         let receiver = accounts[2];
         let deposit = 10;
+        let id1 = 0;
+        let id2 = 1;
 
-        await device_factory.createDevice("device", 0, sender, 0);
-        await device_factory.createDevice("device2", 0, sender, 1);
+        await device_factory.createDevice(id1, 0, sender);
+        await device_factory.createDevice(id2, 0, sender);
 
         let devices = await device_factory.getDeployedDevices(
             { from: sender }).then(devices => {
@@ -48,15 +50,6 @@ contract("Test for generic proof data", function (accounts) {
         await erc20.approve(dnote.address, deposit, { from: receiver })
 
         await dnote.acceptDeliveryNote(deposit, { from: receiver })
-
-        // let function_hash = await device.getProofs("function");
-        // let transfer_hash = await device.getProofs("transfer");
-
-        // let first_proof = await device.getProof(function_hash[0], "function");
-        // let second_proof = await device.getProof(transfer_hash[0], "transfer");
-
-        // console.log(`First proof: ${web3.utils.toDecimal(first_proof.block_number)}`);
-        // console.log(`Second proof: ${web3.utils.toDecimal(second_proof.block_number)}`);
     });
 });
 

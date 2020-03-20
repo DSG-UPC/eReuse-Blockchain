@@ -23,7 +23,7 @@ contract DAOInterface {
 
     function getPricePerMB() public view returns (uint256);
 
-    function getRoleManager() public view returns (address);
+    // function getRoleManager() public view returns (address);
 
     function getDeviceFactory() public view returns (address);
 

@@ -1,7 +1,6 @@
 pragma solidity ^0.4.25;
 
 import "contracts/DAOInterface.sol";
-import "contracts/tokens/MyERC721.sol";
 import "contracts/tokens/EIP20Interface.sol";
 import "contracts/devices/DeliveryNoteInterface.sol";
 import "contracts/devices/DeviceFactoryInterface.sol";
@@ -14,7 +13,6 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract DepositDevice is Ownable {
     // parameters -----------------------------------------------------------
-    MyERC721 erc721;
     EIP20Interface erc20;
     DAOInterface public DAOContract;
     DeviceFactoryInterface factory;
@@ -24,7 +22,6 @@ contract DepositDevice is Ownable {
     // types ----------------------------------------------------------------
     //Struct that mantains the basic values of the device
     struct DevData {
-        string name;
         uint256 uid;
         uint256 erc721Id;
         uint256 deposit;
@@ -36,26 +33,21 @@ contract DepositDevice is Ownable {
     DevData data;
 
     // events ----------------------------------------------------------------
-    event TestEv(address test);
-    event proofGenerated(bytes32 proofHash);
+    event proofGenerated(bytes32 indexed proofHash);
 
     constructor(
-        string _name,
+        uint256 _uid,
         address _sender,
         uint256 _initialDeposit,
-        address _daoAddress,
-        uint256 _uid
+        address _daoAddress
     ) public {
         DAOContract = DAOInterface(_daoAddress);
         address erc20Address = DAOContract.getERC20();
-        address erc721Address = DAOContract.getERC721();
         address dFactory = DAOContract.getDeviceFactory();
         address pHandler = DAOContract.getProofsHandler();
-        erc721 = MyERC721(erc721Address);
         erc20 = EIP20Interface(erc20Address);
         factory = DeviceFactoryInterface(dFactory);
         handler = ProofsHandler(pHandler);
-        data.name = _name;
         data.owner = _sender;
         data.deposit = _initialDeposit;
         data.uid = _uid;
@@ -270,10 +262,6 @@ contract DepositDevice is Ownable {
 
     function getOwner() public view returns (address owner) {
         return data.owner;
-    }
-
-    function getName() public view returns (string name) {
-        return data.name;
     }
 
     function getDeposit() public view returns (uint256 deposit) {

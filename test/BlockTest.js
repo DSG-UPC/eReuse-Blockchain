@@ -25,13 +25,14 @@ contract("Test for generic proof data", function (accounts) {
         let receiver = accounts[2];
         let deposit = 10;
         let isWaste = true;
+        let id1 = 0;
 
         let score = 8;
         let diskUsage = 20;
         let algorithm = "v3"
         let proofAuthor = accounts[3]
 
-        await device_factory.createDevice("device", 0, accounts[0], 0);
+        await device_factory.createDevice(id1, 0, accounts[0]);
 
         deviceAddress = await device_factory.getDeployedDevices(
             { from: accounts[0] }).then(devices => {
@@ -50,9 +51,11 @@ contract("Test for generic proof data", function (accounts) {
         let diskUsage = 20;
         let algorithm = "v3"
         let proofAuthor = accounts[3]
+        let id1 = 0;
+        let id2 = 1;
 
-        await device_factory.createDevice("device", 0, accounts[0], 0);
-        await device_factory.createDevice("device1", 0, accounts[0], 1);
+        await device_factory.createDevice(id1, 0, accounts[0]);
+        await device_factory.createDevice(id2, 0, accounts[0]);
 
         let deviceAddresses = await device_factory.getDeployedDevices(
             { from: accounts[0] }).then(devices => {
@@ -73,8 +76,9 @@ contract("Test for generic proof data", function (accounts) {
         let algorithm = "v3"
         let proofAuthor = accounts[3]
         let proofType = "ProofFunction";
+        let id1 = 0;
 
-        await device_factory.createDevice("device", 0, accounts[0], 0);
+        await device_factory.createDevice(id1, 0, accounts[0]);
 
         let deviceAddress = await device_factory.getDeployedDevices(
             { from: accounts[0] }).then(devices => {

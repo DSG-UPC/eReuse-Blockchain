@@ -22,7 +22,7 @@ contract DeliveryNote is Ownable {
 
     /*   Events  */
     event DeviceAdded( address indexed _device);
-    event NoteEmitted(string concept, uint256 _deposit);
+    event NoteEmitted(string indexed concept, uint256 indexed _deposit);
 
 
     constructor(address _receiver, address _daoAddress)

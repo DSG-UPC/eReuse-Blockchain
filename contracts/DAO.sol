@@ -6,7 +6,7 @@ import "contracts/DAOInterface.sol";
 contract DAO is Ownable {
     address public ERC20;
     address public ERC721;
-    address public RoleManager;
+    // address public RoleManager;
     address public OracleQuery;
     address public DeviceFactory;
     address public ProofsHandler;
@@ -53,13 +53,13 @@ contract DAO is Ownable {
         return ERC721;
     }
 
-    function setRoleManager(address _address) public onlyOwner {
-        RoleManager = _address;
-    }
+    // function setRoleManager(address _address) public onlyOwner {
+    //     RoleManager = _address;
+    // }
 
-    function getRoleManager() public view returns (address) {
-        return RoleManager;
-    }
+    // function getRoleManager() public view returns (address) {
+    //     return RoleManager;
+    // }
 
     function setDeviceFactory(address _address) public onlyOwner {
         DeviceFactory = _address;
