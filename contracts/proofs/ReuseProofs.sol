@@ -5,7 +5,6 @@ contract ReuseProofs is GenericProof {
     struct ProofData {
         string receiverSegment;
         string idReceipt;
-        address supplier;
         address receiver;
         uint256 price;
     }
@@ -20,7 +19,6 @@ contract ReuseProofs is GenericProof {
         returns (
             string receiverSegment,
             string idReceipt,
-            address supplier,
             address receiver,
             uint256 price
         )
@@ -28,7 +26,6 @@ contract ReuseProofs is GenericProof {
         return (
             dataProofs[_hash].receiverSegment,
             dataProofs[_hash].idReceipt,
-            dataProofs[_hash].supplier,
             dataProofs[_hash].receiver,
             dataProofs[_hash].price
         );
@@ -39,7 +36,6 @@ contract ReuseProofs is GenericProof {
         address owner,
         string receiverSegment,
         string idReceipt,
-        address supplier,
         address receiver,
         uint256 price
     ) public returns (bytes32 _hash) {
@@ -48,7 +44,6 @@ contract ReuseProofs is GenericProof {
         dataProofs[_hash] = ProofData(
             receiverSegment,
             idReceipt,
-            supplier,
             receiver,
             price
         );

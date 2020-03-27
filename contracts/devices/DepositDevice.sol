@@ -179,7 +179,6 @@ contract DepositDevice is Ownable {
     function generateReuseProof(
         string receiverSegment,
         string idReceipt,
-        address supplier,
         address receiver,
         uint256 price
     ) public {
@@ -188,7 +187,6 @@ contract DepositDevice is Ownable {
             this.owner(),
             receiverSegment,
             idReceipt,
-            supplier,
             receiver,
             price
         );
@@ -202,7 +200,6 @@ contract DepositDevice is Ownable {
         returns (
             string receiverSegment,
             string idReceipt,
-            address supplier,
             address receiver,
             uint256 price
         )

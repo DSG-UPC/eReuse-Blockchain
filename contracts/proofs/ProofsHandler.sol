@@ -100,7 +100,6 @@ contract ProofsHandler {
         address owner,
         string receiverSegment,
         string idReceipt,
-        address supplier,
         address receiver,
         uint256 price
     ) public returns (bytes32 _hash) {
@@ -110,7 +109,6 @@ contract ProofsHandler {
                 owner,
                 receiverSegment,
                 idReceipt,
-                supplier,
                 receiver,
                 price
             );
@@ -269,7 +267,6 @@ contract ProofsHandler {
         returns (
             string receiverSegment,
             string idReceipt,
-            address supplier,
             address receiver,
             uint256 price
         )

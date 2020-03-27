@@ -164,15 +164,14 @@ contract("Basic test for block_number", function (accounts) {
         let price = 10;
         let receiverSegment = "segment1";
         let idReceipt = "1876323hh823";
-        let supplier = accounts[1];
         let receiver = accounts[2];
 
         let proofType = "ProofReuse"
         let device = await DepositDevice.at(deviceAddress);
 
-        await device.generateReuseProof(receiverSegment, idReceipt, supplier,
+        await device.generateReuseProof(receiverSegment, idReceipt,
             receiver, price, { from: accounts[0], gas: 6721975 });
-        await device.generateReuseProof(receiverSegment, idReceipt, supplier,
+        await device.generateReuseProof(receiverSegment, idReceipt,
             receiver, price, { from: accounts[0], gas: 6721975 });
 
         let hashes = await device.getProofs(proofType);
@@ -185,16 +184,12 @@ contract("Basic test for block_number", function (accounts) {
         assert.equal(web3.utils.toDecimal(first_proof.price), price);
         assert.equal(first_proof.receiverSegment, receiverSegment);
         assert.equal(first_proof.idReceipt, idReceipt);
-        assert.equal(web3.utils.toChecksumAddress(first_proof.supplier),
-            web3.utils.toChecksumAddress(supplier));
         assert.equal(web3.utils.toChecksumAddress(first_proof.receiver),
             web3.utils.toChecksumAddress(receiver));
 
         assert.equal(web3.utils.toDecimal(second_proof.price), price);
         assert.equal(second_proof.receiverSegment, receiverSegment);
         assert.equal(second_proof.idReceipt, idReceipt);
-        assert.equal(web3.utils.toChecksumAddress(second_proof.supplier),
-            web3.utils.toChecksumAddress(supplier));
         assert.equal(web3.utils.toChecksumAddress(second_proof.receiver),
             web3.utils.toChecksumAddress(receiver));
     });
