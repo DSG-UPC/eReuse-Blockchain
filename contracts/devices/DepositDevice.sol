@@ -179,7 +179,6 @@ contract DepositDevice is Ownable {
     function generateReuseProof(
         string receiverSegment,
         string idReceipt,
-        address receiver,
         uint256 price
     ) public {
         bytes32 proofHash = handler.generateReuseProof(
@@ -187,7 +186,6 @@ contract DepositDevice is Ownable {
             this.owner(),
             receiverSegment,
             idReceipt,
-            receiver,
             price
         );
         proofs["ProofReuse"].push(proofHash);
@@ -200,7 +198,6 @@ contract DepositDevice is Ownable {
         returns (
             string receiverSegment,
             string idReceipt,
-            address receiver,
             uint256 price
         )
     {

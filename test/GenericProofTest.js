@@ -137,15 +137,14 @@ contract("Test for generic proof data", function (accounts) {
         let price = 10;
         let receiverSegment = "segment1";
         let idReceipt = "1876323hh823";
-        let receiver = accounts[2];
 
         let proofType = "ProofReuse"
         let device = await DepositDevice.at(deviceAddress);
 
-        await device.generateReuseProof(receiverSegment, idReceipt,
-            receiver, price, { from: accounts[0], gas: 6721975 });
-        await device.generateReuseProof(receiverSegment, idReceipt,
-            receiver, price, { from: accounts[0], gas: 6721975 });
+        await device.generateReuseProof(receiverSegment, idReceipt, price,
+            { from: accounts[0], gas: 6721975 });
+        await device.generateReuseProof(receiverSegment, idReceipt, price,
+            { from: accounts[0], gas: 6721975 });
 
         let hashes = await device.getProofs(proofType);
 
