@@ -1,15 +1,16 @@
 import React from 'react'
 import Head from 'next/head'
 import App from 'next/app'
-import { IAppContext } from "../components/app-context"
+import { providers } from "ethers"
+import { IContract } from "../lib/types"
+import Contract from "../lib/contract"
+import AppContext, { IAppContext } from "../components/app-context"
 import Web3Wallet, { AccountState } from "../lib/web3-wallet"
-import MetamaskState from '../components/metamask-state'
 import GeneralError from '../components/error'
-import { DrizzleContext } from "@drizzle/react-plugin";
-import { Drizzle } from "@drizzle/store";
-import drizzleOptions from "../lib/drizzleOptions";
-import Index from "./index";
-// import MyComponent from "./MyComponent";
+import IndexPage from "./index"
+import { getContractInstance } from "../lib/deployment"
+import DeviceFactory from '../../build/contracts/DeviceFactory.json'
+
 import "../styles/app.css";
 // import { } from "../lib/types"
 // import { isServer } from '../lib/util'
@@ -29,15 +30,17 @@ import 'antd/lib/input-number/style/index.css'
 import 'antd/lib/date-picker/style/index.css'
 import 'antd/lib/spin/style/index.css'
 
-const drizzle = new Drizzle(drizzleOptions);
 
 type Props = {
     // injectedArray: any[],
 }
 
 type State = {
+    provider: object
     isConnected: boolean,
     accountState: AccountState,
+    address: string,
+    contracts: IContract[],
     networkName: string,
 
     // STATE SHARED WITH CHILDREN
@@ -46,8 +49,11 @@ type State = {
 
 class MainApp extends App<Props, State> {
     state: State = {
+        provider: null,
         isConnected: false,
         accountState: AccountState.Unknown,
+        address: null,
+        contracts: [],
         title: "Explorer",
         networkName: null
     }
@@ -64,9 +70,17 @@ class MainApp extends App<Props, State> {
     //     return { injectedArray, ...appProps }
     // }
 
-    componentDidMount() {
-    
-        // this.refreshInterval = setInterval(() => this.refreshStatus(), 3500)
+    async componentDidMount() {
+        // const provider = new $window.web3.providers.WebsocketProvider('ws://' + $window.CONSTANTS.blockchain + ':8545')
+        // const web3 = new $window.web3(provider)
+        // const web3wallet = new Web3Wallet()
+        await Web3Wallet.connect()
+        const address = await Web3Wallet.getAddress()
+       
+        const instance = await  getContractInstance(Web3Wallet.provider, DeviceFactory.networks[0].address, DeviceFactory)
+        const contract  = new Contract("DeviceFactory", DeviceFactory.networks[0].address, instance)
+        this.setState({address, contracts: [contract]})
+        
     }
 
     componentWillUnmount() {
@@ -93,23 +107,20 @@ class MainApp extends App<Props, State> {
         // </div>
     }
 
-    renderMetamaskState() {
-        return <div>
-            <MetamaskState accountState={this.state.accountState} />
-        </div>
-    }
-
+    
     render() {
         const accountState = this.state.accountState
+        const address = this.state.address
+        const contracts = this.state.contracts
 
-        if (!this.state.isConnected) {
-            return this.renderPleaseWait()
-        }
-        else if (Web3Wallet.isAvailable()) {
-            if (accountState !== AccountState.Ok) {
-                return this.renderMetamaskState()
-            }
-        }
+        // if (!this.state.isConnected) {
+        //     return this.renderPleaseWait()
+        // }
+        // else if (Web3Wallet.isAvailable()) {
+        //     if (accountState !== AccountState.Ok) {
+        //         return this.renderMetamaskState()
+        //     }
+        // }
 
         // Main render
 
@@ -118,29 +129,25 @@ class MainApp extends App<Props, State> {
         // Get data from getInitialProps and provide it as the global context to children
         // const { injectedArray } = this.props
 
-        // const injectedGlobalContext: IAppContext = {
-        //     title: this.state.title,
-        //     setTitle: (title) => this.setTitle(title),
-        //     onGatewayError: this.onGatewayError
-        // }
+        const globalContext: IAppContext = {
+            account: {
+                address: address,
+                tokens: 0,
+                web3Wallet: Web3Wallet
+            },
+            contracts: contracts
+        }
 
 
         return (
-            <DrizzleContext.Provider drizzle={drizzle}>
-              <DrizzleContext.Consumer>
-                {drizzleContext => {
-                  const { drizzle, drizzleState, initialized } = drizzleContext;
-        
-                  if (!initialized) {
-                    return "Loading..."
-                  }
-        
-                  return (
-                    <Index {...pageProps} drizzle={drizzle} drizzleState={drizzleState} />
-                  )
-                }}
-              </DrizzleContext.Consumer>
-            </DrizzleContext.Provider>
+            <AppContext.Provider value={globalContext}>
+                <Head>
+                <title>Vocdoni Entities</title>
+            </Head>
+            {/* <Layout> */}
+                <IndexPage {...pageProps} />
+            {/* </Layout> */}
+            </AppContext.Provider>
           );
     }
 }
