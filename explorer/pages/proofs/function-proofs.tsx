@@ -1,15 +1,16 @@
 import { useContext, Component } from 'react'
-import AppContext, { IAppContext } from '../components/app-context'
+import AppContext, { IAppContext } from '../../components/app-context'
 import Link from "next/link"
-import { message, Button, Spin, Divider, Menu } from 'antd'
+import { message, Button, Spin, Divider } from 'antd'
 
+const contractName =  "FunctionProofs"
 
 // MAIN COMPONENT
-const IndexPage = (props) => {
+const FunctionProofsPage = (props) => {
   // Get the global context and pass it to our stateful component
   const context = useContext(AppContext)
 
-  return <IndexView {...context} />
+  return <FunctionProofsView {...context} />
 }
 
 
@@ -19,7 +20,7 @@ type State = {
 }
 
 // Stateful component
-class IndexView extends Component<IAppContext, State> {
+class FunctionProofsView extends Component<IAppContext, State> {
   state: State = {}
 
   async componentDidMount() {
@@ -45,31 +46,6 @@ class IndexView extends Component<IAppContext, State> {
     // }
   }
 
-  renderSideMenu() {
-
-    return <div id="page-menu">
-      <Menu mode="inline" defaultSelectedKeys={['profile']} style={{ width: 200 }}>
-        {/* <Menu.Item key="profile">
-          <Link href={"/" + location.hash}>
-            <a>Profile</a>
-          </Link>
-        </Menu.Item>
-        <Menu.Item key="proofs">
-          <Link href={"/proofs/" + location.hash}>
-            <a>Proofs</a>
-          </Link>
-        </Menu.Item>
-        <Menu.Item key="devices">
-          <Link href={"/devices/" + location.hash}>
-            <a>Devices</a>
-          </Link>
-        </Menu.Item> */}
-      </Menu>
-    </div>
-
-
-  }
-
   renderUserInfo() {
     return <>
       <Divider />
@@ -91,7 +67,8 @@ class IndexView extends Component<IAppContext, State> {
   }
 
   render() {
-    {this.renderSideMenu()}
+    const contract = this.props.contracts[contractName]
+    
     return <div id="index">
       <div className="card">
         <h3>Usody</h3>
@@ -110,7 +87,7 @@ class IndexView extends Component<IAppContext, State> {
 
         <div className="section">
           <h2>Active Account</h2>
-          {JSON.stringify(this.props.account)}
+           {JSON.stringify(this.props.account)}
         </div>
 
         <div className="section">
@@ -135,4 +112,4 @@ class IndexView extends Component<IAppContext, State> {
 //   {props.children}
 // </MainLayout>
 
-export default IndexPage
+export default FunctionProofsPage

@@ -37,6 +37,7 @@ async function generatePathMap() {
   return {
     '/': { page: '/' },
     '/devices': { page: '/devices' },
-    // '/proofs': { page: '/proofs' },
+    '/proofs': { page: '/proofs' },
+    '/proofs/function': { page: '/proofs/function' },
   }
 }

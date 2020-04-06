@@ -9,6 +9,12 @@ import GeneralError from '../components/error'
 // import IndexPage from "./index"
 import { getContractInstance } from "../lib/deployment"
 import DeviceFactory from '../../build/contracts/DeviceFactory.json'
+// import DepositDevice from '../../build/contracts/DepositDevice.json'
+// import FunctionProofs from '../../build/contracts/FunctionProofs.json'
+import ProofsHandler from '../../build/contracts/ProofsHandler.json'
+// let contracts = [DepositDevice, DeviceFactory, FunctionProofs]
+const  CONTRACTS = [DeviceFactory, ProofsHandler]
+// TODO Add other contracts
 
 import "../styles/app.css";
 // import { } from "../lib/types"
@@ -39,7 +45,7 @@ type State = {
     isConnected: boolean,
     accountState: AccountState,
     address: string,
-    contracts: IContract[],
+    contracts: {},
     networkName: string,
 
     // STATE SHARED WITH CHILDREN
@@ -52,7 +58,7 @@ class MainApp extends App<Props, State> {
         isConnected: false,
         accountState: AccountState.Unknown,
         address: null,
-        contracts: [],
+        contracts: {},
         title: "Explorer",
         networkName: null
     }
@@ -80,15 +86,33 @@ class MainApp extends App<Props, State> {
             await Web3Wallet.unlock()
             const address = await Web3Wallet.getAddress()
             const network = window["web3"].currentProvider.networkVersion
+            console.log(network)
             // console.log(JSON.stringify(DeviceFactory.networks,null,2))
+            // TODO Make following function work
+            // const availableContracts = this.getContracts(network)
+            // console.log(JSON.stringify(availableContracts))
             const instance = getContractInstance(Web3Wallet.provider, DeviceFactory.networks[network].address, DeviceFactory)
             const contract = new Contract("DeviceFactory", DeviceFactory.networks[network].address, instance)
-            this.setState({ address, contracts: [contract] })
+            // this.setState({ address, contracts: availableContracts })
+            this.setState({ address, contracts: {DeviceFactory: contract} })
         } catch (error) {
             console.error(error)
         }
 
 
+    }
+
+    getContracts(network) {
+        let result = {}
+        CONTRACTS.map(contract => {
+            const name = contract.contractName
+            const address = contract.networks[network].address
+            console.log()
+            const instance = getContractInstance(Web3Wallet.provider, address, name)
+            result[name] = new Contract(name, address, instance)
+            return
+        })
+        return result
     }
 
     componentWillUnmount() {
