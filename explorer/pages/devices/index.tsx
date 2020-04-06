@@ -98,12 +98,10 @@
 
 // export default IndexPage
 import React from "react";
-import { newContextComponents } from "@drizzle/react-components";
 // import logo from "../../public/logo.png";
 
-const { AccountData, ContractData, ContractForm } = newContextComponents;
 
-export default ({ drizzle, drizzleState }) => {
+export default () => {
   // destructure drizzle and drizzleState from props
   return (
     <div className="App">
@@ -117,12 +115,7 @@ export default ({ drizzle, drizzleState }) => {
 
       <div className="section">
         <h2>Active Account</h2>
-        <AccountData
-          drizzle={drizzle}
-          drizzleState={drizzleState}
-          accountIndex={0}
-          units="ether"
-          precision={3}
+       
         />
       </div>
 
@@ -134,11 +127,7 @@ export default ({ drizzle, drizzleState }) => {
         </p>
         <p>
           <strong>Stored Value: </strong>
-          <ContractData
-            drizzle={drizzle}
-            drizzleState={drizzleState}
-            contract="DAO"
-            method="getDeviceFactory"
+       
           />
         </p>
         {/* <ContractForm drizzle={drizzle} contract="SimpleStorage" method="set" /> */}

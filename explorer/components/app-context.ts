@@ -1,4 +1,4 @@
-import { createContext, Component } from 'react'
+import { createContext} from 'react'
 import { IContract, IAccount } from "../lib/types"
 
 

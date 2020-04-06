@@ -1,13 +1,12 @@
 import React from 'react'
 import Head from 'next/head'
 import App from 'next/app'
-import { providers } from "ethers"
 import { IContract } from "../lib/types"
 import Contract from "../lib/contract"
 import AppContext, { IAppContext } from "../components/app-context"
 import Web3Wallet, { AccountState } from "../lib/web3-wallet"
 import GeneralError from '../components/error'
-import IndexPage from "./index"
+// import IndexPage from "./index"
 import { getContractInstance } from "../lib/deployment"
 import DeviceFactory from '../../build/contracts/DeviceFactory.json'
 
@@ -74,13 +73,22 @@ class MainApp extends App<Props, State> {
         // const provider = new $window.web3.providers.WebsocketProvider('ws://' + $window.CONSTANTS.blockchain + ':8545')
         // const web3 = new $window.web3(provider)
         // const web3wallet = new Web3Wallet()
-        await Web3Wallet.connect()
-        const address = await Web3Wallet.getAddress()
-       
-        const instance = await  getContractInstance(Web3Wallet.provider, DeviceFactory.networks[0].address, DeviceFactory)
-        const contract  = new Contract("DeviceFactory", DeviceFactory.networks[0].address, instance)
-        this.setState({address, contracts: [contract]})
-        
+        console.log(window["ethereum"])
+        try {
+            // await window["ethereum"].enable()
+            await Web3Wallet.connect()
+            await Web3Wallet.unlock()
+            const address = await Web3Wallet.getAddress()
+            const network = window["web3"].currentProvider.networkVersion
+            // console.log(JSON.stringify(DeviceFactory.networks,null,2))
+            const instance = getContractInstance(Web3Wallet.provider, DeviceFactory.networks[network].address, DeviceFactory)
+            const contract = new Contract("DeviceFactory", DeviceFactory.networks[network].address, instance)
+            this.setState({ address, contracts: [contract] })
+        } catch (error) {
+            console.error(error)
+        }
+
+
     }
 
     componentWillUnmount() {
@@ -94,10 +102,10 @@ class MainApp extends App<Props, State> {
 
 
 
-    componentDidCatch(error: Error, _errorInfo: any/*ErrorInfo*/) {
-        console.error(error)
-        return <GeneralError />
-    }
+    // componentDidCatch(error: Error, _errorInfo: any/*ErrorInfo*/) {
+    //     console.error(error)
+    //     return <GeneralError />
+    // }
 
     renderPleaseWait() {
         return null // The loading message will appear
@@ -107,9 +115,8 @@ class MainApp extends App<Props, State> {
         // </div>
     }
 
-    
+
     render() {
-        const accountState = this.state.accountState
         const address = this.state.address
         const contracts = this.state.contracts
 
@@ -125,6 +132,7 @@ class MainApp extends App<Props, State> {
         // Main render
 
         const { Component, pageProps } = this.props
+        console.log(Component);
 
         // Get data from getInitialProps and provide it as the global context to children
         // const { injectedArray } = this.props
@@ -142,13 +150,13 @@ class MainApp extends App<Props, State> {
         return (
             <AppContext.Provider value={globalContext}>
                 <Head>
-                <title>Vocdoni Entities</title>
-            </Head>
-            {/* <Layout> */}
-                <IndexPage {...pageProps} />
-            {/* </Layout> */}
+                    <title>Usody</title>
+                </Head>
+                {/* <Layout> */}
+                <Component {...pageProps} />
+                {/* </Layout> */}
             </AppContext.Provider>
-          );
+        );
     }
 }
 

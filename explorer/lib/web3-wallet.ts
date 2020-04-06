@@ -1,6 +1,10 @@
 import { providers } from "ethers"
+// import Web3 from "web3"
 
-let provider: providers.Web3Provider = null
+// Web3.providers.WebsocketProvider.prototype.sendAsync = Web3.providers.WebsocketProvider.prototype.send
+
+let provider = null
+let web3
 
 export enum AccountState {
     Unknown = "Unknown",
@@ -13,6 +17,7 @@ export enum AccountState {
 export default class Web3Wallet {
     static get provider() { return provider }
     static get signer() { return provider.getSigner() }
+    static get web3 () {return web3}
 
     static isAvailable() {
         return Web3Wallet.isWeb3Available() && Web3Wallet.isEthereumAvailable()
@@ -29,6 +34,11 @@ export default class Web3Wallet {
     static connect() {
         if (provider != null) provider.polling = false
         provider = new providers.Web3Provider(window["web3"].currentProvider)
+        // window["web3"].currentProvider.sendAsync = window["web3"].currentProvider.send
+        // provider = new providers.Web3Provider(window["web3"].currentProvider)
+        // provider = new Web3(window["web3"].currentProvider)
+        // // provider.sendAsync = provider.send
+        web3 = window["web3"]
     }
 
     public static unlock(): Promise<void> {

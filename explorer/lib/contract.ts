@@ -1,6 +1,5 @@
 import { IContract } from "./types"
 import { Component } from 'react'
-import contract from 'truffle-contract'
 
 
 

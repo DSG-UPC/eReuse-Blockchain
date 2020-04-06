@@ -36,7 +36,7 @@ module.exports = {
 async function generatePathMap() {
   return {
     '/': { page: '/' },
-    '/devices': { page: '/entities' },
-    '/proofs': { page: '/proofs' },
+    // '/devices': { page: '/entities' },
+    // '/proofs': { page: '/proofs' },
   }
 }

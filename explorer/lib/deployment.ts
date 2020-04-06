@@ -1,7 +1,10 @@
 // const deviceFactoryArtifacts = require('../../build/contracts/DeviceFactory')
 // const daoArtifacts = require('../../../build/contracts/DAO')
 // const erc20Artifacts = require('../../build/contracts/EIP20')
-import contract from 'truffle-contract'
+// import contract from '@truffle/contract'
+const contract = require('@truffle/contract')
+const ethers = require('ethers');
+
 
 // /**
 //  * Function to deploy both sets of contracts. Those related with Devices.
@@ -48,19 +51,19 @@ import contract from 'truffle-contract'
 //   })
 // }
 
-/**
- * Auxiliary function to obtain an instance of an already
- * deployed contract
- * @param {Function} contract Structure of the given smart contract.
- * @returns {Promise} A promise which resolves to the selected contract.
- */
-function selectContractInstance (contract) {
-  return new Promise(resolve => {
-    contract.deployed().then(instance => {
-      resolve(instance)
-    })
-  })
-}
+// /**
+//  * Auxiliary function to obtain an instance of an already
+//  * deployed contract
+//  * @param {Function} contract Structure of the given smart contract.
+//  * @returns {Promise} A promise which resolves to the selected contract.
+//  */
+// function selectContractInstance(contract) {
+//     return new Promise(resolve => {
+//         contract.deployed().then(instance => {
+//             resolve(instance)
+//         })
+//     })
+// }
 
 /**
  * Auxiliary function to create an instance of some smart contract
@@ -71,13 +74,21 @@ function selectContractInstance (contract) {
  * @param {File} artifacts JSON representation of smart contract.
  * @returns {Promise} A promise which resolves to the the smart contract instance.
  */
-export function getContractInstance (provider, contractAddress, artifacts) {
-  let deviceContract = initializeContract( provider, artifacts)
-  return new Promise(resolve => {
-    deviceContract.at(contractAddress).then(instance => {
-      resolve(instance)
+export function getContractInstance(provider, contractAddress, artifacts) {
+    let deviceContract = initializeContract(provider, artifacts)
+    return new ethers.Contract(contractAddress, deviceContract.abi, provider);
+
+    return new Promise((resolve, reject) => {
+        // console.log(JSON.stringify(deviceContract, null, 2))
+        deviceContract.at(contractAddress, {from: provider.selectedAddress, gas:6721975})
+            .then(instance => {
+                resolve(instance)
+            })
+        // .catch(error => {
+        //     console.error(error)
+        //     reject(error)
+        // })
     })
-  })
 }
 
 /**
@@ -86,12 +97,16 @@ export function getContractInstance (provider, contractAddress, artifacts) {
  * @param {File} artifacts JSON representation of smart contract.
  * @returns {Function} Structure of the smart contract.
  */
-export function initializeContract ( provider, artifacts) {
-  let myContract = contract(artifacts)
-  myContract.setProvider(provider)
-  myContract.defaults({
-    gasLimit: '6721975'
-  })
-  return myContract
+function initializeContract(provider, artifact) {
+    // let artifact = JSON.parse(artifacts)
+    const myContract = contract({
+        abi: artifact.abi,
+        unlinked_binary: artifact.deployedBytecode
+    })
+    myContract.setProvider(provider)
+    myContract.defaults({
+        gasLimit: '6721975'
+    })
+    return myContract
 }
 
