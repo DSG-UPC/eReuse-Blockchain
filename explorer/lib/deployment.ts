@@ -1,6 +1,9 @@
 // const deviceFactoryArtifacts = require('../../build/contracts/DeviceFactory')
 // const daoArtifacts = require('../../../build/contracts/DAO')
 // const erc20Artifacts = require('../../build/contracts/EIP20')
+import EIP20 from '../../build/contracts/EIP20.json'
+import DeviceFactory from '../../build/contracts/DeviceFactory.json'
+import ProofsHandler from '../../build/contracts/ProofsHandler.json'
 // import contract from '@truffle/contract'
 const contract = require('@truffle/contract')
 const ethers = require('ethers');
@@ -74,21 +77,22 @@ const ethers = require('ethers');
  * @param {File} artifacts JSON representation of smart contract.
  * @returns {Promise} A promise which resolves to the the smart contract instance.
  */
-export function getContractInstance(provider, contractAddress, artifacts) {
+function getContractInstance(provider, network, artifacts) {
+    let contractAddress = artifacts.networks[network].address;
     let deviceContract = initializeContract(provider, artifacts)
     return new ethers.Contract(contractAddress, deviceContract.abi, provider);
+}
 
-    // return new Promise((resolve, reject) => {
-    //     // console.log(JSON.stringify(deviceContract, null, 2))
-    //     deviceContract.at(contractAddress, {from: provider.selectedAddress, gas:6721975})
-    //         .then(instance => {
-    //             resolve(instance)
-    //         })
-    //     // .catch(error => {
-    //     //     console.error(error)
-    //     //     reject(error)
-    //     // })
-    // })
+export function getDeviceFactory(provider, network) {
+    return getContractInstance(provider, network, DeviceFactory);
+}
+
+export function getERC20(provider, network) {
+    return getContractInstance(provider, network, EIP20);
+}
+
+export function getProofsHandler(provider, network) {
+    return getContractInstance(provider, network, ProofsHandler);
 }
 
 /**

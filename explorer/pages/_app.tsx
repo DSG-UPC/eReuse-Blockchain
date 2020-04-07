@@ -6,14 +6,8 @@ import Contract from "../lib/contract"
 import AppContext, { IAppContext } from "../components/app-context"
 import Web3Wallet, { AccountState } from "../lib/web3-wallet"
 import GeneralError from '../components/error'
-// import IndexPage from "./index"
-import { getContractInstance } from "../lib/deployment"
-import DeviceFactory from '../../build/contracts/DeviceFactory.json'
-// import DepositDevice from '../../build/contracts/DepositDevice.json'
-// import FunctionProofs from '../../build/contracts/FunctionProofs.json'
-import ProofsHandler from '../../build/contracts/ProofsHandler.json'
-// let contracts = [DepositDevice, DeviceFactory, FunctionProofs]
-const  CONTRACTS = [DeviceFactory, ProofsHandler]
+import { getDeviceFactory, getERC20, getProofsHandler } from "../lib/deployment"
+import { getTokens } from "../lib/erc20"
 // TODO Add other contracts
 
 import "../styles/app.css";
@@ -47,6 +41,7 @@ type State = {
     address: string,
     contracts: {},
     networkName: string,
+    num_tokens: number
 
     // STATE SHARED WITH CHILDREN
     title: string,
@@ -60,7 +55,8 @@ class MainApp extends App<Props, State> {
         address: null,
         contracts: {},
         title: "Explorer",
-        networkName: null
+        networkName: null,
+        num_tokens: 0
     }
 
     refreshInterval: any
@@ -82,37 +78,38 @@ class MainApp extends App<Props, State> {
         console.log(window["ethereum"])
         try {
             // await window["ethereum"].enable()
-            await Web3Wallet.connect()
-            await Web3Wallet.unlock()
-            const address = await Web3Wallet.getAddress()
-            const network = window["web3"].currentProvider.networkVersion
-            console.log(network)
-            // console.log(JSON.stringify(DeviceFactory.networks,null,2))
-            // TODO Make following function work
-            // const availableContracts = this.getContracts(network)
-            // console.log(JSON.stringify(availableContracts))
-            const instance = getContractInstance(Web3Wallet.provider, DeviceFactory.networks[network].address, DeviceFactory)
-            const contract = new Contract("DeviceFactory", DeviceFactory.networks[network].address, instance)
-            // this.setState({ address, contracts: availableContracts })
-            this.setState({ address, contracts: {DeviceFactory: contract} })
+            await Web3Wallet.connect();
+            await Web3Wallet.unlock();
+            const address = await Web3Wallet.getAddress();
+            const network = window["web3"].currentProvider.networkVersion;
+            console.log(network);
+            const contracts = this.getContracts(network);
+            let token_number = await getTokens(contracts.ERC20.contractInstance, address);
+            this.setState({
+                address,
+                contracts: contracts,
+                num_tokens: token_number.toNumber()
+            });
         } catch (error) {
             console.error(error)
         }
 
-
     }
 
     getContracts(network) {
-        let result = {}
-        CONTRACTS.map(contract => {
-            const name = contract.contractName
-            const address = contract.networks[network].address
-            console.log()
-            const instance = getContractInstance(Web3Wallet.provider, address, name)
-            result[name] = new Contract(name, address, instance)
-            return
-        })
-        return result
+        const deviceFactory = getDeviceFactory(Web3Wallet.provider, [network]);
+        const erc20 = getERC20(Web3Wallet.provider, network);
+        const proofsHandler = getProofsHandler(Web3Wallet.provider, network);
+        const dFactoryContract = new Contract("DeviceFactory", deviceFactory.address, deviceFactory);
+        const erc20Contract = new Contract("EIP20", erc20.address, erc20);
+        const pHandlersContract = new Contract("ProofsHandler", proofsHandler.address, proofsHandler);
+
+        return {
+            DeviceFactory: dFactoryContract,
+            ERC20: erc20Contract,
+            ProofsHandler: pHandlersContract
+        };
+
     }
 
     componentWillUnmount() {
@@ -164,7 +161,7 @@ class MainApp extends App<Props, State> {
         const globalContext: IAppContext = {
             account: {
                 address: address,
-                tokens: 0,
+                tokens: this.state.num_tokens,
                 web3Wallet: Web3Wallet
             },
             contracts: contracts

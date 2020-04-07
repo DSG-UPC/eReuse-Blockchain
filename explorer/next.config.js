@@ -25,6 +25,10 @@ module.exports = {
         use: 'null-loader',
       })
     }
+    config.node = {
+      fs: 'empty',
+      module: "empty",
+    };
     return config
   },
 }

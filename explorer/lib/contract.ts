@@ -19,7 +19,7 @@ class Contract {
     contractName: string
     contractInstance: {}
     // events : {}[]
-    constructor (
+    constructor(
         // web3Contract,
         name,
         // events = [],
@@ -30,12 +30,12 @@ class Contract {
         // this.address = web3Contract.options.address
         this.address = address
         this.contractName = name
-        this.contractInstance =  contractInstance
+        this.contractInstance = contractInstance
         // this.contractArtifact = contractArtifact
         // this.events = events
     }
 }
 
-  
+
 
 export default Contract

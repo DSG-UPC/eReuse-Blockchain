@@ -97,8 +97,6 @@ class DevicesView extends Component<IAppContext, State> {
             <strong>Stored Value: </strong>
           </p>
         </div>
-
-
       </div>
     </div>
   }
