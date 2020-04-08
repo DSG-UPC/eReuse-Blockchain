@@ -6,7 +6,7 @@ export interface IAppContext {
     // globalState: IGlobalState,
 
     account: IAccount,
-    contracts: {},
+    contracts: object,
 }
 
 // Global context provided to every page
