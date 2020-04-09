@@ -8,7 +8,9 @@ import { message, Button, Spin, Divider } from 'antd'
 const DevicesPage = (props) => {
   // Get the global context and pass it to our stateful component
   const context = useContext(AppContext)
-
+  console.log("Hi")
+  console.log(context.contracts)
+  console.log(context.account.address)
   return <DevicesView {...context} />
 }
 
@@ -16,13 +18,21 @@ const DevicesPage = (props) => {
 type State = {
   // connected?: boolean,
   // userAddress?: string,
+  contracts: object
 }
 
 // Stateful component
 class DevicesView extends Component<IAppContext, State> {
-  state: State = {}
+  state: State = {
+    contracts: {}
+  }
 
   async componentDidMount() {
+    console.log("Ho")
+    console.log(this.props.contracts)
+    console.log(this.props.account.address)
+    this.setState({contracts: this.props.contracts})
+
     // const context = useContext(AppContext)
 
     // try {
@@ -66,9 +76,25 @@ class DevicesView extends Component<IAppContext, State> {
   }
 
   render() {
+    const props = this.props
+    let contracts
+    console.log(this.props) 
+    console.log(Object.keys(this.props.contracts).length)
+    // const contracts = this.state.contracts
+    if (Object.keys(this.props.contracts).length > 0 )
+      contracts = <div id="test">
+        {this.props.contracts[Object.keys(this.props.contracts)[0]].address}
+      </div>
+    else
+      contracts = <div id="test"></div>
+
     return <div id="index">
       <div className="card">
         <h3>Usody</h3>
+        {props.account.address}
+        {contracts}
+      
+        
         {/* 
         {
           this.state.connected ? this.renderLoading() :
