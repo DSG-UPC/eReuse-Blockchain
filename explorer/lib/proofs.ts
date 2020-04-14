@@ -7,14 +7,9 @@
  *                                 address of the owner.
  * @returns {Promise} A promise which resolves to the the devices owned by user.
  */
-export function getDeployedDevices(contractInstance, ownerAddress) {
-    return contractInstance.getDeployedDevices({ from: ownerAddress });
+export function getProofsFromDevice(contractInstance, ownerAddress) {
+    return contractInstance.getDeployedDevices({ from: ownerAddress })
 }
 
-export function getDeviceInformation(contractInstance) {
-    let deposit = contractInstance.getDeposit.call();
-    let uid = contractInstance.getOwner.call();
-    let owner = contractInstance.getUid.call();
-    return [deposit, uid, owner];
-}
+function getProofInformation
 

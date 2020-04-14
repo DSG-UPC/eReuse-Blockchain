@@ -29,7 +29,6 @@ import 'antd/lib/input-number/style/index.css'
 import 'antd/lib/date-picker/style/index.css'
 import 'antd/lib/spin/style/index.css'
 
-
 type Props = {
     // injectedArray: any[],
 }
@@ -75,20 +74,22 @@ class MainApp extends App<Props, State> {
         // const provider = new $window.web3.providers.WebsocketProvider('ws://' + $window.CONSTANTS.blockchain + ':8545')
         // const web3 = new $window.web3(provider)
         // const web3wallet = new Web3Wallet()
-        console.log(window["ethereum"])
         try {
             // await window["ethereum"].enable()
             await Web3Wallet.connect();
             await Web3Wallet.unlock();
             const address = await Web3Wallet.getAddress();
-            const network = window["web3"].currentProvider.networkVersion;
-            console.log(network);
+            const provider = window["web3"].currentProvider
+            const network = provider.networkVersion;
             const contracts = this.getContracts(network);
             let token_number = await getTokens(contracts.ERC20.contractInstance, address);
             this.setState({
-                address,
+                address: address,
                 contracts: contracts,
-                num_tokens: token_number.toNumber()
+                num_tokens: token_number.toNumber(),
+                provider: provider,
+                isConnected: true,
+                networkName: network,
             });
         } catch (error) {
             console.error(error)
@@ -97,7 +98,7 @@ class MainApp extends App<Props, State> {
     }
 
     getContracts(network) {
-        const deviceFactory = getDeviceFactory(Web3Wallet.provider, [network]);
+        const deviceFactory = getDeviceFactory(Web3Wallet.provider, network);
         const erc20 = getERC20(Web3Wallet.provider, network);
         const proofsHandler = getProofsHandler(Web3Wallet.provider, network);
         const dFactoryContract = new Contract("DeviceFactory", deviceFactory.address, deviceFactory);
@@ -116,13 +117,6 @@ class MainApp extends App<Props, State> {
         clearInterval(this.refreshInterval)
     }
 
-    // setTitle(title: string) {
-    //     this.setState({ title })
-    // }
-
-
-
-
     // componentDidCatch(error: Error, _errorInfo: any/*ErrorInfo*/) {
     //     console.error(error)
     //     return <GeneralError />
@@ -140,6 +134,7 @@ class MainApp extends App<Props, State> {
     render() {
         const address = this.state.address
         const contracts = this.state.contracts
+        const tokens = this.state.num_tokens
 
         // if (!this.state.isConnected) {
         //     return this.renderPleaseWait()
@@ -153,7 +148,6 @@ class MainApp extends App<Props, State> {
         // Main render
 
         const { Component, pageProps } = this.props
-        console.log(Component);
 
         // Get data from getInitialProps and provide it as the global context to children
         // const { injectedArray } = this.props
@@ -161,7 +155,7 @@ class MainApp extends App<Props, State> {
         const globalContext: IAppContext = {
             account: {
                 address: address,
-                tokens: this.state.num_tokens,
+                tokens: tokens,
                 web3Wallet: Web3Wallet
             },
             contracts: contracts
@@ -171,10 +165,10 @@ class MainApp extends App<Props, State> {
         return (
             <AppContext.Provider value={globalContext}>
                 <Head>
-                    <title>Usody</title>
+                    <title>{this.state.title}</title>
                 </Head>
                 {/* <Layout> */}
-                <Component {...pageProps} />
+                <Component {...this.state} />
                 {/* </Layout> */}
             </AppContext.Provider>
         );

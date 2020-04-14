@@ -1,49 +1,36 @@
-import { useContext, Component } from 'react'
-import AppContext, { IAppContext } from '../../components/app-context'
-import Link from "next/link"
-import { message, Button, Spin, Divider } from 'antd'
+import { Component } from 'react'
+import { Button, Spin, Divider } from 'antd'
 
 const contractName =  "FunctionProofs"
 
 // MAIN COMPONENT
 const ProofsPage = (props) => {
-  // Get the global context and pass it to our stateful component
-  const context = useContext(AppContext)
-
-  return <ProofsView {...context} />
+  return <ProofsView {...props} />
 }
 
-
 type State = {
-  // connected?: boolean,
-  // userAddress?: string,
+  contracts: object,
+  address: string,
+  proofs: Array<string>
 }
 
 // Stateful component
-class ProofsView extends Component<IAppContext, State> {
-  state: State = {}
+class ProofsView extends Component<State> {
+  state: State = {
+    contracts: {},
+    address: null,
+    proofs: []
+  }
+
+  constructor(props) {
+    super(props);
+  }
 
   async componentDidMount() {
-    // const context = useContext(AppContext)
-
-    // try {
-    //   let userAddress = null
-    //   if (Web3Wallet.isEthereumAvailable() && Web3Wallet.isWeb3Available()) {
-    //     this.setState({ connected: true })
-    //     userAddress = await Web3Wallet.getAddress()
-
-
-    //     this.setState({ userAddress })
-    //   }
-    // }
-    // catch (err) {
-    //   this.setState({ connected: false })
-    //   if (err && err.message == "The given entity has no metadata defined yet") {
-    //     return // nothing to show
-    //   }
-    //   console.log(err)
-    //   message.error("Could not connect to the network")
-    // }
+    this.setState({
+      contracts: this.props.contracts,
+      address: this.props.address
+    })
   }
 
   renderUserInfo() {
@@ -66,39 +53,38 @@ class ProofsView extends Component<IAppContext, State> {
     return <div>Please, wait... <Spin size="small" /></div>
   }
 
+  updateProofs(contracts, address) {
+    if (Object.keys(contracts).length > 0) {
+      // getDeployedDevices(contracts['DeviceFactory'].contractInstance, address).
+      //   then(result => {
+      //     this.setState({ devices: result })
+      //   });
+    }
+  }
+
+  renderProofs(proofs){
+    let result = (<div></div>);
+    result = (
+      <div>
+        {proofs.map((item, index) => (
+          <p key={item}>{item}</p>
+        ))}
+      </div>
+    )
+    return result;
+  }
+
   render() {
+    this.updateProofs(this.state.contracts, this.state.address);
+    const proofsRender = this.renderProofs(this.state.proofs);
     return <div id="index">
       <div className="card">
         <h3>Usody</h3>
-        {/* 
-        {
-          this.state.connected ? this.renderLoading() :
-            (this.state.userAddress ? this.renderUserInfo() : this.renderGetStarted())
-        } */}
-
-        <div>
-          <h1> Example</h1>
-          <p>
-            Examples 
-        </p>
-        </div>
-
+        
         <div className="section">
-          <h2>Active Account</h2>
-           {JSON.stringify(this.props.account)}
+          <h2>Devices</h2>
+          {proofsRender}
         </div>
-
-        <div className="section">
-          <h2>DAO</h2>
-          <p>
-            This shows a simple ContractData component with no arguments, along
-            with a form to set its value.
-        </p>
-          <p>
-            <strong>Stored Value: </strong>
-          </p>
-        </div>
-
 
       </div>
     </div>

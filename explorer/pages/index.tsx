@@ -1,48 +1,35 @@
-import { useContext, Component } from 'react'
-import AppContext, { IAppContext } from '../components/app-context'
-import Link from "next/link"
-import { message, Button, Spin, Divider, Menu } from 'antd'
+import { Component } from 'react'
+import { Button, Spin, Divider, Menu } from 'antd'
 
 
 // MAIN COMPONENT
 const IndexPage = (props) => {
-  // Get the global context and pass it to our stateful component
-  const context = useContext(AppContext)
-
-  return <IndexView {...context} />
+  return <IndexView {...props} />
 }
 
 
 type State = {
   // connected?: boolean,
-  // userAddress?: string,
-}
+  address: string,
+  num_tokens: number
+};
 
 // Stateful component
-class IndexView extends Component<IAppContext, State> {
-  state: State = {}
+class IndexView extends Component<State> {
+  state: State = {
+    address: null,
+    num_tokens: 0
+  };
+
+  constructor(props) {
+    super(props);
+  }
 
   async componentDidMount() {
-    // const context = useContext(AppContext)
-
-    // try {
-    //   let userAddress = null
-    //   if (Web3Wallet.isEthereumAvailable() && Web3Wallet.isWeb3Available()) {
-    //     this.setState({ connected: true })
-    //     userAddress = await Web3Wallet.getAddress()
-
-
-    //     this.setState({ userAddress })
-    //   }
-    // }
-    // catch (err) {
-    //   this.setState({ connected: false })
-    //   if (err && err.message == "The given entity has no metadata defined yet") {
-    //     return // nothing to show
-    //   }
-    //   console.log(err)
-    //   message.error("Could not connect to the network")
-    // }
+    this.setState({
+      address: this.props.address,
+      num_tokens: this.props.num_tokens
+    })
   }
 
   renderSideMenu() {
@@ -67,7 +54,6 @@ class IndexView extends Component<IAppContext, State> {
       </Menu>
     </div>
 
-
   }
 
   renderUserInfo() {
@@ -90,8 +76,16 @@ class IndexView extends Component<IAppContext, State> {
     return <div>Please, wait... <Spin size="small" /></div>
   }
 
+  renderAccount() {
+    return (<div className="section">
+      <h2>Active Account</h2>
+      <p>User ethereum address: {this.props.address}</p>
+      <p>User tokens: {this.props.num_tokens}</p>
+    </div>)
+  }
+
   render() {
-    {this.renderSideMenu()}
+    // { this.renderSideMenu() }
     return <div id="index">
       <div className="card">
         <h3>Usody</h3>
@@ -108,11 +102,7 @@ class IndexView extends Component<IAppContext, State> {
         </p>
         </div>
 
-        <div className="section">
-          <h2>Active Account</h2>
-          <p>{this.props.account.address}</p>
-          <p>{this.props.account.tokens}</p>
-        </div>
+        {this.renderAccount()}
 
         <div className="section">
           <h2>DAO</h2>
