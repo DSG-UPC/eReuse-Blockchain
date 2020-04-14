@@ -110,7 +110,8 @@ class IndexView extends Component<IAppContext, State> {
 
         <div className="section">
           <h2>Active Account</h2>
-          {JSON.stringify(this.props.account)}
+          <p>{this.props.account.address}</p>
+          <p>{this.props.account.tokens}</p>
         </div>
 
         <div className="section">
