@@ -69,7 +69,6 @@ typings/
 
 # Remove build/ folder
 build/
-package-lock.json
 
 # Remove json-server dependencies
 .db.json.swp
