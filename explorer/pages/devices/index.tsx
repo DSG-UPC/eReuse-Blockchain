@@ -1,4 +1,5 @@
 import { Component } from 'react'
+import ContractComponent from './ContractComponent'
 import { Button, Spin, Divider } from 'antd'
 import { getDeployedDevices } from '../../lib/devices'
 
@@ -43,36 +44,35 @@ class DevicesView extends Component<State> {
   }
 
   renderContracts(contracts) {
-    let result = (<div></div>);
-    const keys = Object.keys(contracts);
+    let result = <div></div>;
+    const keys = Object.keys(contracts).slice();
     if (keys.length > 0) {
-      result = <div>
-        {keys.map(k => {
-          (<p key={k}>{k}</p>);
-        })}
-      </div>;
+      result = (<div>
+        {keys.map((k, index) =>
+          <ContractComponent key={k} {...contracts[k]} />
+        )}
+      </div>);
     }
     return result;
   }
 
   renderDevices(devices) {
     let result = (<div></div>);
-    result = (
-      <div>
-        {devices.map((item, index) => (
-          <p key={item}>{item}</p>
-        ))}
-      </div>
-    )
+    if (devices.length > 0) {
+      result = (
+        <div>
+          {devices.map((item, index) => (
+            <p key={item}>{item}</p>
+          ))}
+        </div>
+      )
+    }
     return result;
   }
 
   render() {
-    const contracts = this.props.contracts;
-    const address = this.props.address;
-
-    this.updateDevices(contracts, address);
-    let contractsRender = this.renderContracts(contracts);
+    this.updateDevices(this.props.contracts, this.props.address);
+    let contractsRender = this.renderContracts(this.props.contracts);
     let devicesRender = this.renderDevices(this.state.devices);
 
     return <div id="index">

@@ -1,11 +1,11 @@
 // NEWS FEED
 
-let proof : IProof = {
+let proof: IProof = {
     proofId: "a"
 }
 
 export interface IProof {
-   proofId: number,
+    proofId: number,
 }
 
 
@@ -14,7 +14,7 @@ export interface IConnection {
 }
 
 
-export interface IAccount{
+export interface IAccount {
     address: string,
     tokens: number,
     web3Wallet: object,
@@ -22,9 +22,9 @@ export interface IAccount{
 
 
 export interface IContract {
-    abi : string,
+    abi: string,
     address: string,
     contractName: string,
     contractArtifact: object,
-    events : Array
+    events: Array
 }
