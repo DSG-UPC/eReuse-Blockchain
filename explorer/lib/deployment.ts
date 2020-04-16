@@ -4,6 +4,7 @@
 import EIP20 from '../../build/contracts/EIP20.json'
 import DeviceFactory from '../../build/contracts/DeviceFactory.json'
 import ProofsHandler from '../../build/contracts/ProofsHandler.json'
+import DepositDevice from '../../build/contracts/DepositDevice.json'
 // import contract from '@truffle/contract'
 const contract = require('@truffle/contract')
 const ethers = require('ethers');
@@ -77,14 +78,22 @@ const ethers = require('ethers');
  * @param {File} artifacts JSON representation of smart contract.
  * @returns {Promise} A promise which resolves to the the smart contract instance.
  */
-function getContractInstance(provider, network, artifacts) {
-    let contractAddress = artifacts.networks[network].address;
+function getContractInstance(provider, network, artifacts, address = null) {
+    let contractAddress
+    if (address)
+        contractAddress = address
+    else 
+        contractAddress = artifacts.networks[network].address;
     let deviceContract = initializeContract(provider, artifacts)
     return new ethers.Contract(contractAddress, deviceContract.abi, provider);
 }
 
 export function getDeviceFactory(provider, network) {
     return getContractInstance(provider, network, DeviceFactory);
+}
+
+export function getDepositDevice(provider, network, address) {
+    return getContractInstance(provider, network, DepositDevice, address);
 }
 
 export function getERC20(provider, network) {
