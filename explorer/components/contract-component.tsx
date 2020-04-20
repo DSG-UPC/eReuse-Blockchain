@@ -1,6 +1,6 @@
 import { Component } from 'react'
-import { IContract } from '../../lib/types';
-import Contract from '../../lib/contract'
+import { IContract } from '../lib/types';
+import Contract from '../lib/contract'
 
 const ContractView = (props) => {
     return (<ContractComponent {...props} />)
@@ -27,15 +27,18 @@ class ContractComponent extends Component<Contract> {
     }
 
     render() {
-        let contractRender = <p></p>
         if (this.state.contract) {
-            contractRender = <p>{this.state.contract.address}</p>
+            return (<tr>
+                <td className="centering">
+                    {this.state.contract.contractName}
+                </td>
+                <td className="centering">
+                    {this.state.contract.address}
+                </td>
+            </tr>);
+        } else {
+            return (<tr></tr>);
         }
-        return (
-            <div className="contractMain">
-                {contractRender}
-            </div>
-        );
     }
 }
 

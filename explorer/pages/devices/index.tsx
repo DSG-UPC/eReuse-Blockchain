@@ -1,5 +1,6 @@
 import { Component } from 'react'
-import ContractComponent from '../../components/device-contract'
+import DeviceComponent from '../../components/device-component'
+import ContractComponent from '../../components/contract-component'
 import { Button, Spin, Divider } from 'antd'
 import { getDeployedDevices } from '../../lib/devices'
 import Router from 'next/router'
@@ -52,13 +53,20 @@ class DevicesView extends Component<State> {
     let deviceId = null
     if (params)
       deviceId = params[0]
-    console.log(deviceId)
+    // console.log(deviceId)
     if (deviceId != this.state.deviceId)
       this.setState({
         contracts: this.props.contracts,
         address: this.props.address,
         deviceId
       })
+  }
+
+  renderTableHeader() {
+    return (<tr>
+      <th className="centering">Contract Name</th>
+      <th className="centering">Contract Address</th>
+    </tr>);
   }
 
   updateDevices(contracts, address) {
@@ -71,29 +79,30 @@ class DevicesView extends Component<State> {
   }
 
   renderContracts(contracts) {
-    let result = <div></div>;
     const keys = Object.keys(contracts).slice();
-    if (keys.length > 0) {
-      result = (<div>
-        {keys.map((k, index) =>
-          <ContractComponent key={k} {...contracts[k]} />
-        )}
-      </div>);
-    }
-    return result;
+    return (
+      <table>
+        {this.renderTableHeader()}
+        {(keys.length > 0) &&
+          keys.map((k, index) =>
+            <ContractComponent key={k} {...contracts[k]} />
+          )
+        }
+      </table>
+    );
   }
 
   renderDevices(devices) {
     let result = (<div></div>);
     if (devices.length > 0) {
       result = (
-        <div>
+        <ul>
           {devices.map((item, index) => (
             <Link href={"/devices/#/" + item}>
-              <a>{item}</a>
+              <a><li>{item}</li></a>
             </Link>
           ))}
-        </div>
+        </ul>
       )
     }
     return result;
@@ -108,7 +117,7 @@ class DevicesView extends Component<State> {
       return <div id="index">
         <div className="section">
           <h3>Contracts</h3>
-          
+          {contractsRender}
 
           <div className="section">
             <h2>Devices</h2>
@@ -117,7 +126,7 @@ class DevicesView extends Component<State> {
         </div>
       </div>
     else
-      return <ContractComponent {...deviceAddress = deviceAddress}></ContractComponent>
+      return <DeviceComponent {...deviceAddress = deviceAddress}></DeviceComponent>
   }
 }
 
