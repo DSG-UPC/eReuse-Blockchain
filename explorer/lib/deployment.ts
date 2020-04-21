@@ -3,7 +3,8 @@ import DeviceFactory from '../../build/contracts/DeviceFactory.json'
 import ProofsHandler from '../../build/contracts/ProofsHandler.json'
 import DepositDevice from '../../build/contracts/DepositDevice.json'
 const contract = require('@truffle/contract')
-const ethers = require('ethers');
+import  { ethers, providers} from 'ethers'
+
 
 
 /**
@@ -16,14 +17,16 @@ const ethers = require('ethers');
  * @param {string} address contract address in case it is needed.
  * @returns {Promise} A promise which resolves to the the smart contract instance.
  */
-function getContractInstance(provider, network, artifacts, address = null) {
+function getContractInstance(provider: providers.Web3Provider, network, artifacts, address = null) {
     let contractAddress;
     if (address)
-        contractAddress = address
+        contractAddress =  ethers.utils.getAddress(address)
     else
         contractAddress = artifacts.networks[network].address;
     let deviceContract = initializeContract(provider, artifacts)
-    return new ethers.Contract(contractAddress, deviceContract.abi, provider);
+    console.log(deviceContract)
+    const signer = provider.getSigner()
+    return new ethers.Contract(contractAddress, deviceContract.abi, signer);
 }
 
 export function getDeviceFactory(provider, network) {

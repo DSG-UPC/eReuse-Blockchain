@@ -62,25 +62,46 @@ class MainApp extends App<Props, State> {
 
     async componentDidMount() {
         try {
-            await Web3Wallet.connect();
             await Web3Wallet.unlock();
-            const address = await Web3Wallet.getAddress();
-            const provider = window["web3"].currentProvider
-            const network = provider.networkVersion;
-            const contracts = this.getContracts(network);
-            let token_number = await getTokens(contracts.ERC20.contractInstance, address);
-            this.setState({
-                address: address,
-                contracts: contracts,
-                num_tokens: token_number.toNumber(),
-                provider: provider,
-                isConnected: true,
-                networkName: network,
-            });
+            await this.refreshStatus()
+            // setContext()
+            this.refreshInterval = setInterval(() => { }, 35000)
         } catch (error) {
             console.error(error)
         }
 
+    }
+
+    // async componentDidUpdate() {
+    //     try {
+    //         await this.refreshStatus()
+    //         // setContext()
+    //         // this.refreshInterval = setInterval(() => { }, 35000)
+    //     } catch (error) {
+    //         console.error(error)
+    //     }
+
+    // }
+
+    async refreshStatus() {
+        await Web3Wallet.connect();
+        const address = await Web3Wallet.getAddress()
+        // const provider = window["web3"].currentProvider
+        const provider = Web3Wallet.provider
+        // const network = provider.networkVersion;
+        const network = (await provider.getNetwork())
+        const networkName = String(network.chainId)
+        // const contracts = this.getContracts(network);
+        const contracts = this.getContracts(networkName);
+        let token_number = await getTokens(contracts.ERC20.contractInstance, address);
+        this.setState({
+            address: address,
+            contracts: contracts,
+            num_tokens: token_number.toNumber(),
+            provider: provider,
+            isConnected: true,
+            networkName: networkName,
+        });
     }
 
     getContracts(network) {
@@ -112,7 +133,7 @@ class MainApp extends App<Props, State> {
         const address = this.state.address
         const contracts = this.state.contracts
         const tokens = this.state.num_tokens
-
+        console.log("App State", this.state);
         // Main render
 
         const { Component, pageProps } = this.props
@@ -120,18 +141,18 @@ class MainApp extends App<Props, State> {
         // Get data from getInitialProps and provide it as the global context to children
         // const { injectedArray } = this.props
 
-        const globalContext: IAppContext = {
-            account: {
-                address: address,
-                tokens: tokens,
-                web3Wallet: Web3Wallet
-            },
-            contracts: contracts
-        }
+        // const globalContext: IAppContext = {
+        //     account: {
+        //         address: address,
+        //         tokens: tokens,
+        //         web3Wallet: Web3Wallet
+        //     },
+        //     contracts: contracts
+        // }
 
 
         return (
-            <AppContext.Provider value={globalContext}>
+            <AppContext.Provider value={this.state}>
                 <Head>
                     <title>{this.state.title}</title>
                 </Head>
