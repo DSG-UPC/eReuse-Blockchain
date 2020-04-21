@@ -3,7 +3,7 @@ import { providers } from "ethers"
 
 // Web3.providers.WebsocketProvider.prototype.sendAsync = Web3.providers.WebsocketProvider.prototype.send
 
-let provider = null
+let provider: providers.Web3Provider = null
 let web3
 
 export enum AccountState {

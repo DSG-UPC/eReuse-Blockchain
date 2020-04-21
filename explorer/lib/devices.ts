@@ -1,4 +1,4 @@
-
+import { utils } from 'ethers'
 /**
  * Auxiliary function to create an instance of some smart contract
  * whose address is known.
@@ -12,23 +12,24 @@ export function getDeployedDevices(contractInstance, ownerAddress) {
 }
 
 export type DeviceInfo = {
-    uid: number,
+    uid: string,
     owner: string,
-    deposit: number,
+    deposit: string,
     state: number
 
 }
 
-export function getDeviceInformation(contractInstance): DeviceInfo {
-    let deposit = contractInstance.getDeposit.call()
-    let uid = contractInstance.getOwner.call()
-    let owner = contractInstance.getUid.call()
-    let state = contractInstance.state.call()
+export async function getDeviceInformation(contractInstance): Promise<DeviceInfo> {
+    let deposit = utils.bigNumberify(await contractInstance.getDeposit.call()).toString()
+    let uid = utils.bigNumberify(await contractInstance.getUid.call()).toString()
+    let owner = await contractInstance.getOwner.call()
+    // let state = contractInstance.state.call()
     return {
         uid,
         owner,
         deposit,
-        state
+        // state
+        state: 0
     }
 }
 
