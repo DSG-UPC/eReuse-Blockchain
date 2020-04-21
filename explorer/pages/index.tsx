@@ -1,5 +1,6 @@
 import { Component } from 'react'
 import { Button, Spin, Divider, Menu } from 'antd'
+import Link from "next/link"
 
 
 // MAIN COMPONENT
@@ -36,21 +37,6 @@ class IndexView extends Component<State> {
 
     return <div id="page-menu">
       <Menu mode="inline" defaultSelectedKeys={['profile']} style={{ width: 200 }}>
-        {/* <Menu.Item key="profile">
-          <Link href={"/" + location.hash}>
-            <a>Profile</a>
-          </Link>
-        </Menu.Item>
-        <Menu.Item key="proofs">
-          <Link href={"/proofs/" + location.hash}>
-            <a>Proofs</a>
-          </Link>
-        </Menu.Item>
-        <Menu.Item key="devices">
-          <Link href={"/devices/" + location.hash}>
-            <a>Devices</a>
-          </Link>
-        </Menu.Item> */}
       </Menu>
     </div>
 
@@ -60,8 +46,6 @@ class IndexView extends Component<State> {
     return <>
       <Divider />
       <h4>{"HEADER"}</h4>
-      {/* <p>{this.context.account.address}</p> */}
-      {/* <p><Link href={`/entities/edit/#/${this.state.entityId}`}><a><Button>Manage my entity</Button></a></Link></p> */}
     </>
   }
 
@@ -85,45 +69,20 @@ class IndexView extends Component<State> {
   }
 
   render() {
-    // { this.renderSideMenu() }
     return <div id="index">
       <div className="card">
         <h3>Usody</h3>
-        {/* 
-        {
-          this.state.connected ? this.renderLoading() :
-            (this.state.userAddress ? this.renderUserInfo() : this.renderGetStarted())
-        } */}
-
-        <div>
-          <h1> Example</h1>
-          <p>
-            Examples of how to get started with Drizzle in various situations.
-        </p>
-        </div>
 
         {this.renderAccount()}
 
         <div className="section">
-          <h2>DAO</h2>
-          <p>
-            This shows a simple ContractData component with no arguments, along
-            with a form to set its value.
-        </p>
-          <p>
-            <strong>Stored Value: </strong>
-          </p>
+          <Link href="/devices/">
+            <a>Show devices</a>
+            </Link>
         </div>
-
-
       </div>
     </div>
   }
 }
-
-// // Custom layout example
-// IndexPage.Layout = props => <MainLayout>
-//   {props.children}
-// </MainLayout>
 
 export default IndexPage

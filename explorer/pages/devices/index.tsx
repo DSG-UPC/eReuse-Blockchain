@@ -1,9 +1,7 @@
 import { Component } from 'react'
 import DeviceComponent from '../../components/device-component'
 import ContractComponent from '../../components/contract-component'
-import { Button, Spin, Divider } from 'antd'
 import { getDeployedDevices } from '../../lib/devices'
-import Router from 'next/router'
 import Link from "next/link"
 
 
@@ -32,28 +30,11 @@ class DevicesView extends Component<State> {
     super(props);
   }
 
-  async componentDidMount() {
-    // const params = location.hash.substr(2).split("/")
-    // let deviceId = null
-    // if (params)
-    //   deviceId = params[0]
-    // console.log(deviceId)
-    // if (deviceId != this.state.deviceId)
-    //   this.setState({
-    //     contracts: this.props.contracts,
-    //     address: this.props.address,
-    //     deviceId
-    //   })
-    // Router.push(location)
-
-  }
-
   async componentDidUpdate() {
     const params = location.hash.substr(2).split("/")
     let deviceId = null
     if (params)
       deviceId = params[0]
-    // console.log(deviceId)
     if (deviceId != this.state.deviceId)
       this.setState({
         contracts: this.props.contracts,
@@ -63,10 +44,13 @@ class DevicesView extends Component<State> {
   }
 
   renderTableHeader() {
-    return (<tr>
-      <th className="centering">Contract Name</th>
-      <th className="centering">Contract Address</th>
-    </tr>);
+    return (
+      <thead>
+        <tr>
+          <th className="centering">Contract Name</th>
+          <th className="centering">Contract Address</th>
+        </tr>
+      </thead>);
   }
 
   updateDevices(contracts, address) {
@@ -83,12 +67,15 @@ class DevicesView extends Component<State> {
     return (
       <table>
         {this.renderTableHeader()}
-        {(keys.length > 0) &&
-          keys.map((k, index) =>
-            <ContractComponent key={k} {...contracts[k]} />
-          )
-        }
-      </table>
+        <tbody>
+          {
+            (keys.length > 0) &&
+            keys.map((k, index) =>
+              <ContractComponent key={k} {...contracts[k]} />
+            )
+          }
+        </tbody>
+      </table >
     );
   }
 
@@ -98,8 +85,13 @@ class DevicesView extends Component<State> {
       result = (
         <ul>
           {devices.map((item, index) => (
-            <Link href={"/devices/#/" + item}>
-              <a><li>{item}</li></a>
+            <Link
+              key={item}
+              href={{ pathname: '/components/device-component', query: { deviceAddress: item } }}
+              as={"/devices/" + item}>
+              <a>
+                <li>{item}</li>
+              </a>
             </Link>
           ))}
         </ul>
@@ -110,11 +102,11 @@ class DevicesView extends Component<State> {
 
   render() {
     this.updateDevices(this.props.contracts, this.props.address);
-    let contractsRender = this.renderContracts(this.props.contracts);
     let devicesRender = this.renderDevices(this.state.devices);
+    let contractsRender = this.renderContracts(this.props.contracts);
     let deviceAddress = this.state.deviceId
     if (!deviceAddress)
-      return <div id="index">
+      return (<div id="index">
         <div className="section">
           <h3>Contracts</h3>
           {contractsRender}
@@ -124,7 +116,7 @@ class DevicesView extends Component<State> {
             {devicesRender}
           </div>
         </div>
-      </div>
+      </div>)
     else
       return <DeviceComponent {...deviceAddress = deviceAddress}></DeviceComponent>
   }

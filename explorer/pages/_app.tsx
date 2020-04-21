@@ -60,22 +60,8 @@ class MainApp extends App<Props, State> {
 
     refreshInterval: any
 
-    // static async getInitialProps(appContext) {
-    //     // calls page's `getInitialProps` and fills `appProps.pageProps`
-    //     const appProps = await App.getInitialProps(appContext)
-    //
-    //     // Fetch data and provide it on the first render
-    //     const injectedArray = []
-    //
-    //     return { injectedArray, ...appProps }
-    // }
-
     async componentDidMount() {
-        // const provider = new $window.web3.providers.WebsocketProvider('ws://' + $window.CONSTANTS.blockchain + ':8545')
-        // const web3 = new $window.web3(provider)
-        // const web3wallet = new Web3Wallet()
         try {
-            // await window["ethereum"].enable()
             await Web3Wallet.connect();
             await Web3Wallet.unlock();
             const address = await Web3Wallet.getAddress();
@@ -114,20 +100,11 @@ class MainApp extends App<Props, State> {
     }
 
     componentWillUnmount() {
-        clearInterval(this.refreshInterval)
+        clearInterval(this.refreshInterval);
     }
 
-    // componentDidCatch(error: Error, _errorInfo: any/*ErrorInfo*/) {
-    //     console.error(error)
-    //     return <GeneralError />
-    // }
-
     renderPleaseWait() {
-        return null // The loading message will appear
-
-        // return <div id="global-loading">
-        //     <div><Spin size="small" /> &nbsp;Please, wait... </div>
-        // </div>
+        return null;
     }
 
 
@@ -135,15 +112,6 @@ class MainApp extends App<Props, State> {
         const address = this.state.address
         const contracts = this.state.contracts
         const tokens = this.state.num_tokens
-
-        // if (!this.state.isConnected) {
-        //     return this.renderPleaseWait()
-        // }
-        // else if (Web3Wallet.isAvailable()) {
-        //     if (accountState !== AccountState.Ok) {
-        //         return this.renderMetamaskState()
-        //     }
-        // }
 
         // Main render
 
@@ -167,9 +135,7 @@ class MainApp extends App<Props, State> {
                 <Head>
                     <title>{this.state.title}</title>
                 </Head>
-                {/* <Layout> */}
                 <Component {...this.state} />
-                {/* </Layout> */}
             </AppContext.Provider>
         );
     }

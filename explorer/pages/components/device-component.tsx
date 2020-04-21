@@ -1,44 +1,51 @@
 import { Component } from 'react'
-import { IContract } from '../lib/types';
-import Contract from '../lib/contract'
-import { getDeviceInformation, DeviceInfo } from "../lib/devices"
-import { getDepositDevice } from "../lib/deployment"
+import {withRouter} from 'next/router';
+import Contract from '../../lib/contract'
+import { getDeviceInformation, DeviceInfo } from '../../lib/devices'
+import { getDepositDevice } from '../../lib/deployment'
 
 const DeviceView = (props) => {
     return (<DeviceComponent {...props} />)
 }
 
 type Props = {
-    provider: object,
+    provider: Object,
     networkName: string,
-    deviceAddress: string
+    router: Object
 }
 
 type State = {
     contract: Contract
     properties: DeviceInfo
+    deviceAddress: string
 }
 
 class DeviceComponent extends Component<Props, State> {
 
     state: State = {
         contract: null,
-        properties: {} as DeviceInfo
+        properties: {} as DeviceInfo,
+        deviceAddress: null
     }
 
     constructor(props) {
         super(props);
     }
 
-    async componentDidMount() {
-        if (this.props && this.props.deviceAddress) {
+    static getInitialProps({ query }) {
+        return { query }
+    }
 
-            let contractInstance = await getDepositDevice(this.props.provider, this.props.networkName, this.props.deviceAddress)
-            let contract: Contract = new Contract('DepositDevice', this.props.deviceAddress, contractInstance)
+    async componentDidMount() {
+        const deviceAddress = this.props.router.query.deviceAddress;
+        if (this.props && deviceAddress) {
+            let contractInstance = await getDepositDevice(this.props.provider, this.props.networkName, deviceAddress)
+            let contract = new Contract('DepositDevice', deviceAddress, contractInstance)
             const properties = await getDeviceInformation(contractInstance)
             this.setState({
                 contract,
-                properties
+                properties,
+                deviceAddress
             })
         }
     }
@@ -57,7 +64,6 @@ class DeviceComponent extends Component<Props, State> {
         if (contract && this.state.properties) {
             contractRender.push(<p>{contract.address}</p>)
             contractRender.push(<ul>{this.renderObjectProperties()}</ul>)
-
         }
         return (
             <div className="contractMain">
@@ -67,4 +73,4 @@ class DeviceComponent extends Component<Props, State> {
     }
 }
 
-export default DeviceView
+export default withRouter(DeviceView)
