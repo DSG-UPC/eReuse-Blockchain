@@ -109,17 +109,19 @@ class DevicesView extends Component<IAppContext, State> {
 
     let devicesRender = this.renderDevices(this.state.devices);
     let contractsRender = this.renderContracts(this.props.contracts);
-    return (<div id="index">
-      <div className="section">
-        <h3>Contracts</h3>
-        {contractsRender}
-
+    return (
+      <div id="index">
         <div className="section">
-          <h2>Devices</h2>
-          {devicesRender}
+          <h3>Contracts</h3>
+          {contractsRender}
+
+          <div className="section">
+            <h2>Devices</h2>
+            {devicesRender}
+          </div>
         </div>
       </div>
-    </div>)
+    )
   }
 }
 

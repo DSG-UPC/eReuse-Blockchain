@@ -55,10 +55,10 @@ class DeviceComponent extends Component<IAppContext, State> {
 
     render() {
         let contractRender = []
-        contractRender.push(<p>HI</p>)
+        contractRender.push(<p></p>)
         const contract = this.state.contract
         if (contract && this.state.properties) {
-            contractRender.push(<p>{contract.address}</p>)
+            contractRender.push(<h2>{contract.address}</h2>)
             contractRender.push(<ul>{this.renderObjectProperties()}</ul>)
 
         }

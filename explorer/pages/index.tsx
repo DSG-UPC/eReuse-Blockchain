@@ -69,19 +69,21 @@ class IndexView extends Component<State> {
   }
 
   render() {
-    return <div id="index">
-      <div className="card">
-        <h3>Usody</h3>
+    return (
+      <div id="index">
+        <div className="card">
+          <h3>Usody</h3>
 
-        {this.renderAccount()}
+          {this.renderAccount()}
 
-        <div className="section">
-          <Link href="/devices/">
-            <a>Show devices</a>
+          <div className="section">
+            <Link href="/devices/">
+              <a>Show devices</a>
             </Link>
+          </div>
         </div>
       </div>
-    </div>
+    )
   }
 }
 

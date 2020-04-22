@@ -1,4 +1,5 @@
 const env = require("./env-config.js")
+const path = require("path")
 
 module.exports = {
   env,
@@ -24,11 +25,13 @@ module.exports = {
         test: antStyles,
         use: 'null-loader',
       })
+      
     }
     config.node = {
       fs: 'empty',
       module: "empty",
     };
+    config.resolve.alias['static'] = path.join(__dirname, './public');
     return config
   },
 }
@@ -41,6 +44,7 @@ async function generatePathMap() {
   return {
     '/': { page: '/' },
     '/devices': { page: '/devices' },
+    "/devices/:id": {page: "devices/[item]"},
     '/proofs': { page: '/proofs' },
     '/proofs/function': { page: '/proofs/function' },
   }

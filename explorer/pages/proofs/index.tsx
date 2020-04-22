@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import { Button, Spin, Divider } from 'antd'
 
-const contractName =  "FunctionProofs"
+const contractName = "FunctionProofs"
 
 // MAIN COMPONENT
 const ProofsPage = (props) => {
@@ -62,7 +62,7 @@ class ProofsView extends Component<State> {
     }
   }
 
-  renderProofs(proofs){
+  renderProofs(proofs) {
     let result = (<div></div>);
     result = (
       <div>
@@ -77,17 +77,19 @@ class ProofsView extends Component<State> {
   render() {
     this.updateProofs(this.state.contracts, this.state.address);
     const proofsRender = this.renderProofs(this.state.proofs);
-    return <div id="index">
-      <div className="card">
-        <h3>Usody</h3>
-        
-        <div className="section">
-          <h2>Devices</h2>
-          {proofsRender}
-        </div>
+    return (
+      <div id="index">
+        <div className="card">
+          <h3>Usody</h3>
 
+          <div className="section">
+            <h2>Devices</h2>
+            {proofsRender}
+          </div>
+
+        </div>
       </div>
-    </div>
+    )
   }
 }
 

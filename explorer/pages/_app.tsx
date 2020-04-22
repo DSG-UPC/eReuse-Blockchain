@@ -8,6 +8,7 @@ import Web3Wallet, { AccountState } from "../lib/web3-wallet"
 import GeneralError from '../components/error'
 import { getDeviceFactory, getERC20, getProofsHandler } from "../lib/deployment"
 import { getTokens } from "../lib/erc20"
+import AppLayout from "../components/layout"
 // TODO Add other contracts
 
 import "../styles/app.css";
@@ -28,6 +29,7 @@ import 'antd/lib/input/style/index.css'
 import 'antd/lib/input-number/style/index.css'
 import 'antd/lib/date-picker/style/index.css'
 import 'antd/lib/spin/style/index.css'
+// import { Layout } from 'antd'
 
 type Props = {
     // injectedArray: any[],
@@ -136,7 +138,8 @@ class MainApp extends App<Props, State> {
         console.log("App State", this.state);
         // Main render
 
-        const { Component, pageProps } = this.props
+        const { Component, pageProps, router } = this.props
+        router.pathname
 
         // Get data from getInitialProps and provide it as the global context to children
         // const { injectedArray } = this.props
@@ -156,7 +159,9 @@ class MainApp extends App<Props, State> {
                 <Head>
                     <title>{this.state.title}</title>
                 </Head>
-                <Component {...this.state} />
+                <AppLayout location={router.pathname}>
+                    <Component {...this.state} />
+                </AppLayout>
             </AppContext.Provider>
         );
     }
