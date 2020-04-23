@@ -1,5 +1,5 @@
 import Link from "next/link"
-import  image from '../public/logo.png'
+// import logo from "../public/logo.png"
 import Router from 'next/router'
 import { Divider, Menu, Layout, List } from 'antd'
 import { UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';

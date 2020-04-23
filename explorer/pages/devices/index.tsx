@@ -91,7 +91,7 @@ class DevicesView extends Component<IAppContext, State> {
       result = (
         <ul>
           {devices.map((item, index) => (
-            <li key={index}>
+            <li key={item}>
               <Link
                 href="/devices/[item]"
                 as={"/devices/" + item}>

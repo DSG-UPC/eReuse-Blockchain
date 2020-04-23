@@ -75,12 +75,6 @@ class IndexView extends Component<State> {
           <h3>Usody</h3>
 
           {this.renderAccount()}
-
-          <div className="section">
-            <Link href="/devices/">
-              <a>Show devices</a>
-            </Link>
-          </div>
         </div>
       </div>
     )
