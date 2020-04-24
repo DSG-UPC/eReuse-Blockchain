@@ -1,3 +1,5 @@
+import { proof } from "./types";
+
 /**
  * Auxiliary function to create an instance of some smart contract
  * whose address is known.

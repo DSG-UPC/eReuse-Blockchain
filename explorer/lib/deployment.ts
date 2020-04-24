@@ -24,7 +24,7 @@ function getContractInstance(provider: providers.Web3Provider, network, artifact
     else
         contractAddress = artifacts.networks[network].address;
     let deviceContract = initializeContract(provider, artifacts)
-    console.log(deviceContract)
+    // console.log(deviceContract)
     const signer = provider.getSigner()
     return new ethers.Contract(contractAddress, deviceContract.abi, signer);
 }

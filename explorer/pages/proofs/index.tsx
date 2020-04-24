@@ -44,20 +44,24 @@ class ProofsView extends Component<IAppContext, State> {
       getDeployedDevices(contracts['DeviceFactory'].contractInstance,
         this.props.address).
         then(result => {
+          this.updateProofs(result)
           this.setState({ devices: result })
         });
     }
   }
 
-  async updateProofs() {
-    if (Object.keys(this.state.devices).length > 0) {
+  updateProofs(devices) {
+    if (devices.length > 0) {
       let currentProofs = {};
-      await this.state.devices.map(async (item, index) => {
+      devices.map(async (item, index) => {
         let contractInstance = await getDepositDevice(this.props.provider, this.props.networkName, item)
-        await Object.keys(this.state.proofs).map(async (item, index) => {
-          currentProofs[item] = await getProofsFromDevice(contractInstance, item)
-        })
-        this.setState({ proofs: currentProofs })
+        await Object.keys(this.state.proofs).map(async (proofType, index) => {
+          await getProofsFromDevice(contractInstance, proofType)
+            .then(proofs => {
+              currentProofs[proofType] = proofs;
+            })
+            this.setState({ proofs: currentProofs })
+          })
       })
     }
   }
@@ -66,16 +70,10 @@ class ProofsView extends Component<IAppContext, State> {
     if (prevprops.contracts && prevprops.contracts != this.props.contracts) {
       await this.updateDevices(this.props.contracts);
     }
-    if (this.state.devices.length > 0) {
-      await this.updateProofs();
-    }
   }
 
   async componentDidMount() {
-    this.setState({
-      contracts: this.props.contracts,
-      address: this.props.address
-    })
+    await this.updateDevices(this.props.contracts);
   }
 
   renderUserInfo() {
@@ -99,10 +97,11 @@ class ProofsView extends Component<IAppContext, State> {
   }
 
   renderProofs(proofType) {
-    let result = (<div></div>);
+    let result = [<div></div>];
     const proofs = this.state.proofs;
-    if (this.state.proofs && this.state.proofs[proofType].length > 0) {
-      result =
+    if (proofs && proofs[proofType].length > 0) {
+      result = [
+        <h3 key={proofType}>{proofType}</h3>,
         <ul>
           {proofs[proofType].map((proof, index) => (
             <li key={proof}>
@@ -114,6 +113,7 @@ class ProofsView extends Component<IAppContext, State> {
             </li>
           ))}
         </ul>
+      ]
     }
     return result;
   }
@@ -127,11 +127,10 @@ class ProofsView extends Component<IAppContext, State> {
             <h2>Proofs</h2>
             {
               Object.keys(this.state.proofs).map((item, index) => (
-                [<h3 key={item}>{item}</h3>, this.renderProofs(item)]
+                this.renderProofs(item)
               ))
             }
           </div>
-
         </div>
       </div>
     )

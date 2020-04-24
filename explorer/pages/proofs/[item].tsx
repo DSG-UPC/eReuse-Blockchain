@@ -35,7 +35,6 @@ class ProofComponent extends Component<IAppContext, State> {
         console.log(this.props)
         if (deviceAddress) {
             let contractInstance = await getDepositDevice(this.props.provider, this.props.networkName, deviceAddress)
-            console.log(contractInstance)
             let contract: Contract = new Contract('DepositDevice', deviceAddress, contractInstance)
             const properties = await getDeviceInformation(contractInstance)
             this.setState({
