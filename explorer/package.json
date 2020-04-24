@@ -22,7 +22,7 @@
     "typescript": "^3.8.2"
   },
   "scripts": {
-    "dev": "next dev -p 8080",
+    "dev": "rm -rf .next && next dev -p 8080",
     "build": "next build",
     "start": "next start",
     "export": "next build && next export -o build"
