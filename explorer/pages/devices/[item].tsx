@@ -3,6 +3,7 @@ import Contract from '../../lib/contract'
 import { getDeviceInformation, DeviceInfo } from "../../lib/devices"
 import { getDepositDevice } from "../../lib/deployment"
 import AppContext, { IAppContext } from '../../components/app-context';
+import {  List } from 'antd';
 
 export default function DeviceView(props) {
     return <AppContext.Consumer>
@@ -46,9 +47,30 @@ class DeviceComponent extends Component<IAppContext, State> {
 
     renderObjectProperties() {
         let properties = this.state.properties
-        return Object.keys(properties).map((key, index) => {
-            return <li key={key}>{key + ": " + properties[key]}</li>
-        })
+        // return Object.keys(properties).map((key, index) => {
+        //     return <li key={key}>{key + ": " + properties[key]}</li>
+        // })
+        return (
+            <div className="body-card">
+                <List
+                    className="list"
+                    itemLayout="vertical"
+                    dataSource={Object.keys(properties)}
+                    renderItem={item => (
+                        <List.Item
+                        // actions={[<a key="list-loadmore-edit">show</a>, <a key="list-loadmore-more">more</a>]}
+                        >
+                            {/* <Skeleton avatar title={false}> */}
+                            <List.Item.Meta
+                                title={item}
+                            // description="Info for ..."
+                            />
+                            {properties[item]}
+                        </List.Item>
+                    )}
+                />
+            </div>
+        )
     }
 
     render() {
@@ -59,7 +81,7 @@ class DeviceComponent extends Component<IAppContext, State> {
             contractRender.push(<ul key={this.state.properties.uid}>{this.renderObjectProperties()}</ul>)
         }
         return (
-            <div className="contractMain">
+            <div className="page-body">
                 {contractRender}
             </div>
         );

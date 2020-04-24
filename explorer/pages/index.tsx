@@ -1,6 +1,7 @@
 import { Component } from 'react'
-import { Button, Spin, Divider, Menu } from 'antd'
+import { Button, Spin, Divider, Menu, Card, Avatar, List } from 'antd'
 import Link from "next/link"
+import Icon, { UserOutlined } from '@ant-design/icons'
 
 
 // MAIN COMPONENT
@@ -61,21 +62,34 @@ class IndexView extends Component<State> {
   }
 
   renderAccount() {
-    return (<div className="section">
-      <h2>Active Account</h2>
-      <p>User ethereum address: {this.props.address}</p>
-      <p>User tokens: {this.props.num_tokens}</p>
+    return (<div className="body-card">
+      {/* <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#87d068' }}/> */}
+      <Card style={{ width: 300 }}
+      // cover={}
+      >
+        <Card.Meta title="Active Account"  avatar={<Avatar icon={<UserOutlined />} style={{ backgroundColor: '#87d068' }} />}></Card.Meta>
+        {/* <Card title="Active Account" extra={<a href="#">More</a>} style={{ width: 300 }}> */}
+        <List
+        >
+          <List.Item >
+            <List.Item.Meta title="Ethereum Address"/>
+            {this.props.address}
+          </List.Item>
+          <List.Item >
+            <List.Item.Meta title="# of Tokens"/>
+            {this.props.num_tokens}
+          </List.Item>
+        </List>
+      </Card>
     </div>)
   }
 
   render() {
     return (
-      <div id="index">
-        <div className="card">
-          <h3>Usody</h3>
-
-          {this.renderAccount()}
-        </div>
+      <div id="page-body">
+        {/* <div className="body-card"> */}
+        {this.renderAccount()}
+        {/* </div> */}
       </div>
     )
   }

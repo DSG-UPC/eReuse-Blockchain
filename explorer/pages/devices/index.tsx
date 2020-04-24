@@ -3,6 +3,8 @@ import ContractComponent from '../../components/contract-component'
 import { getDeployedDevices } from '../../lib/devices'
 import Link from "next/link"
 import AppContext, { IAppContext } from '../../components/app-context'
+import { Divider, Menu, List, Avatar, Skeleton } from 'antd'
+import { UserOutlined } from '@ant-design/icons'
 
 
 // MAIN COMPONENT
@@ -84,22 +86,34 @@ class DevicesView extends Component<IAppContext, State> {
     );
   }
 
-  renderDevices(devices) {
+  renderDevices(devices: String[]) {
     let result = (<div></div>)
     console.log(devices)
     if (devices.length > 0) {
       result = (
-        <ul>
-          {devices.map((item, index) => (
-            <li key={item}>
-              <Link
-                href="/devices/[item]"
-                as={"/devices/" + item}>
-                <a>{item}</a>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <List
+          className="list"
+          itemLayout="vertical"
+          dataSource={devices}
+          renderItem={item => (
+            <List.Item
+            // actions={[<a key="list-loadmore-edit">show</a>, <a key="list-loadmore-more">more</a>]}
+            >
+              {/* <Skeleton avatar title={false}> */}
+              <List.Item.Meta
+                avatar={<Avatar style={{ backgroundColor: '#87d068' }}>{item.slice(item.length - 2)}</Avatar>}
+                title={<Link href="/devices/[item]"
+                  as={"/devices/" + item}>
+                  <a>{item}</a>
+                </Link>
+                }
+                description="Info for ..."
+              />
+              {/* <div>content</div> */}
+              {/* </Skeleton> */}
+            </List.Item>
+          )}
+        />
       )
     }
     return result;
@@ -107,19 +121,19 @@ class DevicesView extends Component<IAppContext, State> {
 
   render() {
 
-    let devicesRender = this.renderDevices(this.state.devices);
-    let contractsRender = this.renderContracts(this.props.contracts);
+    // let devicesRender = this.renderDevices(this.state.devices);
+    // let contractsRender = this.renderContracts(this.props.contracts);
     return (
-      <div id="index">
-        <div className="section">
+      <div id="page-body">
+        {/* <div className="section">
           <h3>Contracts</h3>
-          {contractsRender}
+          {contractsRender} */}
 
-          <div className="section">
-            <h2>Devices</h2>
-            {devicesRender}
-          </div>
+        <div className="body-card">
+          <h2>Devices</h2>
+          {this.renderDevices(this.state.devices)}
         </div>
+        {/* </div> */}
       </div>
     )
   }

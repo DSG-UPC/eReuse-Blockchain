@@ -16,6 +16,9 @@ import "../styles/app.css";
 // import { isServer } from '../lib/util'
 
 import "../styles/index.css"
+import 'antd/lib/avatar/style/index.css'
+import 'antd/lib/card/style/index.css'
+import 'antd/lib/icon/style/index.css'
 import 'antd/lib/grid/style/index.css'
 import 'antd/lib/list/style/index.css'
 import 'antd/lib/form/style/index.css'

@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import { Button, Spin, Divider } from 'antd'
+import { Button, Spin, Divider, List, Avatar } from 'antd'
 import { getDeployedDevices } from '../../lib/devices'
 import { getDepositDevice } from "../../lib/deployment"
 import AppContext, { IAppContext } from '../../components/app-context'
@@ -60,8 +60,8 @@ class ProofsView extends Component<IAppContext, State> {
             .then(proofs => {
               currentProofs[proofType] = proofs;
             })
-            this.setState({ proofs: currentProofs })
-          })
+          this.setState({ proofs: currentProofs })
+        })
       })
     }
   }
@@ -96,42 +96,69 @@ class ProofsView extends Component<IAppContext, State> {
     return <div>Please, wait... <Spin size="small" /></div>
   }
 
-  renderProofs(proofType) {
-    let result = [<div></div>];
+  renderProofs() {
+    return (
+      <div className="body-card">
+        <h2>Proofs</h2>
+        <div id="proof-types-list" >
+          <List
+            className="list"
+            itemLayout="vertical"
+            dataSource={Object.keys(this.state.proofs)}
+            renderItem={item => (
+              <List.Item  >
+                <List.Item.Meta
+                  avatar={<Avatar style={{ backgroundColor: '#87d068' }}>{item.replace(/[a-z]/g, '')}</Avatar>}
+                  // avatar={<Avatar style={{ backgroundColor: '#87d068' }}>{ item. Array(item).filter(i=> item.toUpperCase().indexOf(i)>-1)}</Avatar>}
+                  title={item}
+                  description={`Set of ${item} Proofs`}
+                />
+                {this.renderProofType(item)}
+              </List.Item>
+            )}
+          />
+        </div>
+      </div>
+    )
+  }
+
+  renderProofType(proofType: string) {
+    let result = (<div></div>);
     const proofs = this.state.proofs;
-    if (proofs && proofs[proofType].length > 0) {
-      result = [
-        <h3 key={proofType}>{proofType}</h3>,
-        <ul>
-          {proofs[proofType].map((proof, index) => (
-            <li key={proof}>
-              <Link
-                href="/proofs/[item]/"
-                as={`/proofs/${proofType}/${proof}`}>
-                <a>{proof}</a>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      ]
+    if (proofs && proofs[proofType] && proofs[proofType].length > 0) {
+      const data: string[] = proofs[proofType]
+      console.log(data)
+      result = (
+        <div id='proofs-list'>
+          <List
+            className="list"
+            itemLayout="vertical"
+            dataSource={data}
+            renderItem={item => (
+              <List.Item
+              // actions={[<a key="list-loadmore-edit">show</a>, <a key="list-loadmore-more">more</a>]}
+              >
+                {/* <Skeleton avatar title={false}> */}
+                <List.Item.Meta
+                  title={<Link
+                    href="/proofs/[item]/"
+                    as={`/proofs/${proofType}/${item}`}>
+                    <a>{item}</a>
+                  </Link>
+                  }
+                description=""
+                />
+              </List.Item>
+            )}
+          /></div>)
     }
     return result;
   }
 
   render() {
     return (
-      <div id="index">
-        <div className="card">
-          <h3>Usody</h3>
-          <div key="proofs-div" className="section">
-            <h2>Proofs</h2>
-            {
-              Object.keys(this.state.proofs).map((item, index) => (
-                this.renderProofs(item)
-              ))
-            }
-          </div>
-        </div>
+      <div id="page-body">
+        {this.renderProofs()}
       </div>
     )
   }

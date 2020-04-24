@@ -44,7 +44,7 @@ export default function ({ children, ...props }: Props) {
 
         {/* <div id="page-menu"> */}
 
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={props.location.pathname ? props.location.pathname.split('/')[1] : "profile"} >
+        <Menu theme="dark" mode="inline" defaultSelectedKeys={props.location ? props.location.split('/')[1] : "profile"} >
           <Menu.Item key="profile">
             <UserOutlined />
             <Link href={"/"}>
