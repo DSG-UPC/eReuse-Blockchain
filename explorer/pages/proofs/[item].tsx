@@ -1,26 +1,25 @@
 import { Component } from 'react'
-import Contract from '../../lib/contract'
-import { getDeviceInformation, DeviceInfo } from "../../lib/devices"
-import { getDepositDevice } from "../../lib/deployment"
+import { getProofsHandler } from "../../lib/deployment"
 import AppContext, { IAppContext } from '../../components/app-context';
+import { getProofInformation } from '../../lib/proofs'
+import { IProof } from '../../lib/types'
 
 export default function DeviceView(props) {
     return <AppContext.Consumer>
         {context => <ProofComponent {...context} />}
     </AppContext.Consumer>
-
 }
 
 type State = {
-    contract: Contract
-    properties: DeviceInfo
+    proof: IProof
+    properties: object
 }
 
 class ProofComponent extends Component<IAppContext, State> {
 
     state: State = {
-        contract: null,
-        properties: {} as DeviceInfo
+        proof: null,
+        properties: {}
     }
 
     constructor(props) {
@@ -30,16 +29,20 @@ class ProofComponent extends Component<IAppContext, State> {
     async componentDidMount() {
         console.log(location)
         console.log(location.pathname)
-        console.log(location.pathname.trim().split('/'))
-        const deviceAddress = location.pathname.trim().split('/')[2]
+        const url = location.pathname.trim().split('/')
+        const type = url[2]
+        const hash = url[3]
         console.log(this.props)
-        if (deviceAddress) {
-            let contractInstance = await getDepositDevice(this.props.provider, this.props.networkName, deviceAddress)
-            let contract: Contract = new Contract('DepositDevice', deviceAddress, contractInstance)
-            const properties = await getDeviceInformation(contractInstance)
+        if (type && hash) {
+            let contractInstance = await getProofsHandler(this.props.provider, this.props.networkName);
+            let proof: IProof = {
+                proofHash: hash,
+                proofType: type
+            };
+            const properties = await getProofInformation(contractInstance, hash, type);
             this.setState({
-                contract,
-                properties
+                proof: proof,
+                properties: properties
             })
         }
     }
@@ -53,10 +56,10 @@ class ProofComponent extends Component<IAppContext, State> {
 
     render() {
         let contractRender = []
-        const contract = this.state.contract
-        if (contract && this.state.properties) {
-            contractRender.push(<h2 key={contract.address}>{contract.address}</h2>)
-            contractRender.push(<ul key={this.state.properties.uid}>{this.renderObjectProperties()}</ul>)
+        const proof = this.state.proof
+        if (proof && this.state.properties) {
+            contractRender.push(<h2 key={proof.proofType}>{proof.proofHash}</h2>)
+            contractRender.push(<ul key={proof.proofHash}>{this.renderObjectProperties()}</ul>)
         }
         return (
             <div className="contractMain">

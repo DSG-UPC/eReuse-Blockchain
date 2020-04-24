@@ -1,18 +1,6 @@
 import { IContract } from "./types"
 import { Component } from 'react'
 
-
-
-//  interface IContract {
-//     contract: string,
-//     method: string,
-//     methodArgs?: [],
-//     hideIndicator?: boolean,
-//     toUtf8?: boolean,
-//     toAscii?: boolean,
-//     render?: () => any,
-// }
-
 class Contract {
     // abi: string
     address: string

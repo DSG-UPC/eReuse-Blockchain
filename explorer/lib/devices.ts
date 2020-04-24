@@ -16,7 +16,6 @@ export type DeviceInfo = {
     owner: string,
     deposit: string,
     state: number
-
 }
 
 export async function getDeviceInformation(contractInstance): Promise<DeviceInfo> {

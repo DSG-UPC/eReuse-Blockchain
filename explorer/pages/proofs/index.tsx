@@ -106,7 +106,7 @@ class ProofsView extends Component<IAppContext, State> {
           {proofs[proofType].map((proof, index) => (
             <li key={proof}>
               <Link
-                href="/proofs/[item]"
+                href="/proofs/[item]/"
                 as={`/proofs/${proofType}/${proof}`}>
                 <a>{proof}</a>
               </Link>
