@@ -127,7 +127,7 @@ class ProofsView extends Component<IAppContext, State> {
     const proofs = this.state.proofs;
     if (proofs && proofs[proofType] && proofs[proofType].length > 0) {
       const data: string[] = proofs[proofType]
-      console.log(data)
+      // console.log(data)
       result = (
         <div id='proofs-list'>
           <List
@@ -141,12 +141,12 @@ class ProofsView extends Component<IAppContext, State> {
                 {/* <Skeleton avatar title={false}> */}
                 <List.Item.Meta
                   title={<Link
-                    href="/proofs/[item]/"
-                    as={`/proofs/${proofType}/${item}`}>
+                    href={{ pathname: '/proofs/[item]', query: { proof: item, type: proofType } }}
+                    as={{ pathname: `/proofs/proof_info`, query: { proof: item, type: proofType } }}>
                     <a>{item}</a>
                   </Link>
                   }
-                description=""
+                  description=""
                 />
               </List.Item>
             )}

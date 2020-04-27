@@ -26,20 +26,40 @@ class ProofComponent extends Component<IAppContext, State> {
         super(props);
     }
 
+    parseParams(query: string): object {
+        const params = query.split('&');
+        let result = {}
+        params.map((i: string) => {
+            let entry = i.split('=')
+            result[entry[0]] = entry[1]
+        })
+        return result
+    }
+
+    cleanProperties(properties: object): object {
+        const numElements =Object.keys(properties).length;
+        for (let i = 0; i < numElements; i++) {
+            delete properties[i];
+        }
+        return properties
+    }
+
+    static async getInitialProps(query) {
+        return { query };
+    }
+
     async componentDidMount() {
         console.log(location)
-        console.log(location.pathname)
-        const url = location.pathname.trim().split('/')
-        const type = url[2]
-        const hash = url[3]
-        console.log(this.props)
-        if (type && hash) {
+        let params = this.parseParams(location.search.substr(1));
+        console.log(params)
+        if (params['type'] && params['proof']) {
             let contractInstance = await getProofsHandler(this.props.provider, this.props.networkName);
             let proof: IProof = {
-                proofHash: hash,
-                proofType: type
+                proofHash: params['proof'],
+                proofType: params['type']
             };
-            const properties = await getProofInformation(contractInstance, hash, type);
+            let properties = await getProofInformation(contractInstance, params['proof'], params['type']);
+            properties = this.cleanProperties(properties);
             this.setState({
                 proof: proof,
                 properties: properties
