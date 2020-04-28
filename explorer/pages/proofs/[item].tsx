@@ -1,9 +1,9 @@
 import { Component } from 'react'
 import { getProofsHandler } from "../../lib/deployment"
 import AppContext, { IAppContext } from '../../components/app-context';
-import { getProofInformation } from '../../lib/proofs'
+import { getProofInformation, getProofKeys } from '../../lib/proofs'
 import { IProof } from '../../lib/types'
-import {  List } from 'antd';
+import { List } from 'antd';
 
 export default function DeviceView(props) {
     return <AppContext.Consumer>
@@ -37,12 +37,13 @@ class ProofComponent extends Component<IAppContext, State> {
         return result
     }
 
-    cleanProperties(properties: object): object {
-        const numElements =Object.keys(properties).length;
-        for (let i = 0; i < numElements; i++) {
-            delete properties[i];
+    formatProperties(properties: Array<object>, proofType: string): object {
+        let proofKeys = getProofKeys(proofType);
+        let result = {}
+        for (let k in proofKeys) {
+            result[proofKeys[k]] = properties[k].toString();
         }
-        return properties
+        return result
     }
 
     static async getInitialProps(query) {
@@ -60,8 +61,8 @@ class ProofComponent extends Component<IAppContext, State> {
                 proofType: params['type']
             };
             let properties = await getProofInformation(contractInstance, params['proof'], params['type']);
-            properties = this.cleanProperties(properties);
-            console.log(properties)
+            properties = this.formatProperties(properties, proof.proofType);
+            // console.log(`After cleaning: ${properties}`)
             this.setState({
                 proof: proof,
                 properties: properties

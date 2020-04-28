@@ -34,6 +34,24 @@ export function getProofInformation(contractInstance, proofHash, proofType) {
     }
 }
 
+export function getProofKeys(proofType: string): Array<string> {
+    switch (proofType) {
+        case 'ProofDataWipe':
+            return ['erasureType', 'date', 'erasureResult', 'proofAuthor'];
+        case 'ProofTransfer':
+            return ['supplier', 'receiver', 'deposit', 'isWaste'];
+        case 'ProofFunction':
+            return ['score', 'diskUsage', 'algorithmVersion', 'proofAuthor'];
+        case 'ProofReuse':
+            return ['receiverSegment', 'idReceipt', 'price'];
+        case 'ProofRecycling':
+            return ['collectionPoint', 'date', 'contact', 'ticket',
+                'gpsLocation', 'recyclerCode'];
+        default:
+            break;
+    }
+}
+
 export type Proof = {
     proofHash: string,
     proofType: string
