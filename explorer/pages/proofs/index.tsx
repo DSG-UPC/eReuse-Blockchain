@@ -42,26 +42,26 @@ class ProofsView extends Component<IAppContext, State> {
   async updateDevices(contracts) {
     if (Object.keys(contracts).length > 0) {
       getDeployedDevices(contracts['DeviceFactory'].contractInstance,
-        this.props.address).
-        then(result => {
-          this.updateProofs(result)
+        this.props.address).then(result => {
           this.setState({ devices: result })
+          this.updateProofs(result)
         });
     }
   }
 
   updateProofs(devices) {
     if (devices.length > 0) {
-      let currentProofs = {};
+      let currentProofs = this.state.proofs;
       devices.map(async (item, index) => {
         let contractInstance = await getDepositDevice(this.props.provider, this.props.networkName, item)
         await Object.keys(this.state.proofs).map(async (proofType, index) => {
           await getProofsFromDevice(contractInstance, proofType)
             .then(proofs => {
-              currentProofs[proofType] = proofs;
+              const newProofs = proofs.filter(i => !Object.values(this.state.proofs).includes(i));
+              currentProofs[proofType] = currentProofs[proofType].concat(newProofs);
             })
-          this.setState({ proofs: currentProofs })
-        })
+            this.setState({ proofs: currentProofs })
+          })
       })
     }
   }
