@@ -4,7 +4,7 @@ import { getDeployedDevices } from '../../lib/devices'
 import { getDepositDevice } from "../../lib/deployment"
 import AppContext, { IAppContext } from '../../components/app-context'
 import Link from "next/link"
-import { getProofsFromDevice } from '../../lib/proofs'
+import { getProofsFromDevice, proofTypes } from '../../lib/proofs'
 
 const contractName = "FunctionProofs"
 
@@ -14,25 +14,19 @@ const ProofsPage = (props) => {
 }
 
 type State = {
-  contracts: object,
   address: string,
+  contracts: object,
+  devices: Array<string>,
   proofs: Object,
-  devices: Array<string>
 }
 
 // Stateful component
 class ProofsView extends Component<IAppContext, State> {
   state: State = {
-    contracts: {},
     address: null,
-    proofs: {
-      'ProofDataWipe': [],
-      'ProofTransfer': [],
-      'ProofFunction': [],
-      'ProofReuse': [],
-      'ProofRecycle': []
-    },
-    devices: []
+    contracts: {},
+    devices: [],
+    proofs: this.initializeProofs()
   }
 
   constructor(props) {
@@ -49,6 +43,13 @@ class ProofsView extends Component<IAppContext, State> {
     }
   }
 
+  initializeProofs() {
+    return Object.values(proofTypes).reduce((acc, k) => {
+      acc[k] = [];
+      return acc;
+    }, {})
+  }
+
   updateProofs(devices) {
     if (devices.length > 0) {
       let currentProofs = this.state.proofs;
@@ -60,8 +61,8 @@ class ProofsView extends Component<IAppContext, State> {
               const newProofs = proofs.filter(i => !Object.values(this.state.proofs).includes(i));
               currentProofs[proofType] = currentProofs[proofType].concat(newProofs);
             })
-            this.setState({ proofs: currentProofs })
-          })
+          this.setState({ proofs: currentProofs })
+        })
       })
     }
   }
@@ -157,9 +158,11 @@ class ProofsView extends Component<IAppContext, State> {
 
   render() {
     return (
+      [<div>
+      </div>,
       <div id="page-body">
         {this.renderProofs()}
-      </div>
+      </div>]
     )
   }
 }

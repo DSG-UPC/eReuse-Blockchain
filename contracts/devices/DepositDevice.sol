@@ -7,6 +7,7 @@ import "contracts/devices/DeviceFactoryInterface.sol";
 import "contracts/proofs/ProofsHandler.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
+
 /**
  * @title Ereuse Device basic implementation
  */
@@ -18,6 +19,7 @@ contract DepositDevice is Ownable {
     DeviceFactoryInterface factory;
     ProofsHandler handler;
     mapping(string => bytes32[]) proofs;
+    string[] private types;
 
     // types ----------------------------------------------------------------
     //Struct that mantains the basic values of the device
@@ -52,6 +54,13 @@ contract DepositDevice is Ownable {
         data.deposit = _initialDeposit;
         data.uid = _uid;
         _transferOwnership(_sender);
+        types = [
+            "ProofDataWipe",
+            "ProofFunction",
+            "ProofTransfer",
+            "ProofReuse",
+            "ProofRecycling"
+        ];
     }
 
     function transferDevice(address _to, uint256 _new_deposit)
@@ -61,7 +70,7 @@ contract DepositDevice is Ownable {
         // Return the deposit first of all
         returnDeposit();
 
-        factory.transfer(data.owner,_to);
+        factory.transfer(data.owner, _to);
         data.owner = _to;
         data.deposit = _new_deposit;
         transferOwnership(_to);
@@ -88,7 +97,7 @@ contract DepositDevice is Ownable {
         uint256 diskUsage,
         string algorithmVersion,
         address proofAuthor
-    ) public{
+    ) public {
         bytes32 proofHash = handler.generateFunctionProof(
             address(this),
             this.owner(),
@@ -195,11 +204,7 @@ contract DepositDevice is Ownable {
     function getReuseProof(bytes32 _hash)
         public
         view
-        returns (
-            string receiverSegment,
-            string idReceipt,
-            uint256 price
-        )
+        returns (string receiverSegment, string idReceipt, uint256 price)
     {
         return handler.getReuseProofData(_hash);
     }

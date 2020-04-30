@@ -1,5 +1,6 @@
 import { Component } from 'react'
 import { Button, Spin, Divider, Menu, Card, Avatar, List } from 'antd'
+import SearchBar from '../components/search-bar'
 import Link from "next/link"
 import Icon, { UserOutlined } from '@ant-design/icons'
 
@@ -64,6 +65,7 @@ class IndexView extends Component<State> {
   renderAccount() {
     return (<div className="body-card">
       {/* <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#87d068' }}/> */}
+      <SearchBar></SearchBar>
       <Card style={{ width: 300 }}
       // cover={}
       >

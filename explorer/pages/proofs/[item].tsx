@@ -51,9 +51,7 @@ class ProofComponent extends Component<IAppContext, State> {
     }
 
     async componentDidMount() {
-        console.log(location)
         let params = this.parseParams(location.search.substr(1));
-        console.log(params)
         if (params['type'] && params['proof']) {
             let contractInstance = await getProofsHandler(this.props.provider, this.props.networkName);
             let proof: IProof = {
@@ -78,12 +76,6 @@ class ProofComponent extends Component<IAppContext, State> {
     }
 
     render() {
-        // let contractRender = []
-        // const proof = this.state.proof
-        // if (proof && this.state.properties) {
-        //     contractRender.push(<h2 key={proof.proofType}>{proof.proofHash}</h2>)
-        //     contractRender.push(<ul key={proof.proofHash}>{this.renderObjectProperties()}</ul>)
-        // }
         const properties = this.state.properties
         return (
             <div className="body-card">

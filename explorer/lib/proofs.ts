@@ -19,15 +19,15 @@ export function getProofsFromDevice(contractInstance, proofType) {
  */
 export function getProofInformation(contractInstance, proofHash, proofType) {
     switch (proofType) {
-        case 'ProofDataWipe':
+        case proofTypes.dataWipe:
             return contractInstance.getDataWipeProofData(proofHash);
-        case 'ProofTransfer':
+        case proofTypes.transfer:
             return contractInstance.getTransferProofData(proofHash);
-        case 'ProofFunction':
+        case proofTypes.function:
             return contractInstance.getFunctionProofData(proofHash);
-        case 'ProofReuse':
+        case proofTypes.reuse:
             return contractInstance.getReuseProofData(proofHash);
-        case 'ProofRecycling':
+        case proofTypes.recycle:
             return contractInstance.getRecycleProofData(proofHash);
         default:
             break;
@@ -36,15 +36,15 @@ export function getProofInformation(contractInstance, proofHash, proofType) {
 
 export function getProofKeys(proofType: string): Array<string> {
     switch (proofType) {
-        case 'ProofDataWipe':
+        case proofTypes.dataWipe:
             return ['erasureType', 'date', 'erasureResult', 'proofAuthor'];
-        case 'ProofTransfer':
+        case proofTypes.transfer:
             return ['supplier', 'receiver', 'deposit', 'isWaste'];
-        case 'ProofFunction':
+        case proofTypes.function:
             return ['score', 'diskUsage', 'algorithmVersion', 'proofAuthor'];
-        case 'ProofReuse':
+        case proofTypes.reuse:
             return ['receiverSegment', 'idReceipt', 'price'];
-        case 'ProofRecycling':
+        case proofTypes.recycle:
             return ['collectionPoint', 'date', 'contact', 'ticket',
                 'gpsLocation', 'recyclerCode'];
         default:
@@ -55,4 +55,12 @@ export function getProofKeys(proofType: string): Array<string> {
 export type Proof = {
     proofHash: string,
     proofType: string
+}
+
+export const proofTypes = {
+    dataWipe: 'ProofDataWipe',
+    transfer: 'ProofTransfer',
+    function: 'ProoFunction',
+    reuse: 'ProofReuse',
+    recycle: 'ProofRecycling',
 }
