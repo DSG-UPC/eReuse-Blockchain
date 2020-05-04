@@ -1,8 +1,8 @@
 import React from 'react'
 import Head from 'next/head'
 import App from 'next/app'
-import { IContract } from "../lib/types"
-import Contract from "../lib/contract"
+import { Address, Provider } from "../lib/types"
+import Contract, { Contracts } from "../lib/contract"
 import AppContext, { IAppContext } from "../components/app-context"
 import Web3Wallet, { AccountState } from "../lib/web3-wallet"
 import GeneralError from '../components/error'
@@ -32,6 +32,7 @@ import 'antd/lib/input/style/index.css'
 import 'antd/lib/input-number/style/index.css'
 import 'antd/lib/date-picker/style/index.css'
 import 'antd/lib/spin/style/index.css'
+import { Network } from 'ethers/utils'
 // import { Layout } from 'antd'
 
 type Props = {
@@ -39,11 +40,11 @@ type Props = {
 }
 
 type State = {
-    provider: object
+    provider: Provider
     isConnected: boolean,
     accountState: AccountState,
-    address: string,
-    contracts: {},
+    address: Address,
+    contracts: Contracts,
     networkName: string,
     num_tokens: number
 
@@ -57,7 +58,7 @@ class MainApp extends App<Props, State> {
         isConnected: false,
         accountState: AccountState.Unknown,
         address: null,
-        contracts: {},
+        contracts: null,
         title: "Explorer",
         networkName: null,
         num_tokens: 0
@@ -98,7 +99,7 @@ class MainApp extends App<Props, State> {
         const networkName = String(network.chainId)
         // const contracts = this.getContracts(network);
         const contracts = this.getContracts(networkName);
-        let token_number = await getTokens(contracts.ERC20.contractInstance, address);
+        let token_number = await getTokens(contracts['ERC20'].contractInstance, address);
         this.setState({
             address: address,
             contracts: contracts,
@@ -109,7 +110,7 @@ class MainApp extends App<Props, State> {
         });
     }
 
-    getContracts(network) {
+    getContracts(network: string) {
         const deviceFactory = getDeviceFactory(Web3Wallet.provider, network);
         const erc20 = getERC20(Web3Wallet.provider, network);
         const proofsHandler = getProofsHandler(Web3Wallet.provider, network);

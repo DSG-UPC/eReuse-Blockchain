@@ -1,3 +1,5 @@
+import { Instance } from "./types";
+
 /**
  * Auxiliary function to create an instance of some smart contract
  * whose address is known.
@@ -6,7 +8,7 @@
  *                                 address of the owner.
  * @returns {Promise} A promise which resolves to the the devices owned by user.
  */
-export function getProofsFromDevice(contractInstance, proofType: ProofType) {
+export function getProofsFromDevice(contractInstance: Instance, proofType: ProofType): Promise<string[]> {
     return contractInstance.getProofs(proofType);
 }
 

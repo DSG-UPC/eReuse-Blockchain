@@ -1,4 +1,15 @@
-// NEWS FEED
+import  { providers, ethers } from 'ethers'
+// import TruffleContract  from '@truffle/contract'
+import { Abi } from '@truffle/contract-schema'
+import { Contract} from './contract'
+
+export type Address = string
+export type Provider =  providers.Web3Provider 
+export type Instance = ethers.Contract // | 
+export type Abi = Abi
+// export type abi = ethers.Contract.
+// type abi?
+// tyep
 
 export interface IProof {
     proofHash: string,
@@ -50,13 +61,4 @@ export interface IAccount {
     address: string,
     tokens: number,
     web3Wallet: object,
-}
-
-
-export interface IContract {
-    abi: string,
-    address: string,
-    contractName: string,
-    contractArtifact: object,
-    events: Array
 }

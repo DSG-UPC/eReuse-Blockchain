@@ -5,6 +5,8 @@ import { getDepositDevice } from "../../lib/deployment"
 import AppContext, { IAppContext } from '../../components/app-context'
 import Link from "next/link"
 import { getProofsFromDevice, proofTypes, ProofType } from '../../lib/proofs'
+import { Address, Instance } from '../../lib/types'
+import { IContract, Contracts } from '../../lib/contract'
 
 const contractName = "FunctionProofs"
 
@@ -14,10 +16,11 @@ const ProofsPage = (props) => {
 }
 
 type State = {
-  address: string,
-  contracts: object,
-  devices: Array<string>,
-  proofs: Object,
+  address: Address,
+  contracts: Contracts,
+  devices: Array<Address>,
+  //TODO: Add following type proofs: {[k in ProofType]: Address[]} and fix initialization
+  proofs: object,
 }
 
 // Stateful component
@@ -49,12 +52,13 @@ class ProofsView extends Component<IAppContext, State> {
       return acc;
     }, {})
   }
-
-  updateProofs(devices) {
+  //TODO: Why this is not async? does it work properly?
+  // If it should be async it should also be called with await or then afterwards 
+  updateProofs(devices: Address[]) {
     if (devices.length > 0) {
       let currentProofs = this.state.proofs;
       devices.map(async (item, index) => {
-        let contractInstance = await getDepositDevice(this.props.provider, this.props.networkName, item)
+        let contractInstance: Instance = await getDepositDevice(this.props.provider, this.props.networkName, item)
         await Object.keys(this.state.proofs).map(async (proofType: ProofType, index) => {
           await getProofsFromDevice(contractInstance, proofType)
             .then(proofs => {
@@ -123,7 +127,7 @@ class ProofsView extends Component<IAppContext, State> {
     )
   }
 
-  renderProofType(proofType: string) {
+  renderProofType(proofType) {
     let result = (<div></div>);
     const proofs = this.state.proofs;
     if (proofs && proofs[proofType] && proofs[proofType].length > 0) {

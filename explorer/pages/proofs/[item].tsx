@@ -2,10 +2,11 @@ import { Component } from 'react'
 import { getProofsHandler } from "../../lib/deployment"
 import AppContext, { IAppContext } from '../../components/app-context';
 // import { getProofInformation, getProofKeys, proofTypeAttributes } from '../../lib/proofs'
-import { getProofInformation, proofTypeAttributes, Proof } from '../../lib/proofs'
+import { getProofInformation, proofTypeAttributes, Proof, ProofType } from '../../lib/proofs'
 // import { proofId } from '../../lib/types'
 import { ProofID } from '../../lib/proofs'
 import { List } from 'antd';
+import { Instance } from '../../lib/types';
 
 export default function DeviceView(props) {
     return <AppContext.Consumer>
@@ -39,7 +40,7 @@ class ProofComponent extends Component<IAppContext, State> {
         return result
     }
 
-    formatProperties(properties, proofType: string): Proof {
+    formatProperties(properties: Proof, proofType: ProofType): Proof {
         // let proofKeys = getProofKeys(proofType);
         let proofKeys = proofTypeAttributes[proofType];
         let result = {} as Proof
@@ -56,7 +57,7 @@ class ProofComponent extends Component<IAppContext, State> {
     async componentDidMount() {
         let params = this.parseParams(location.search.substr(1));
         if (params['type'] && params['proof']) {
-            let contractInstance = await getProofsHandler(this.props.provider, this.props.networkName);
+            let contractInstance: Instance = await getProofsHandler(this.props.provider, this.props.networkName);
             let proofID: ProofID= {
                 hash: params['proof'],
                 type: params['type']

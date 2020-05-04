@@ -1,3 +1,4 @@
+import { Address, Instance } from "./types";
 
 /**
  * Auxiliary function to create an instance of some smart contract
@@ -8,7 +9,7 @@
  * @param {File} artifacts JSON representation of smart contract.
  * @returns {Promise} A promise which resolves to the the smart contract instance.
  */
-export function getTokens(contractInstance, ethAddress) {
+export function getTokens(contractInstance: Instance, ethAddress: Address): Promise<any> {
     return contractInstance.balanceOf(ethAddress)
 }
 
