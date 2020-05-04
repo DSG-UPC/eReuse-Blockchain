@@ -4,7 +4,7 @@ import { getDeployedDevices } from '../../lib/devices'
 import { getDepositDevice } from "../../lib/deployment"
 import AppContext, { IAppContext } from '../../components/app-context'
 import Link from "next/link"
-import { getProofsFromDevice, proofTypes } from '../../lib/proofs'
+import { getProofsFromDevice, proofTypes, ProofType } from '../../lib/proofs'
 
 const contractName = "FunctionProofs"
 
@@ -55,7 +55,7 @@ class ProofsView extends Component<IAppContext, State> {
       let currentProofs = this.state.proofs;
       devices.map(async (item, index) => {
         let contractInstance = await getDepositDevice(this.props.provider, this.props.networkName, item)
-        await Object.keys(this.state.proofs).map(async (proofType, index) => {
+        await Object.keys(this.state.proofs).map(async (proofType: ProofType, index) => {
           await getProofsFromDevice(contractInstance, proofType)
             .then(proofs => {
               const newProofs = proofs.filter(i => !Object.values(this.state.proofs).includes(i));

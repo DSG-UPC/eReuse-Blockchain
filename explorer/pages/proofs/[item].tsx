@@ -1,8 +1,10 @@
 import { Component } from 'react'
 import { getProofsHandler } from "../../lib/deployment"
 import AppContext, { IAppContext } from '../../components/app-context';
-import { getProofInformation, getProofKeys } from '../../lib/proofs'
-import { IProof } from '../../lib/types'
+// import { getProofInformation, getProofKeys, proofTypeAttributes } from '../../lib/proofs'
+import { getProofInformation, proofTypeAttributes, ProofAttributeObject } from '../../lib/proofs'
+// import { proofId } from '../../lib/types'
+import { ProofID } from '../../lib/proofs'
 import { List } from 'antd';
 
 export default function DeviceView(props) {
@@ -12,15 +14,15 @@ export default function DeviceView(props) {
 }
 
 type State = {
-    proof: IProof
-    properties: object
+    proofID: ProofID
+    properties: ProofAttributeObject
 }
 
 class ProofComponent extends Component<IAppContext, State> {
 
     state: State = {
-        proof: null,
-        properties: {}
+        proofID: null,
+        properties: {} as ProofAttributeObject
     }
 
     constructor(props) {
@@ -37,9 +39,10 @@ class ProofComponent extends Component<IAppContext, State> {
         return result
     }
 
-    formatProperties(properties: Array<object>, proofType: string): object {
-        let proofKeys = getProofKeys(proofType);
-        let result = {}
+    formatProperties(properties, proofType: string): ProofAttributeObject {
+        // let proofKeys = getProofKeys(proofType);
+        let proofKeys = proofTypeAttributes[proofType];
+        let result = {} as ProofAttributeObject
         for (let k in proofKeys) {
             result[proofKeys[k]] = properties[k].toString();
         }
@@ -54,16 +57,16 @@ class ProofComponent extends Component<IAppContext, State> {
         let params = this.parseParams(location.search.substr(1));
         if (params['type'] && params['proof']) {
             let contractInstance = await getProofsHandler(this.props.provider, this.props.networkName);
-            let proof: IProof = {
-                proofHash: params['proof'],
-                proofType: params['type']
+            let proofID: ProofID= {
+                hash: params['proof'],
+                type: params['type']
             };
-            let properties = await getProofInformation(contractInstance, params['proof'], params['type']);
-            properties = this.formatProperties(properties, proof.proofType);
+            let properties = await getProofInformation(contractInstance, proofID);
+            properties = this.formatProperties(properties, proofID.type);
             // console.log(`After cleaning: ${properties}`)
             this.setState({
-                proof: proof,
-                properties: properties
+                proofID,
+                properties
             })
         }
     }
