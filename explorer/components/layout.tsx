@@ -52,12 +52,12 @@ export default function ({ children, ...props }: Props) {
             </Link>
           </Menu.Item>
           <Menu.Item key="devices">
-            <Link href={"/devices/"}>
+            <Link href={"/devices"}>
               <a>Devices</a>
             </Link>
           </Menu.Item>
           <Menu.Item key="proofs">
-            <Link href={"/proofs/"}>
+            <Link href={"/proofs"}>
               <a>Proofs</a>
             </Link>
           </Menu.Item>
