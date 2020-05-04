@@ -2,7 +2,7 @@ import { Component } from 'react'
 import { getProofsHandler } from "../../lib/deployment"
 import AppContext, { IAppContext } from '../../components/app-context';
 // import { getProofInformation, getProofKeys, proofTypeAttributes } from '../../lib/proofs'
-import { getProofInformation, proofTypeAttributes, ProofAttributeObject } from '../../lib/proofs'
+import { getProofInformation, proofTypeAttributes, Proof } from '../../lib/proofs'
 // import { proofId } from '../../lib/types'
 import { ProofID } from '../../lib/proofs'
 import { List } from 'antd';
@@ -15,14 +15,14 @@ export default function DeviceView(props) {
 
 type State = {
     proofID: ProofID
-    properties: ProofAttributeObject
+    properties: Proof
 }
 
 class ProofComponent extends Component<IAppContext, State> {
 
     state: State = {
         proofID: null,
-        properties: {} as ProofAttributeObject
+        properties: {} as Proof
     }
 
     constructor(props) {
@@ -39,10 +39,10 @@ class ProofComponent extends Component<IAppContext, State> {
         return result
     }
 
-    formatProperties(properties, proofType: string): ProofAttributeObject {
+    formatProperties(properties, proofType: string): Proof {
         // let proofKeys = getProofKeys(proofType);
         let proofKeys = proofTypeAttributes[proofType];
-        let result = {} as ProofAttributeObject
+        let result = {} as Proof
         for (let k in proofKeys) {
             result[proofKeys[k]] = properties[k].toString();
         }
