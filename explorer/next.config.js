@@ -4,6 +4,7 @@ const path = require("path")
 module.exports = {
   env,
   exportTrailingSlash: true,
+  pageExtensions: ['tsx'],
   exportPathMap: () => generatePathMap(),
   webpack: (config, { isServer }) => {
     if (isServer) {
@@ -31,7 +32,8 @@ module.exports = {
       fs: 'empty',
       module: "empty",
     };
-    config.resolve.alias['static'] = path.join(__dirname, './public');
+    config.resolve.alias['react'] = path.resolve('node_modules/react'),
+    config.resolve.alias['static'] = path.join(__dirname, './public')
     return config
   },
 }
@@ -44,8 +46,10 @@ async function generatePathMap() {
   return {
     '/': { page: '/' },
     '/devices': { page: '/devices' },
-    "/devices/:id": {page: "devices/[item]"},
+    // "/devices/:item": {page: "devices/[item]", query: { proof: item, type: proofType }},
+    "/devices/info": {page: 'devices/info'},
     '/proofs': { page: '/proofs' },
-    '/proofs/function': { page: '/proofs/function' },
+    // '/proofs/:item': { page: '/proofs/[item]' },
+    '/proofs/info': { page: '/proofs/info' },
   }
 }

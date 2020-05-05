@@ -2,13 +2,15 @@ import { Component } from 'react'
 import { getProofsHandler } from "../../lib/deployment"
 import AppContext, { IAppContext } from '../../components/app-context';
 // import { getProofInformation, getProofKeys, proofTypeAttributes } from '../../lib/proofs'
-import { getProofInformation, proofTypeAttributes, Proof, ProofType } from '../../lib/proofs'
+import { getProofInformation, proofTypeAttributes, Proof, ProofType, proofTypes } from '../../lib/proofs'
 // import { proofId } from '../../lib/types'
 import { ProofID } from '../../lib/proofs'
 import { List } from 'antd';
-import { Instance } from '../../lib/types';
+import { Instance } from '../../lib/types'
+import Router, {withRouter} from 'next/router'
+import ErrorBoundary from 'antd/lib/alert/ErrorBoundary';
 
-export default function DeviceView(props) {
+ function DeviceView(props) {
     return <AppContext.Consumer>
         {context => <ProofComponent {...context} />}
     </AppContext.Consumer>
@@ -30,15 +32,15 @@ class ProofComponent extends Component<IAppContext, State> {
         super(props);
     }
 
-    parseParams(query: string): object {
-        const params = query.split('&');
-        let result = {}
-        params.map((i: string) => {
-            let entry = i.split('=')
-            result[entry[0]] = entry[1]
-        })
-        return result
-    }
+    // parseParams(query: string): object {
+    //     const params = query.split('&');
+    //     let result = {}
+    //     params.map((i: string) => {
+    //         let entry = i.split('=')
+    //         result[entry[0]] = entry[1]
+    //     })
+    //     return result
+    // }
 
     formatProperties(properties: Proof, proofType: ProofType): Proof {
         // let proofKeys = getProofKeys(proofType);
@@ -55,21 +57,23 @@ class ProofComponent extends Component<IAppContext, State> {
     }
 
     async componentDidMount() {
-        let params = this.parseParams(location.search.substr(1));
-        if (params['type'] && params['proof']) {
-            let contractInstance: Instance = await getProofsHandler(this.props.provider, this.props.networkName);
-            let proofID: ProofID= {
-                hash: params['proof'],
-                type: params['type']
-            };
-            let properties = await getProofInformation(contractInstance, proofID);
-            properties = this.formatProperties(properties, proofID.type);
-            // console.log(`After cleaning: ${properties}`)
-            this.setState({
-                proofID,
-                properties
-            })
-        }
+        console.log("Router" + Router.query)
+        const type = Router.query.type
+        const hash = Router.query.hash
+        if (!type || !hash || Array.isArray(type) || Array.isArray(hash)) throw new Error("Invalid arguments")
+        if (!proofTypes.includes(type)) throw new Error("Invalid proof type")
+        let contractInstance: Instance = await getProofsHandler(this.props.provider, this.props.networkName);
+        let proofID: ProofID = {
+            hash: hash,
+            type: type as ProofType
+        };
+        let properties = await getProofInformation(contractInstance, proofID);
+        properties = this.formatProperties(properties, proofID.type);
+        // console.log(`After cleaning: ${properties}`)
+        this.setState({
+            proofID,
+            properties
+        })
     }
 
     renderObjectProperties() {
@@ -108,3 +112,5 @@ class ProofComponent extends Component<IAppContext, State> {
         // );
     }
 }
+
+export default withRouter(DeviceView)

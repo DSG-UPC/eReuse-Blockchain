@@ -2,8 +2,10 @@ import { Component } from 'react'
 import Contract, {IContract} from '../../lib/contract'
 import { getDeviceInformation, DeviceInfo } from "../../lib/devices"
 import { getDepositDevice } from "../../lib/deployment"
-import AppContext, { IAppContext } from '../../components/app-context';
-import {  List } from 'antd';
+import AppContext, { IAppContext } from '../../components/app-context'
+import {  List } from 'antd'
+import Router from 'next/router'
+// const router  = useRouter()
 
 export default function DeviceView(props) {
     return <AppContext.Consumer>
@@ -18,7 +20,6 @@ type State = {
 }
 
 class DeviceComponent extends Component<IAppContext, State> {
-
     state: State = {
         contract: null,
         properties: {} as DeviceInfo
@@ -29,10 +30,12 @@ class DeviceComponent extends Component<IAppContext, State> {
     }
 
     async componentDidMount() {
-        console.log(location)
-        console.log(location.pathname)
-        console.log(location.pathname.trim().split('/'))
-        const deviceAddress = location.pathname.trim().split('/')[2]
+        console.log("Router"+JSON.stringify(Router.query))
+        // console.log(location)
+        // console.log(location.pathname)
+        // console.log(location.pathname.trim().split('/'))
+        // const deviceAddress = location.pathname.trim().split('/')[2]
+        const deviceAddress = Router.query.device as string
         console.log(this.props)
         if (deviceAddress) {
             let contractInstance = await getDepositDevice(this.props.provider, this.props.networkName, deviceAddress)

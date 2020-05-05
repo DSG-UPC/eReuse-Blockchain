@@ -2,6 +2,7 @@ import { Component } from 'react'
 import { proofTypes } from '../lib/proofs'
 import AppContext, { IAppContext } from './app-context'
 import Router from 'next/router'
+import Link from 'next/link'
 
 export default function SearchView(props) {
     return <AppContext.Consumer>
@@ -44,15 +45,17 @@ class SearchBar extends Component<IAppContext, State> {
     }
 
     handleSearch(e) {
+        console.log("Submitted")
+        e.preventDefault();
         if (this.state.hash == '' || this.state.hash.length != this.state.hashLenght) {
             alert('You need to provide a valid address')
-            e.preventDefault();
+            // e.preventDefault();
         } else {
+            console.log("Submitted: sending");
             Router.push({
-                pathname: '/proofs/[item]',
-                query: { proof: this.state.hash, type: this.state.type } 
-                },
-                { pathname: `/proofs/proof_info`, query: { proof: this.state.hash, type: this.state.type } })
+                pathname: '/proofs/info',
+                query: { hash: this.state.hash, type: this.state.type }
+            })
         }
     }
 
@@ -71,7 +74,11 @@ class SearchBar extends Component<IAppContext, State> {
     }
 
     renderUri() {
-        return `/proofs/proof_info/?proof=${this.state.hash}&type=${this.state.type}`
+        // return `/proofs/info/?hash=${this.state.hash}&type=${this.state.type}`
+        Router.push({
+            pathname: '/proofs/info',
+            query: { hash: this.state.hash, type: this.state.type }
+        })
     }
 
     render() {
@@ -79,8 +86,8 @@ class SearchBar extends Component<IAppContext, State> {
             <div className="search-bar">
                 <form
                     method="post"
-                    action={this.renderUri()}
-                    onSubmit={this.handleSearch}>
+                    // action={() => this.renderUri()}
+                    onSubmit={e =>this.handleSearch(e)}>
                     <input
                         type="text"
                         placeholder="0x0"

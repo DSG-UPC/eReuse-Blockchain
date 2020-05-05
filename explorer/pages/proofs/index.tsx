@@ -146,8 +146,9 @@ class ProofsView extends Component<IAppContext, State> {
                 {/* <Skeleton avatar title={false}> */}
                 <List.Item.Meta
                   title={<Link
-                    href={{ pathname: '/proofs/[item]', query: { proof: item, type: proofType } }}
-                    as={{ pathname: `/proofs/proof_info`, query: { proof: item, type: proofType } }}>
+                    href={{ pathname: '/proofs/info', query: { hash: item, type: proofType } }}
+                    // as={{ pathname: `/proofs/info`, query: { proof: item, type: proofType } }}
+                    >
                     <a>{item}</a>
                   </Link>
                   }

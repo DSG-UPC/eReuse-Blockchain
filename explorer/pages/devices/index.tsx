@@ -104,8 +104,10 @@ class DevicesView extends Component<IAppContext, State> {
               {/* <Skeleton avatar title={false}> */}
               <List.Item.Meta
                 avatar={<Avatar style={{ backgroundColor: '#87d068' }}>{item.slice(item.length - 2)}</Avatar>}
-                title={<Link href="/devices/[item]"
-                  as={"/devices/" + item}>
+                title={<Link 
+                  href={{ pathname: '/devices/info', query: { device: item } }}
+                  // as={"/devices/" + item}
+                  >
                   <a>{item}</a>
                 </Link>
                 }
