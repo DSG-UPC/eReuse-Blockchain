@@ -112,7 +112,7 @@ class ProofsView extends Component<IAppContext, State> {
                   avatar={<Avatar style={{ backgroundColor: '#87d068' }}>{item.replace(/[a-z]/g, '')}</Avatar>}
                   // avatar={<Avatar style={{ backgroundColor: '#87d068' }}>{ item. Array(item).filter(i=> item.toUpperCase().indexOf(i)>-1)}</Avatar>}
                   title={item}
-                  description={`Set of ${item} Proofs`}
+                  description={`Set of ${item.split('Proof')[1]} Proofs`}
                 />
                 {this.renderProofType(item)}
               </List.Item>
