@@ -1,6 +1,7 @@
 import { Component } from 'react'
 import { proofTypes } from '../lib/proofs'
-import AppContext, { IAppContext } from './app-context';
+import AppContext, { IAppContext } from './app-context'
+import Router from 'next/router'
 
 export default function SearchView(props) {
     return <AppContext.Consumer>
@@ -47,7 +48,11 @@ class SearchBar extends Component<IAppContext, State> {
             alert('You need to provide a valid address')
             e.preventDefault();
         } else {
-
+            Router.push({
+                pathname: '/proofs/[item]',
+                query: { proof: this.state.hash, type: this.state.type } 
+                },
+                { pathname: `/proofs/proof_info`, query: { proof: this.state.hash, type: this.state.type } })
         }
     }
 
