@@ -11,24 +11,27 @@ export default function SearchView(props) {
 type State = {
     hash: string
     type: string
+    hashLenght: number
 }
 
 class SearchBar extends Component<IAppContext, State> {
 
     state: State = {
         hash: '',
-        type: ''
+        type: proofTypes[0],
+        hashLenght: 66
     }
 
     constructor(props) {
         super(props);
-        this.handleSelect = this.handleSelect.bind(this);
-        this.handleWriting = this.handleWriting.bind(this);
-        this.renderOptions = this.renderOptions.bind(this);
     }
 
     async componentDidMount() {
-
+        this.handleSelect = this.handleSelect.bind(this);
+        this.handleWriting = this.handleWriting.bind(this);
+        this.handleSearch = this.handleSearch.bind(this);
+        this.renderOptions = this.renderOptions.bind(this);
+        this.renderUri = this.renderUri.bind(this);
     }
 
     handleWriting(e) {
@@ -37,6 +40,15 @@ class SearchBar extends Component<IAppContext, State> {
 
     handleSelect(e) {
         this.setState({ type: e.target.value });
+    }
+
+    handleSearch(e) {
+        if (this.state.hash == '' || this.state.hash.length != this.state.hashLenght) {
+            alert('You need to provide a valid address')
+            e.preventDefault();
+        } else {
+
+        }
     }
 
     renderOptions() {
@@ -53,15 +65,27 @@ class SearchBar extends Component<IAppContext, State> {
             </select>)
     }
 
+    renderUri() {
+        return `/proofs/proof_info/?proof=${this.state.hash}&type=${this.state.type}`
+    }
+
     render() {
         return (
             <div className="search-bar">
-                <input
-                    type="text"
-                    placeholder="0x0"
-                    onChange={this.handleWriting}>
-                </input>
-                {this.renderOptions()}
+                <form
+                    method="post"
+                    action={this.renderUri()}
+                    onSubmit={this.handleSearch}>
+                    <input
+                        type="text"
+                        placeholder="0x0"
+                        onChange={this.handleWriting}>
+                    </input>
+                    {this.renderOptions()}
+                    <input
+                        type="submit"
+                        value="Search!" />
+                </form>
             </div>
         );
     }
