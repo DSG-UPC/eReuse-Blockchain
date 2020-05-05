@@ -1,9 +1,9 @@
 import { providers } from "ethers"
-// import Web3 from "web3"
+import { Provider } from "./types"
 
 // Web3.providers.WebsocketProvider.prototype.sendAsync = Web3.providers.WebsocketProvider.prototype.send
 
-let provider: providers.Web3Provider = null
+let provider: Provider = null
 let web3
 
 export enum AccountState {
@@ -19,15 +19,15 @@ export default class Web3Wallet {
     static get signer() { return provider.getSigner() }
     static get web3 () {return web3}
 
-    static isAvailable() {
+    static isAvailable(): boolean {
         return Web3Wallet.isWeb3Available() && Web3Wallet.isEthereumAvailable()
     }
 
-    static isWeb3Available() {
+    static isWeb3Available(): boolean {
         return typeof window["web3"] !== 'undefined'
     }
 
-    static isEthereumAvailable() {
+    static isEthereumAvailable(): boolean {
         return typeof window["ethereum"] !== 'undefined'
     }
 

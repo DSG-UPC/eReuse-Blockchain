@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import Contract from '../../lib/contract'
+import Contract, {IContract} from '../../lib/contract'
 import { getDeviceInformation, DeviceInfo } from "../../lib/devices"
 import { getDepositDevice } from "../../lib/deployment"
 import AppContext, { IAppContext } from '../../components/app-context';
@@ -13,7 +13,7 @@ export default function DeviceView(props) {
 }
 
 type State = {
-    contract: Contract
+    contract: IContract
     properties: DeviceInfo
 }
 

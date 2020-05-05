@@ -3,8 +3,9 @@ import DeviceFactory from '../../build/contracts/DeviceFactory.json'
 import ProofsHandler from '../../build/contracts/ProofsHandler.json'
 import DepositDevice from '../../build/contracts/DepositDevice.json'
 const contract = require('@truffle/contract')
-import  { ethers, providers} from 'ethers'
-
+// import TruffleContract from '@truffle/contract'
+import  { ethers } from 'ethers'
+import { Address, Provider, Instance, Abi } from './types'
 
 
 /**
@@ -17,31 +18,31 @@ import  { ethers, providers} from 'ethers'
  * @param {string} address contract address in case it is needed.
  * @returns {Promise} A promise which resolves to the the smart contract instance.
  */
-function getContractInstance(provider: providers.Web3Provider, network, artifacts, address = null) {
+function getContractInstance(provider: Provider, network, artifacts, address: Address = null): Instance {
     let contractAddress;
     if (address)
         contractAddress =  ethers.utils.getAddress(address)
     else
         contractAddress = artifacts.networks[network].address;
-    let deviceContract = initializeContract(provider, artifacts)
+    // let deviceContract = initializeContract(provider, artifacts)
     // console.log(deviceContract)
     const signer = provider.getSigner()
-    return new ethers.Contract(contractAddress, deviceContract.abi, signer);
+    return new ethers.Contract(contractAddress, artifacts.abi, signer);
 }
 
-export function getDeviceFactory(provider, network) {
+export function getDeviceFactory(provider: Provider, network): Instance {
     return getContractInstance(provider, network, DeviceFactory);
 }
 
-export function getDepositDevice(provider, network, address) {
+export function getDepositDevice(provider:Provider, network, address: Address): Instance {
     return getContractInstance(provider, network, DepositDevice, address);
 }
 
-export function getERC20(provider, network) {
+export function getERC20(provider: Provider, network): Instance {
     return getContractInstance(provider, network, EIP20);
 }
 
-export function getProofsHandler(provider, network) {
+export function getProofsHandler(provider: Provider, network): Instance {
     return getContractInstance(provider, network, ProofsHandler);
 }
 
@@ -51,7 +52,7 @@ export function getProofsHandler(provider, network) {
  * @param {File} artifacts JSON representation of smart contract.
  * @returns {Function} Structure of the smart contract.
  */
-function initializeContract(provider, artifact) {
+function initializeContract(provider: Provider, artifact){
     // let artifact = JSON.parse(artifacts)
     const myContract = contract({
         abi: artifact.abi,

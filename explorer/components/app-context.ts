@@ -1,15 +1,15 @@
 import { createContext} from 'react'
-import { IContract, IAccount } from "../lib/types"
+import { Provider, Address } from "../lib/types"
 import { AccountState } from "../lib/web3-wallet"
 
 
 export interface IAppContext {
     // globalState: IGlobalState,
 
-    provider: object
+    provider: Provider
     isConnected: boolean,
     accountState: AccountState,
-    address: string,
+    address: Address,
     contracts: {},
     networkName: string,
     num_tokens: number

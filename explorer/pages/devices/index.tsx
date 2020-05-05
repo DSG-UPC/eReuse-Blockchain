@@ -5,6 +5,8 @@ import Link from "next/link"
 import AppContext, { IAppContext } from '../../components/app-context'
 import { Divider, Menu, List, Avatar, Skeleton } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
+import { Address } from '../../lib/types'
+import { IContract, Contracts } from '../../lib/contract'
 
 
 // MAIN COMPONENT
@@ -17,9 +19,9 @@ const DevicesPage = (props) => {
 }
 
 type State = {
-  contracts: object,
-  address: string,
-  devices: Array<string>,
+  contracts: Contracts,
+  address: Address,
+  devices: Array<Address>,
   deviceId: string
 }
 
@@ -48,7 +50,7 @@ class DevicesView extends Component<IAppContext, State> {
     }
   }
 
-  async updateDevices(contracts, address) {
+  async updateDevices(contracts, address: Address) {
     if (Object.keys(contracts).length > 0) {
       getDeployedDevices(contracts['DeviceFactory'].contractInstance, address).
         then(result => {
@@ -86,7 +88,7 @@ class DevicesView extends Component<IAppContext, State> {
     );
   }
 
-  renderDevices(devices: String[]) {
+  renderDevices(devices: string[]) {
     let result = (<div></div>)
     console.log(devices)
     if (devices.length > 0) {

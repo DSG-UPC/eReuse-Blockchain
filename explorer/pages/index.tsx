@@ -3,6 +3,7 @@ import { Button, Spin, Divider, Menu, Card, Avatar, List } from 'antd'
 import SearchBar from '../components/search-bar'
 import Link from "next/link"
 import Icon, { UserOutlined } from '@ant-design/icons'
+import { Address } from '../lib/types'
 
 
 // MAIN COMPONENT
@@ -13,7 +14,7 @@ const IndexPage = (props) => {
 
 type State = {
   // connected?: boolean,
-  address: string,
+  address: Address,
   num_tokens: number
 };
 

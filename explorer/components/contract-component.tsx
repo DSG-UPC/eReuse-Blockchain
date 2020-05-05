@@ -1,16 +1,15 @@
 import { Component } from 'react'
-import { IContract } from '../lib/types';
-import Contract from '../lib/contract'
+import { IContract } from '../lib/contract'
 
 const ContractView = (props) => {
     return (<ContractComponent {...props} />)
 }
 
 type State = {
-    contract: Contract
+    contract: IContract
 }
 
-class ContractComponent extends Component<Contract> {
+class ContractComponent extends Component<IContract> {
 
     state: State = {
         contract: null
