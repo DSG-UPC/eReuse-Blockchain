@@ -8,7 +8,6 @@ import { ProofID } from '../../lib/proofs'
 import { List } from 'antd';
 import { Instance } from '../../lib/types'
 import Router, {withRouter} from 'next/router'
-import ErrorBoundary from 'antd/lib/alert/ErrorBoundary';
 
  function DeviceView(props) {
     return <AppContext.Consumer>

@@ -2,7 +2,7 @@ import Link from "next/link"
 // import logo from "../public/logo.png"
 import Router from 'next/router'
 import { Divider, Menu, Layout, List } from 'antd'
-import { UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
+import { UploadOutlined, UserOutlined, VideoCameraOutlined, SearchOutlined } from '@ant-design/icons';
 import AppContext from './app-context'
 import { useContext } from "react"
 const { Header, Content, Footer, Sider } = Layout;
@@ -59,6 +59,12 @@ export default function ({ children, ...props }: Props) {
           <Menu.Item key="proofs">
             <Link href={"/proofs"}>
               <a>Proofs</a>
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="search">
+            <SearchOutlined />
+            <Link href={"/search"}>
+              <a>Search</a>
             </Link>
           </Menu.Item>
         </Menu>

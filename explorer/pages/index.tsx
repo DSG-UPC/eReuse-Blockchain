@@ -66,7 +66,7 @@ class IndexView extends Component<State> {
   renderAccount() {
     return (<div className="body-card">
       {/* <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#87d068' }}/> */}
-      <SearchBar></SearchBar>
+      {/* <SearchBar></SearchBar> */}
       <Card style={{ width: 300 }}
       // cover={}
       >
