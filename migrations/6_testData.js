@@ -4,11 +4,11 @@ const DepositDevice = artifacts.require("DepositDevice")
 module.exports = async (deployer, network, accounts) => {
     const deviceFactory = await DeviceFactory.deployed();
     await deviceFactory.createDevice(0, 0, accounts[0]);
-    const deviceAddress = await deviceFactory.getDeployedDevices(
-        { from: accounts[0] }).then(devices => {
-            return devices[0];
-        });
-    const device = await DepositDevice.at(deviceAddress)
+    await deviceFactory.createDevice(1, 1, accounts[0]);
+    const deviceAddresses = await deviceFactory.getDeployedDevices(
+            { from: accounts[0] })
+    const device = await DepositDevice.at(deviceAddresses[0])
+    const device1 = await DepositDevice.at(deviceAddresses[1])
     let transaction
     // Proof of Function
     let score = 10;
@@ -27,6 +27,13 @@ module.exports = async (deployer, network, accounts) => {
     transaction = await device.generateTransferProof(supplier, receiver,
         deposit, isWaste, { from: accounts[0], gas: 6721975 });
     console.log("Proof of Transfer")
+    console.log('\t', JSON.stringify(transaction.logs))
+    // proof of Transfer for device 1
+    deposit = 30;
+    isWaste = true;
+    transaction = await device.generateTransferProof(supplier, receiver,
+        deposit, isWaste, { from: accounts[0], gas: 6721975 });
+    console.log("Proof of Transfer (device1)")
     console.log('\t', JSON.stringify(transaction.logs))
     // proof of Data Wipe
     let erasureType = "complete_erasure";
@@ -54,5 +61,15 @@ module.exports = async (deployer, network, accounts) => {
     transaction = await device.generateReuseProof(receiverSegment, idReceipt, price,
         { from: accounts[0], gas: 6721975 });
     console.log("Proof of Reuse")
+    console.log('\t', JSON.stringify(transaction.logs))
+
+    // second proof of Reuse
+    price = 11;
+    receiverSegment = "segment2";
+    idReceipt = "1876323hh824";
+
+    transaction = await device.generateReuseProof(receiverSegment, idReceipt, price,
+        { from: accounts[0], gas: 6721975 });
+    console.log("2nd Proof of Reuse")
     console.log('\t', JSON.stringify(transaction.logs))
 };
