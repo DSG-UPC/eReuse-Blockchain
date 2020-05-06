@@ -1,6 +1,6 @@
 import { Component } from 'react'
 import Contract, {IContract} from '../../lib/contract'
-import { getDeviceInformation, DeviceInfo } from "../../lib/devices"
+import { getDeviceInformation, DeviceInfo, hasDeviceProofs } from "../../lib/devices"
 import { getDepositDevice } from "../../lib/deployment"
 import AppContext, { IAppContext } from '../../components/app-context'
 import {  List } from 'antd'
@@ -17,12 +17,14 @@ export default function DeviceView(props) {
 type State = {
     contract: IContract
     properties: DeviceInfo
+    hasProofsDataWipe: boolean
 }
 
 class DeviceComponent extends Component<IAppContext, State> {
     state: State = {
         contract: null,
-        properties: {} as DeviceInfo
+        properties: {} as DeviceInfo,
+        hasProofsDataWipe: false
     }
 
     constructor(props) {
@@ -31,25 +33,24 @@ class DeviceComponent extends Component<IAppContext, State> {
 
     async componentDidMount() {
         console.log("Router"+JSON.stringify(Router.query))
-        // console.log(location)
-        // console.log(location.pathname)
-        // console.log(location.pathname.trim().split('/'))
-        // const deviceAddress = location.pathname.trim().split('/')[2]
         const deviceAddress = Router.query.device as string
         console.log(this.props)
         if (deviceAddress) {
             let contractInstance = await getDepositDevice(this.props.provider, this.props.networkName, deviceAddress)
+            const hasProofsDataWipe = await hasDeviceProofs(contractInstance, 'ProofDataWipe');
             let contract: Contract = new Contract('DepositDevice', deviceAddress, contractInstance)
             const properties = await getDeviceInformation(contractInstance)
             this.setState({
                 contract,
-                properties
+                properties,
+                hasProofsDataWipe
             })
         }
     }
 
     renderObjectProperties() {
         let properties = this.state.properties
+        properties['hasProofsDataWipe'] = this.state.hasProofsDataWipe.toString();
         // return Object.keys(properties).map((key, index) => {
         //     return <li key={key}>{key + ": " + properties[key]}</li>
         // })

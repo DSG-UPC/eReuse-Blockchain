@@ -8,7 +8,7 @@ import { Address } from './types'
  *                                 address of the owner.
  * @returns {Promise} A promise which resolves to the the devices owned by user.
  */
-export function getDeployedDevices(contractInstance, ownerAddress: Address) : Promise<Address[]> {
+export function getDeployedDevices(contractInstance, ownerAddress: Address): Promise<Address[]> {
     return contractInstance.getDeployedDevices({ from: ownerAddress })
 }
 
@@ -28,8 +28,10 @@ export async function getDeviceInformation(contractInstance): Promise<DeviceInfo
         uid,
         owner,
         deposit,
-        // state
         state: 0
     }
 }
 
+export async function hasDeviceProofs(contractInstance, proofType: string): Promise<boolean> {
+    return await contractInstance.hasProofs(proofType);
+}

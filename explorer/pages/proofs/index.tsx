@@ -2,11 +2,11 @@ import { Component } from 'react'
 import { Button, Spin, Divider, List, Avatar } from 'antd'
 import { getDeployedDevices } from '../../lib/devices'
 import { getDepositDevice } from "../../lib/deployment"
-import AppContext, { IAppContext } from '../../components/app-context'
-import Link from "next/link"
 import { getProofsFromDevice, proofTypes, ProofType } from '../../lib/proofs'
 import { Address, Instance } from '../../lib/types'
 import { IContract, Contracts } from '../../lib/contract'
+import AppContext, { IAppContext } from '../../components/app-context'
+import Link from "next/link"
 
 const contractName = "FunctionProofs"
 
@@ -147,8 +147,8 @@ class ProofsView extends Component<IAppContext, State> {
                 <List.Item.Meta
                   title={<Link
                     href={{ pathname: '/proofs/info', query: { hash: item, type: proofType } }}
-                    // as={{ pathname: `/proofs/info`, query: { proof: item, type: proofType } }}
-                    >
+                  // as={{ pathname: `/proofs/info`, query: { proof: item, type: proofType } }}
+                  >
                     <a>{item}</a>
                   </Link>
                   }

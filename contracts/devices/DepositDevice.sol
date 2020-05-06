@@ -92,6 +92,10 @@ contract DepositDevice is Ownable {
         return handler.getProof(_hash, proofType);
     }
 
+    function hasProofs(string proofType) public view returns (bool _result) {
+        return proofs[proofType].length > 0;
+    }
+
     function generateFunctionProof(
         uint256 score,
         uint256 diskUsage,

@@ -74,7 +74,6 @@ class SearchBar extends Component<IAppContext, State> {
     }
 
     renderUri() {
-        // return `/proofs/info/?hash=${this.state.hash}&type=${this.state.type}`
         Router.push({
             pathname: '/proofs/info',
             query: { hash: this.state.hash, type: this.state.type }
