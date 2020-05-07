@@ -17,14 +17,14 @@ export default function DeviceView(props) {
 type State = {
     contract: IContract
     properties: DeviceInfo
-    hasProofsDataWipe: boolean
+    hasProofsRecycling: boolean
 }
 
 class DeviceComponent extends Component<IAppContext, State> {
     state: State = {
         contract: null,
         properties: {} as DeviceInfo,
-        hasProofsDataWipe: false
+        hasProofsRecycling: false
     }
 
     constructor(props) {
@@ -37,20 +37,20 @@ class DeviceComponent extends Component<IAppContext, State> {
         console.log(this.props)
         if (deviceAddress) {
             let contractInstance = await getDepositDevice(this.props.provider, this.props.networkName, deviceAddress)
-            const hasProofsDataWipe = await hasDeviceProofs(contractInstance, 'ProofDataWipe');
+            const hasProofsRecycling = await hasDeviceProofs(contractInstance, 'ProofRecycling');
             let contract: Contract = new Contract('DepositDevice', deviceAddress, contractInstance)
             const properties = await getDeviceInformation(contractInstance)
             this.setState({
                 contract,
                 properties,
-                hasProofsDataWipe
+                hasProofsRecycling
             })
         }
     }
 
     renderObjectProperties() {
         let properties = this.state.properties
-        properties['hasProofsDataWipe'] = this.state.hasProofsDataWipe.toString();
+        properties['hasProofsRecycling'] = this.state.hasProofsRecycling.toString();
         // return Object.keys(properties).map((key, index) => {
         //     return <li key={key}>{key + ": " + properties[key]}</li>
         // })
