@@ -92,8 +92,16 @@ contract DepositDevice is Ownable {
         return handler.getProof(_hash, proofType);
     }
 
-    function hasProofs(string proofType) public view returns (string _result) {
+    function hasProofs(string proofType) public view returns (bool _result) {
         return proofs[proofType].length > 0;
+    }
+
+    function isRecycled() public view returns(bytes32 _result){
+        if(hasProofs('ProofRecycling')){
+            return proofs['ProofRecycling'][0];
+        } else{
+            return '';
+        }
     }
 
     function generateFunctionProof(

@@ -1,6 +1,5 @@
 import { Component } from 'react'
-import { proofTypes } from '../../lib/proofs'
-import { hasDeviceProofs } from "../../lib/devices"
+import { proofTypes, hasDeviceProofs, errorHash } from '../../lib/proofs'
 import { getDepositDevice } from "../../lib/deployment"
 import AppContext, { IAppContext } from '../../components/app-context'
 import Router from 'next/router'
@@ -21,7 +20,7 @@ type State = {
     // recycleDevice: Address
     hashLength: number
     dAddressLength: number
-    isRecycled: boolean
+    isRecycled: string
 }
 
 class SearchView extends Component<IAppContext, State> {
@@ -33,7 +32,7 @@ class SearchView extends Component<IAppContext, State> {
         // recycleDevice: ''
         recycleHash: '',
         dAddressLength: 42,
-        isRecycled: false
+        isRecycled: ''
     }
 
     constructor(props) {
@@ -50,7 +49,7 @@ class SearchView extends Component<IAppContext, State> {
         const deviceAddress = this.state.recycleHash;
         if (deviceAddress != '' && deviceAddress.length == this.state.dAddressLength) {
             let contractInstance = await getDepositDevice(this.props.provider, this.props.networkName, deviceAddress);
-            const hasProofsRecycling = await hasDeviceProofs(contractInstance, 'ProofRecycling');
+            const hasProofsRecycling = await hasDeviceProofs(contractInstance);
             this.setState({ isRecycled: hasProofsRecycling });
         }
     }
@@ -97,12 +96,12 @@ class SearchView extends Component<IAppContext, State> {
             // e.preventDefault();
         } else {
             console.log("Submitted: sending");
-            if (this.state.isRecycled) {
-                // Router.push({
-                //     pathname: '/proofs/info',
-                //     query: { hash: e.recycleHash, type: 'ProofRecycling' }
-                // })
-                alert('This device has been recycled');
+            const isRecycled = this.state.isRecycled
+            if (isRecycled != errorHash && isRecycled.length == this.state.hashLength) {
+                Router.push({
+                    pathname: '/proofs/info',
+                    query: { hash: isRecycled, type: 'ProofRecycling' }
+                })
             } else {
                 alert('This device has not been recycled yet');
             }

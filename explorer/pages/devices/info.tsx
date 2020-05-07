@@ -1,9 +1,9 @@
 import { Component } from 'react'
-import Contract, {IContract} from '../../lib/contract'
-import { getDeviceInformation, DeviceInfo, hasDeviceProofs } from "../../lib/devices"
+import Contract, { IContract } from '../../lib/contract'
+import { getDeviceInformation, DeviceInfo } from "../../lib/devices"
 import { getDepositDevice } from "../../lib/deployment"
 import AppContext, { IAppContext } from '../../components/app-context'
-import {  List } from 'antd'
+import { List } from 'antd'
 import Router from 'next/router'
 // const router  = useRouter()
 
@@ -17,14 +17,12 @@ export default function DeviceView(props) {
 type State = {
     contract: IContract
     properties: DeviceInfo
-    hasProofsRecycling: boolean
 }
 
 class DeviceComponent extends Component<IAppContext, State> {
     state: State = {
         contract: null,
         properties: {} as DeviceInfo,
-        hasProofsRecycling: false
     }
 
     constructor(props) {
@@ -32,25 +30,22 @@ class DeviceComponent extends Component<IAppContext, State> {
     }
 
     async componentDidMount() {
-        console.log("Router"+JSON.stringify(Router.query))
+        console.log("Router" + JSON.stringify(Router.query))
         const deviceAddress = Router.query.device as string
         console.log(this.props)
         if (deviceAddress) {
             let contractInstance = await getDepositDevice(this.props.provider, this.props.networkName, deviceAddress)
-            const hasProofsRecycling = await hasDeviceProofs(contractInstance, 'ProofRecycling');
             let contract: Contract = new Contract('DepositDevice', deviceAddress, contractInstance)
             const properties = await getDeviceInformation(contractInstance)
             this.setState({
                 contract,
                 properties,
-                hasProofsRecycling
             })
         }
     }
 
     renderObjectProperties() {
         let properties = this.state.properties
-        properties['hasProofsRecycling'] = this.state.hasProofsRecycling.toString();
         // return Object.keys(properties).map((key, index) => {
         //     return <li key={key}>{key + ": " + properties[key]}</li>
         // })

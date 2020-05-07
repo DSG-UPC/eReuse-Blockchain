@@ -36,6 +36,10 @@ export function getProofInformation(contractInstance, proof: ProofID): Proof {
     }
 }
 
+export async function hasDeviceProofs(contractInstance): Promise<string> {
+    return await contractInstance.isRecycled.call()
+}
+
 
 export type ProofType = 'ProofDataWipe' | 'ProofTransfer' | 'ProofFunction' | 'ProofReuse' | 'ProofRecycling'
 export type Proof = ProofDataWipe | ProofTransfer | ProofFunction | ProofReuse | ProofRecycling
@@ -96,6 +100,8 @@ export const proofTypeAttributes = {
     'ProofRecycling': ['collectionPoint', 'date', 'contact', 'ticket',
         'gpsLocation', 'recyclerCode']
 }
+
+export const errorHash = '0x0000000000000000000000000000000000000000000000000000000000000000'
 
 
 // export type ProofDataWipe = {

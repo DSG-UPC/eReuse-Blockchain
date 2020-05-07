@@ -31,7 +31,3 @@ export async function getDeviceInformation(contractInstance): Promise<DeviceInfo
         state: 0
     }
 }
-
-export async function hasDeviceProofs(contractInstance, proofType: string): Promise<boolean> {
-    return await contractInstance.hasProofs(proofType);
-}
