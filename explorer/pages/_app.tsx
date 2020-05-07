@@ -14,9 +14,12 @@ import AppLayout from "../components/layout"
 import "../styles/app.css";
 // import { } from "../lib/types"
 // import { isServer } from '../lib/util'
+import "antd/dist/antd.css";
 
 import "../styles/index.css"
 import 'antd/lib/avatar/style/index.css'
+import 'antd/lib/select/style/index.css'
+import 'antd/lib/form/style/index.css'
 import 'antd/lib/card/style/index.css'
 import 'antd/lib/icon/style/index.css'
 import 'antd/lib/grid/style/index.css'

@@ -110,8 +110,8 @@ class ProofsView extends Component<IAppContext, State> {
             className="list"
             itemLayout="vertical"
             dataSource={Object.keys(this.state.proofs)}
-            renderItem={item => (
-              <List.Item  >
+            renderItem={(item,index) => (
+              <List.Item  key={index}  >
                 <List.Item.Meta
                   avatar={<Avatar style={{ backgroundColor: '#87d068' }}>{item.replace(/[a-z]/g, '')}</Avatar>}
                   // avatar={<Avatar style={{ backgroundColor: '#87d068' }}>{ item. Array(item).filter(i=> item.toUpperCase().indexOf(i)>-1)}</Avatar>}
@@ -139,12 +139,13 @@ class ProofsView extends Component<IAppContext, State> {
             className="list"
             itemLayout="vertical"
             dataSource={data}
-            renderItem={item => (
-              <List.Item
+            renderItem={(item, index) => (
+              <List.Item key={index}
               // actions={[<a key="list-loadmore-edit">show</a>, <a key="list-loadmore-more">more</a>]}
               >
                 {/* <Skeleton avatar title={false}> */}
                 <List.Item.Meta
+                  
                   title={<Link
                     href={{ pathname: '/proofs/info', query: { hash: item, type: proofType } }}
                   // as={{ pathname: `/proofs/info`, query: { proof: item, type: proofType } }}
