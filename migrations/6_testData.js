@@ -9,7 +9,9 @@ module.exports = async (deployer, network, accounts) => {
             { from: accounts[0] })
     const device = await DepositDevice.at(deviceAddresses[0])
     const device1 = await DepositDevice.at(deviceAddresses[1])
-    let transaction
+    let transaction;
+
+
     // Proof of Function
     let score = 10;
     let diskUsage = 20;
@@ -19,7 +21,9 @@ module.exports = async (deployer, network, accounts) => {
         algorithmVersion, proofAuthor, { from: accounts[0], gas: 6721975 });
     console.log("Proof of Function")
     console.log('\t', JSON.stringify(transaction.logs))
-    // proof of Transfer
+    
+    
+    // Proof of Transfer
     let supplier = accounts[1];
     let receiver = accounts[2];
     let deposit = 20;
@@ -28,14 +32,18 @@ module.exports = async (deployer, network, accounts) => {
         deposit, isWaste, { from: accounts[0], gas: 6721975 });
     console.log("Proof of Transfer")
     console.log('\t', JSON.stringify(transaction.logs))
-    // proof of Transfer for device 1
+    
+    
+    // Proof of Transfer for device 1
     deposit = 30;
     isWaste = true;
     transaction = await device.generateTransferProof(supplier, receiver,
         deposit, isWaste, { from: accounts[0], gas: 6721975 });
     console.log("Proof of Transfer (device1)")
     console.log('\t', JSON.stringify(transaction.logs))
-    // proof of Data Wipe
+    
+    
+    // Proof of Data Wipe
     let erasureType = "complete_erasure";
     let date = new Date().toDateString();
     let erasureResult = true;
@@ -43,7 +51,9 @@ module.exports = async (deployer, network, accounts) => {
         proofAuthor, { from: accounts[0], gas: 6721975 });
     console.log("Proof of DataWipe")
     console.log('\t', JSON.stringify(transaction.logs))
-    // proof of Recycle
+    
+    
+    // Proof of Recycle
     let collectionPoint = "Recicla2";
     let contact = "John";
     let ticket = "2187463785273jhcd";
@@ -53,7 +63,9 @@ module.exports = async (deployer, network, accounts) => {
         ticket, gpsLocation, recyclerCode, { from: accounts[0], gas: 6721975 });
     console.log("Proof of recycle")
     console.log('\t', JSON.stringify(transaction.logs))
-    // proof of Reuse
+    
+    
+    // Proof of Reuse
     let price = 10;
     let receiverSegment = "segment1";
     let idReceipt = "1876323hh823";
@@ -63,7 +75,8 @@ module.exports = async (deployer, network, accounts) => {
     console.log("Proof of Reuse")
     console.log('\t', JSON.stringify(transaction.logs))
 
-    // second proof of Reuse
+    
+    // Second Proof of Reuse
     price = 11;
     receiverSegment = "segment2";
     idReceipt = "1876323hh824";

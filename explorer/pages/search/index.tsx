@@ -1,5 +1,7 @@
 import { Component } from 'react'
 import { proofTypes } from '../../lib/proofs'
+import { hasDeviceProofs } from "../../lib/devices"
+import { getDepositDevice } from "../../lib/deployment"
 import AppContext, { IAppContext } from '../../components/app-context'
 import Router from 'next/router'
 import { Input, Button, Form, Select, Divider } from 'antd'
@@ -17,7 +19,9 @@ type State = {
     type: string
     recycleHash: string
     // recycleDevice: Address
-    hashLenght: number
+    hashLength: number
+    dAddressLength: number
+    isRecycled: boolean
 }
 
 class SearchView extends Component<IAppContext, State> {
@@ -25,9 +29,11 @@ class SearchView extends Component<IAppContext, State> {
     state: State = {
         hash: '',
         type: proofTypes[0],
-        hashLenght: 66,
-        recycleHash: '',
+        hashLength: 66,
         // recycleDevice: ''
+        recycleHash: '',
+        dAddressLength: 42,
+        isRecycled: false
     }
 
     constructor(props) {
@@ -40,11 +46,19 @@ class SearchView extends Component<IAppContext, State> {
         this.handleProofSearch = this.handleProofSearch.bind(this);
     }
 
+    async componentDidUpdate() {
+        const deviceAddress = this.state.recycleHash;
+        if (deviceAddress != '' && deviceAddress.length == this.state.dAddressLength) {
+            let contractInstance = await getDepositDevice(this.props.provider, this.props.networkName, deviceAddress);
+            const hasProofsRecycling = await hasDeviceProofs(contractInstance, 'ProofRecycling');
+            this.setState({ isRecycled: hasProofsRecycling });
+        }
+    }
+
     handleHashInput(e) {
         this.setState({ hash: e.target.value });
     }
 
-    
     handleTypeSelect(e) {
         this.setState({ type: e });
     }
@@ -53,7 +67,7 @@ class SearchView extends Component<IAppContext, State> {
         console.log("Submitted")
         console.log(e)
         // e.preventDefault();
-        if (e.hash == '' || e.hash.length != this.state.hashLenght) {
+        if (e.hash == '' || e.hash.length != this.state.hashLength) {
             alert('You need to provide a valid address')
             // e.preventDefault();
         } else {
@@ -78,15 +92,20 @@ class SearchView extends Component<IAppContext, State> {
         console.log("Submitted")
         console.log(e)
         // e.preventDefault();
-        if (e.recycleHash == '' || e.recycleHash.length != this.state.hashLenght) {
+        if (e.recycleHash == '' || e.recycleHash.length != this.state.dAddressLength) {
             alert('You need to provide a valid address')
             // e.preventDefault();
         } else {
             console.log("Submitted: sending");
-            Router.push({
-                pathname: '/proofs/info',
-                query: { hash: e.recycleHash, type: 'ProofRecycling' }
-            })
+            if (this.state.isRecycled) {
+                // Router.push({
+                //     pathname: '/proofs/info',
+                //     query: { hash: e.recycleHash, type: 'ProofRecycling' }
+                // })
+                alert('This device has been recycled');
+            } else {
+                alert('This device has not been recycled yet');
+            }
         }
     }
 
@@ -154,10 +173,11 @@ class SearchView extends Component<IAppContext, State> {
                     initialValues={{ remember: true }}
                     onFinish={e => this.handleRecycledSearch(e)}>
                     <Form.Item
-                        label="Recycle Hash"
+                        label="Has been recycled?"
                         name="recycleHash"
                         rules={[{ required: true, message: 'Please input the proof hash!' }]}>
                         <Input
+                            placeholder="0x0"
                             value={recycleHash}
                             type="text"
                             onChange={e => this.handleRecycleHashInput(e)} />
@@ -185,7 +205,7 @@ class SearchView extends Component<IAppContext, State> {
         return (
             <div id="page-body">
                 {this.renderProofsForm()}
-                <Divider/>
+                <Divider />
                 {this.renderRecycledForm()}
             </div>
         )
