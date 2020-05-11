@@ -45,12 +45,17 @@ class SearchView extends Component<IAppContext, State> {
         this.handleProofSearch = this.handleProofSearch.bind(this);
     }
 
-    async componentDidUpdate() {
+    async componentDidUpdate(prevprops: IAppContext, prevstate: State) {
         const deviceAddress = this.state.recycleHash;
-        if (deviceAddress != '' && deviceAddress.length == this.state.dAddressLength) {
+        if (deviceAddress != '' &&
+            deviceAddress.length == this.state.dAddressLength &&
+            prevstate.recycleHash != deviceAddress) {
+            console.log('Updating')
             let contractInstance = await getDepositDevice(this.props.provider, this.props.networkName, deviceAddress);
             const hasProofsRecycling = await hasDeviceProofs(contractInstance);
-            this.setState({ isRecycled: hasProofsRecycling });
+            this.setState({
+                isRecycled: hasProofsRecycling
+            });
         }
     }
 
