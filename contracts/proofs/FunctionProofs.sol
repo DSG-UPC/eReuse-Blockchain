@@ -7,6 +7,7 @@ contract FunctionProofs is GenericProof {
         uint256 diskUsage;
         string algorithmVersion;
         address proofAuthor;
+        string diskSN;
     }
 
     mapping(bytes32 => ProofData) dataProofs;
@@ -20,14 +21,16 @@ contract FunctionProofs is GenericProof {
             uint256 score,
             uint256 diskUsage,
             string algorithmVersion,
-            address proofAuthor
+            address proofAuthor,
+            string diskSN
         )
     {
         return (
             dataProofs[_hash].score,
             dataProofs[_hash].diskUsage,
             dataProofs[_hash].algorithmVersion,
-            dataProofs[_hash].proofAuthor
+            dataProofs[_hash].proofAuthor,
+            dataProofs[_hash].diskSN
         );
     }
 
@@ -37,7 +40,8 @@ contract FunctionProofs is GenericProof {
         uint256 score,
         uint256 diskUsage,
         string algorithmVersion,
-        address proofAuthor
+        address proofAuthor,
+        string diskSN
     ) public returns (bytes32 _hash) {
         _hash = generateHash(device_addr, "ProofFunction");
         setProof(_hash, device_addr, owner);
@@ -45,7 +49,8 @@ contract FunctionProofs is GenericProof {
             score,
             diskUsage,
             algorithmVersion,
-            proofAuthor
+            proofAuthor,
+            diskSN
         );
         return _hash;
     }

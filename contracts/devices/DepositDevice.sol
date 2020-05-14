@@ -108,7 +108,8 @@ contract DepositDevice is Ownable {
         uint256 score,
         uint256 diskUsage,
         string algorithmVersion,
-        address proofAuthor
+        address proofAuthor,
+        string diskSN
     ) public {
         bytes32 proofHash = handler.generateFunctionProof(
             address(this),
@@ -116,7 +117,8 @@ contract DepositDevice is Ownable {
             score,
             diskUsage,
             algorithmVersion,
-            proofAuthor
+            proofAuthor,
+            diskSN
         );
         proofs["ProofFunction"].push(proofHash);
         emit proofGenerated(proofHash);
@@ -129,7 +131,8 @@ contract DepositDevice is Ownable {
             uint256 score,
             uint256 diskUsage,
             string algorithmVersion,
-            address proofAuthor
+            address proofAuthor,
+            string diskSN
         )
     {
         return handler.getFunctionProofData(_hash);
@@ -170,7 +173,8 @@ contract DepositDevice is Ownable {
         string erasureType,
         string date,
         bool erasureResult,
-        address proofAuthor
+        address proofAuthor,
+        string diskSN
     ) public {
         bytes32 proofHash = handler.generateDataWipeProof(
             address(this),
@@ -178,7 +182,8 @@ contract DepositDevice is Ownable {
             erasureType,
             date,
             erasureResult,
-            proofAuthor
+            proofAuthor,
+            diskSN
         );
         proofs["ProofDataWipe"].push(proofHash);
         emit proofGenerated(proofHash);
@@ -191,7 +196,8 @@ contract DepositDevice is Ownable {
             string erasureType,
             string date,
             bool erasureResult,
-            address proofAuthor
+            address proofAuthor,
+            string diskSN
         )
     {
         return handler.getDataWipeProofData(_hash);

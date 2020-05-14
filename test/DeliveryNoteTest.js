@@ -12,7 +12,7 @@ const minimist = require('minimist'),
     });
 const network = argv.network;
 
-contract("Test for generic proof data", function (accounts) {
+contract("Test for Delivery Note", function (accounts) {
     var device_factory, dao, erc20;
     console.log('');
 

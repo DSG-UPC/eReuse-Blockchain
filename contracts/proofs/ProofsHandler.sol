@@ -44,7 +44,8 @@ contract ProofsHandler {
         uint256 score,
         uint256 diskUsage,
         string algorithmVersion,
-        address proofAuthor
+        address proofAuthor,
+        string diskSN
     ) public returns (bytes32 _hash) {
         return
             functionProofs.setProofData(
@@ -53,7 +54,8 @@ contract ProofsHandler {
                 score,
                 diskUsage,
                 algorithmVersion,
-                proofAuthor
+                proofAuthor,
+                diskSN
             );
     }
 
@@ -82,7 +84,8 @@ contract ProofsHandler {
         string erasureType,
         string date,
         bool erasureResult,
-        address proofAuthor
+        address proofAuthor,
+        string diskSN
     ) public returns (bytes32 _hash) {
         return
             dataWipeProofs.setProofData(
@@ -91,7 +94,8 @@ contract ProofsHandler {
                 erasureType,
                 date,
                 erasureResult,
-                proofAuthor
+                proofAuthor,
+                diskSN
             );
     }
 
@@ -180,7 +184,8 @@ contract ProofsHandler {
             uint256 score,
             uint256 diskUsage,
             string algorithmVersion,
-            address proofAuthor
+            address proofAuthor,
+            string diskSN
         )
     {
         return functionProofs.getProofData(_hash);
@@ -222,7 +227,8 @@ contract ProofsHandler {
             string erasureType,
             string date,
             bool erasureResult,
-            address proofAuthor
+            address proofAuthor,
+            string diskSN
         )
     {
         return dataWipeProofs.getProofData(_hash);
