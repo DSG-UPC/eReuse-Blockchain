@@ -49,7 +49,6 @@ contract("Test for generic proof data", function (accounts) {
             proofAuthor, diskSN, { from: accounts[0], gas: 6721975 });
 
         usage = await device.getDeviceUsage.call();
-        console.log(`Current usage: ${web3.utils.toDecimal(usage)}`);
         assert.equal(web3.utils.toDecimal(usage), 40);
     });
 });

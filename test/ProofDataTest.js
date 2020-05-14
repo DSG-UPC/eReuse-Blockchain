@@ -44,22 +44,32 @@ contract("Basic test for block_number", function (accounts) {
 
         let hashes = await device.getProofs(proofType);
 
-        let first_proof = await device.getFunctionProof(hashes[0]);
-        let second_proof = await device.getFunctionProof(hashes[1]);
+        let second_proof = await device.getFunctionProof(hashes.pop());
+        let first_proof = await device.getFunctionProof(hashes.pop());
 
-        assert.equal(web3.utils.toDecimal(first_proof.score), score);
-        assert.equal(web3.utils.toDecimal(first_proof.diskUsage), diskUsage);
-        assert.equal(first_proof.algorithmVersion, algorithmVersion);
-        assert.equal(web3.utils.toChecksumAddress(first_proof.proofAuthor),
-            web3.utils.toChecksumAddress(proofAuthor));
-        assert.equal(first_proof.diskSN, diskSN);
+        let _score = await first_proof.score;
+        let _diskUsage = await first_proof.diskUsage;
+        let _algorithmVersion = await first_proof.algorithmVersion;
+        let _diskSN = await first_proof.diskSN;
+        let _proofAuthor = await first_proof.proofAuthor;
 
-        assert.equal(web3.utils.toDecimal(second_proof.score), score);
-        assert.equal(web3.utils.toDecimal(second_proof.diskUsage), diskUsage);
-        assert.equal(second_proof.algorithmVersion, algorithmVersion);
-        assert.equal(web3.utils.toChecksumAddress(second_proof.proofAuthor),
-            web3.utils.toChecksumAddress(proofAuthor));
-        assert.equal(second_proof.diskSN, diskSN);
+        assert.equal(web3.utils.toDecimal(_score), score);
+        assert.equal(web3.utils.toDecimal(_diskUsage), diskUsage);
+        assert.equal(_algorithmVersion, algorithmVersion);
+        assert.equal(web3.utils.toChecksumAddress(_proofAuthor), proofAuthor);
+        assert.equal(_diskSN, diskSN);
+
+        _score = await second_proof.score;
+        _diskUsage = await second_proof.diskUsage;
+        _algorithmVersion = await second_proof.algorithmVersion;
+        _diskSN = await second_proof.diskSN;
+        _proofAuthor = await first_proof.proofAuthor;
+
+        assert.equal(web3.utils.toDecimal(_score), score);
+        assert.equal(web3.utils.toDecimal(_diskUsage), diskUsage);
+        assert.equal(_algorithmVersion, algorithmVersion);
+        assert.equal(web3.utils.toChecksumAddress(_proofAuthor), proofAuthor);
+        assert.equal(_diskSN, diskSN);
     });
 
     it("Generates proof of Transfer", async function () {
@@ -78,13 +88,24 @@ contract("Basic test for block_number", function (accounts) {
 
         let hashes = await device.getProofs(proofType);
 
-        first_proof = await device.getTransferProof(hashes[0]);
-        second_proof = await device.getTransferProof(hashes[1]);
+        let second_proof = await device.getTransferProof(hashes.pop());
+        let first_proof = await device.getTransferProof(hashes.pop());
 
-        assert.equal(web3.utils.toChecksumAddress(first_proof.supplier), supplier);
-        assert.equal(web3.utils.toChecksumAddress(first_proof.receiver),
-            receiver);
-        assert.equal(web3.utils.toDecimal(first_proof.deposit), deposit);
+        let _supplier = await first_proof.supplier;
+        let _receiver = await first_proof.receiver;
+        let _deposit = await first_proof.deposit;
+
+        assert.equal(web3.utils.toChecksumAddress(_supplier), supplier);
+        assert.equal(web3.utils.toChecksumAddress(_receiver), receiver);
+        assert.equal(web3.utils.toDecimal(_deposit), deposit);
+
+        _supplier = await second_proof.supplier;
+        _receiver = await second_proof.receiver;
+        _deposit = await second_proof.deposit;
+
+        assert.equal(web3.utils.toChecksumAddress(_supplier), supplier);
+        assert.equal(web3.utils.toChecksumAddress(_receiver), receiver);
+        assert.equal(web3.utils.toDecimal(_deposit), deposit);
     });
 
     it("Generates proof of Data Wipe", async function () {
@@ -103,22 +124,32 @@ contract("Basic test for block_number", function (accounts) {
             proofAuthor, diskSN, { from: accounts[0], gas: 6721975 });
 
         let hashes = await device.getProofs(proofType);
-        first_proof = await device.getDataWipeProof(hashes[0]);
-        second_proof = await device.getDataWipeProof(hashes[1]);
+        let second_proof = await device.getDataWipeProof(hashes.pop());
+        let first_proof = await device.getDataWipeProof(hashes.pop());
 
-        assert.equal(first_proof.erasureType, erasureType);
-        assert.equal(first_proof.date, date);
-        assert.equal(first_proof.erasureResult, erasureResult);
-        assert.equal(web3.utils.toChecksumAddress(first_proof.proofAuthor),
-            web3.utils.toChecksumAddress(proofAuthor));
-        assert.equal(first_proof.diskSN, diskSN);
+        let _erasureType = await first_proof.erasureType;
+        let _date = await first_proof.date;
+        let _eraseureResult = await first_proof.erasureResult;
+        let _proofAuthor = await first_proof.proofAuthor;
+        let _diskSN = await first_proof.diskSN;
 
-        assert.equal(second_proof.erasureType, erasureType);
-        assert.equal(second_proof.date, date);
-        assert.equal(second_proof.erasureResult, erasureResult);
-        assert.equal(web3.utils.toChecksumAddress(second_proof.proofAuthor),
-            web3.utils.toChecksumAddress(proofAuthor));
-        assert.equal(second_proof.diskSN, diskSN);
+        assert.equal(_erasureType, erasureType);
+        assert.equal(_date, date);
+        assert.equal(_eraseureResult, erasureResult);
+        assert.equal(web3.utils.toChecksumAddress(_proofAuthor), proofAuthor);
+        assert.equal(_diskSN, diskSN);
+
+        _erasureType = await second_proof.erasureType;
+        _date = await second_proof.date;
+        _eraseureResult = await second_proof.erasureResult;
+        _proofAuthor = await second_proof.proofAuthor;
+        _diskSN = await second_proof.diskSN;
+
+        assert.equal(_erasureType, erasureType);
+        assert.equal(_date, date);
+        assert.equal(_eraseureResult, erasureResult);
+        assert.equal(web3.utils.toChecksumAddress(_proofAuthor), proofAuthor);
+        assert.equal(_diskSN, diskSN);
     });
 
     it("Generates proof of Recycle", async function () {
@@ -139,52 +170,73 @@ contract("Basic test for block_number", function (accounts) {
 
         let hashes = await device.getProofs(proofType);
 
-        first_proof = await device.getRecycleProof(hashes[0]);
-        second_proof = await device.getRecycleProof(hashes[1]);
+        let second_proof = await device.getRecycleProof(hashes.pop());
+        let first_proof = await device.getRecycleProof(hashes.pop());
 
-        assert.equal(first_proof.collectionPoint, collectionPoint);
-        assert.equal(first_proof.date, date);
-        assert.equal(first_proof.contact, contact);
-        assert.equal(first_proof.ticket, ticket);
-        assert.equal(first_proof.gpsLocation, gpsLocation);
-        assert.equal(first_proof.recyclerCode, recyclerCode);
+        let _collectionPoint = await first_proof.collectionPoint;
+        let _date = await first_proof.date;
+        let _contact = await first_proof.contact;
+        let _ticket = await first_proof.ticket;
+        let _gpsLocation = await first_proof.gpsLocation;
+        let _recyclerCode = await first_proof.recyclerCode;
 
-        assert.equal(second_proof.collectionPoint, collectionPoint);
-        assert.equal(second_proof.date, date);
-        assert.equal(second_proof.contact, contact);
-        assert.equal(second_proof.ticket, ticket);
-        assert.equal(second_proof.gpsLocation, gpsLocation);
-        assert.equal(second_proof.recyclerCode, recyclerCode);
+        assert.equal(_collectionPoint, collectionPoint);
+        assert.equal(_date, date);
+        assert.equal(_contact, contact);
+        assert.equal(_ticket, ticket);
+        assert.equal(_gpsLocation, gpsLocation);
+        assert.equal(_recyclerCode, recyclerCode);
+
+        _collectionPoint = await second_proof.collectionPoint;
+        _date = await second_proof.date;
+        _contact = await second_proof.contact;
+        _ticket = await second_proof.ticket;
+        _gpsLocation = await second_proof.gpsLocation;
+        _recyclerCode = await second_proof.recyclerCode;
+
+        assert.equal(_collectionPoint, collectionPoint);
+        assert.equal(_date, date);
+        assert.equal(_contact, contact);
+        assert.equal(_ticket, ticket);
+        assert.equal(_gpsLocation, gpsLocation);
+        assert.equal(_recyclerCode, recyclerCode);
+
+
     });
 
     it("Generates proof of Reuse", async function () {
         let price = 10;
-        let price2 = 11;
         let receiverSegment = "segment1";
-        let receiverSegment2 = "segment2";
         let idReceipt = "1876323hh823";
-        let idReceipt2 = "1876323hh824";
 
         let proofType = "ProofReuse"
         let device = await DepositDevice.at(deviceAddress);
 
         await device.generateReuseProof(receiverSegment, idReceipt, price,
             { from: accounts[0], gas: 6721975 });
-        await device.generateReuseProof(receiverSegment2, idReceipt2, price2,
+        await device.generateReuseProof(receiverSegment, idReceipt, price,
             { from: accounts[0], gas: 6721975 });
 
         let hashes = await device.getProofs(proofType);
 
-        first_proof = await device.getReuseProof(hashes[0]);
-        second_proof = await device.getReuseProof(hashes[1]);
+        let second_proof = await device.getReuseProof(hashes.pop());
+        let first_proof = await device.getReuseProof(hashes.pop());
 
-        assert.equal(web3.utils.toDecimal(first_proof.price), price);
-        assert.equal(first_proof.receiverSegment, receiverSegment);
-        assert.equal(first_proof.idReceipt, idReceipt);
+        let _price = await first_proof.price;
+        let _receiverSegment = await first_proof.receiverSegment;
+        let _idReceipt = await first_proof.idReceipt;
 
-        assert.equal(web3.utils.toDecimal(second_proof.price), price2);
-        assert.equal(second_proof.receiverSegment, receiverSegment2);
-        assert.equal(second_proof.idReceipt, idReceipt2);
+        assert.equal(web3.utils.toDecimal(_price), price);
+        assert.equal(_receiverSegment, receiverSegment);
+        assert.equal(_idReceipt, idReceipt);
+
+        _price = await second_proof.price;
+        _receiverSegment = await second_proof.receiverSegment;
+        _idReceipt = await second_proof.idReceipt;
+
+        assert.equal(web3.utils.toDecimal(_price), price);
+        assert.equal(_receiverSegment, receiverSegment);
+        assert.equal(_idReceipt, idReceipt);
     });
 });
 
