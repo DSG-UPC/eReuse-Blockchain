@@ -29,6 +29,7 @@ contract DepositDevice is Ownable {
         uint256 deposit;
         address owner;
         uint256 state;
+        uint256 deviceUsage;
     }
 
     // variables -------------------------------------------------------------
@@ -53,6 +54,7 @@ contract DepositDevice is Ownable {
         data.owner = _sender;
         data.deposit = _initialDeposit;
         data.uid = _uid;
+        data.deviceUsage = 0;
         _transferOwnership(_sender);
         types = [
             "ProofDataWipe",
@@ -76,6 +78,10 @@ contract DepositDevice is Ownable {
         transferOwnership(_to);
     }
 
+    function updateDeviceUsage(uint256 diskUsage) private {
+        data.deviceUsage = data.deviceUsage + diskUsage;
+    }
+
     function getProofs(string proofType)
         public
         view
@@ -96,11 +102,11 @@ contract DepositDevice is Ownable {
         return proofs[proofType].length > 0;
     }
 
-    function isRecycled() public view returns(bytes32 _result){
-        if(hasProofs('ProofRecycling')){
-            return proofs['ProofRecycling'][0];
-        } else{
-            return '';
+    function isRecycled() public view returns (bytes32 _result) {
+        if (hasProofs("ProofRecycling")) {
+            return proofs["ProofRecycling"][0];
+        } else {
+            return "";
         }
     }
 
@@ -122,6 +128,7 @@ contract DepositDevice is Ownable {
         );
         proofs["ProofFunction"].push(proofHash);
         emit proofGenerated(proofHash);
+        updateDeviceUsage(diskUsage);
     }
 
     function getFunctionProof(bytes32 _hash)
@@ -287,6 +294,10 @@ contract DepositDevice is Ownable {
 
     function getUid() public view returns (uint256 uid) {
         return data.uid;
+    }
+
+    function getDeviceUsage() public view returns (uint256 uid) {
+        return data.deviceUsage;
     }
 
     function recycle(address _owner) public {
