@@ -2,8 +2,8 @@ pragma solidity ^0.4.25;
 
 import "contracts/devices/DepositDevice.sol";
 import "contracts/DAOInterface.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "contracts/tokens/EIP20Interface.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract DeliveryNote is Ownable {
     
@@ -15,14 +15,14 @@ contract DeliveryNote is Ownable {
     address sender;
     address receiver;
     uint deposit;
-    uint state;
+    uint currentState;
     address[] devices;
     mapping(address => bool) private devicesAdded;
     uint num_devices;
 
     /*   Events  */
     event DeviceAdded( address indexed _device);
-    event NoteEmitted(string concept, uint256 _deposit);
+    event NoteEmitted(string indexed concept, uint256 indexed _deposit);
 
 
     constructor(address _receiver, address _daoAddress)
@@ -34,12 +34,36 @@ contract DeliveryNote is Ownable {
         receiver = _receiver;
         sender = msg.sender;
         num_devices = 0;
-        state = 0;
-        deposit = 0 ;
+        setState(0);
+        deposit = 0;
     }
 
     function getNumDevices() public view returns(uint _num_devices){
         return num_devices;
+    }
+
+    function getState() public view returns(uint s) {
+        return currentState;
+    }
+
+    function getSender() public view onlyOwner returns(address s) {
+        return sender;
+    }
+
+    function getReceiver() public view onlyOwner returns(address r) {
+        return receiver;
+    }
+
+    function getDeposit() public view onlyOwner returns(uint d) {
+        return deposit;
+    }
+
+    function getDevices() public view onlyOwner returns(address[] d) {
+        return devices;
+    }
+
+    function setState(uint _state) public {
+        currentState = _state;
     }
 
     function addDevice(address _device, address _owner, uint256 _deposit)
@@ -62,17 +86,19 @@ contract DeliveryNote is Ownable {
     function emitDeliveryNote()
     public
     onlyOwner
-    validState(0)
     {
-        state = 1;
+        require(currentState == 0, "The current Delivery Note is not the valid state.");
+        require(num_devices>0, "This deliveryNote has 0 devices");
+        setState(1);
         emit NoteEmitted("Transfer", deposit);
     }
 
     function acceptDeliveryNote(uint _deposit)
     public
     onlyReceiver
-    validState(1)
     {
+        require(currentState == 1, "The current Delivery Note is not the valid state.");
+        require(num_devices>0, "This deliveryNote has 0 devices");
         deposit = _deposit;
         erc20.transferFrom(msg.sender, address(this), deposit);
         transferDevices();
@@ -105,7 +131,7 @@ contract DeliveryNote is Ownable {
     onlyOwner
     validState(0)
     {
-        state = 2;
+        setState(2);
         emit NoteEmitted("Recycle", deposit);
         recycleDevices();
     }
@@ -139,7 +165,7 @@ contract DeliveryNote is Ownable {
     /*   Modifiers  */
 
     modifier validState(uint _state){
-        require(state == _state, "The current Delivery Note is not the valid state.");
+        require(currentState == _state, "The current Delivery Note is not the valid state.");
         _;
     }
 

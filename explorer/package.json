@@ -1,0 +1,30 @@
+{
+  "name": "explorer",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "dependencies": {
+    "@ant-design/icons": "^4.0.2",
+    "@truffle/contract": "^4.1.15",
+    "@types/node": "^13.7.4",
+    "@types/react": "^16.9.21",
+    "antd": "^4.0.4",
+    "ethers": "^4.0.46",
+    "immutable": "^4.0.0-rc.12",
+    "iso-language-codes": "^1.0.6",
+    "isomorphic-unfetch": "^3.0.0",
+    "next": "9.3.3",
+    "null-loader": "^3.0.0",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
+    "react-markdown": "^4.3.1",
+    "react-scripts": "3.2.0",
+    "typescript": "^3.8.2"
+  },
+  "scripts": {
+    "dev": "rm -rf .next && next dev -p 8080",
+    "build": "next build",
+    "start": "next start",
+    "export": "next build && next export -o build"
+  }
+}

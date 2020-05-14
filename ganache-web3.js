@@ -1,12 +1,13 @@
-const Web3 = require('web3');
+const Web3 = require('web3')
 
-let web3;
+let web3
 
 Web3.providers.WebsocketProvider.prototype.sendAsync = Web3.providers.WebsocketProvider.prototype.send
 
 // HTTP for deploying and WS for the rest of the process (oracle needs WS)
-const provider = new Web3.providers.WebsocketProvider('ws://localhost:8545');
-web3 = new Web3(provider);
+// const provider = new Web3.providers.WebsocketProvider('ws://localhost:8545')
+// web3 = new Web3(provider)
+web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545')
  /*
 if (typeof web3.currentProvider.sendAsync !== "function") {
   web3.currentProvider.sendAsync = function() {
@@ -17,4 +18,4 @@ if (typeof web3.currentProvider.sendAsync !== "function") {
 }
 */
 
-module.exports = web3;
+module.exports = web3

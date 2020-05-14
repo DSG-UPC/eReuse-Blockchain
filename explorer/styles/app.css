@@ -1,0 +1,24 @@
+/* .App {
+  text-align: center;
+  margin: 2rem;
+} */
+
+/* .section {
+  text-align: left;
+  max-width: 720px;
+  margin: 4rem auto auto;
+} */
+
+.logo {
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px;
+}
+
+.App {
+ background-color: bisque;
+}
+
+.list {
+  min-height: 350px;
+}
