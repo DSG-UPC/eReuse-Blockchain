@@ -20,13 +20,18 @@ contract("Test for generic proof data", function (accounts) {
         handler = await ProofsHandler.deployed();
     });
 
-    it("Generates two proofs and checks the value of deviceUsage", async function () {
+    it("Generates a FunctionProof with metrics values and checks them", async function () {
         let id1 = 0;
         let score = 8;
         let diskUsage = 20;
-        let algorithm = "v3"
-        let proofAuthor = accounts[3]
-        let diskSN = '5QE0RCHD'
+        let algorithm = "v3";
+        let proofAuthor = accounts[3];
+        let proofType = "ProofFunction"
+
+        let diskSN = '5uyg3ry32';
+        let deviceSN = '7626gbdw6';
+        let deviceModel = 'x540l';
+        let deviceManufacturer = 'asus';
 
         await device_factory.createDevice(id1, 0, accounts[0]);
 
@@ -36,19 +41,15 @@ contract("Test for generic proof data", function (accounts) {
             });
         let device = await DepositDevice.at(deviceAddress);
 
-        let usage = await device.getDeviceUsage.call();
-        assert.equal(web3.utils.toDecimal(usage), 0);
+        await device.generateFunctionProofMetrics(score, diskUsage, algorithm,
+            proofAuthor, diskSN, deviceSN, deviceModel, deviceManufacturer,
+            { from: accounts[0], gas: 6721975 });
 
-        await device.generateFunctionProof(score, diskUsage, algorithm,
-            proofAuthor, diskSN, { from: accounts[0], gas: 6721975 });
+        let hashes = await device.getProofs(proofType);
+        console.log(hashes);
+        let proof = await device.getFunctionProof(hashes.pop());
 
-        usage = await device.getDeviceUsage.call();
-        assert.equal(web3.utils.toDecimal(usage), 20);
-
-        await device.generateFunctionProof(score, diskUsage, algorithm,
-            proofAuthor, diskSN, { from: accounts[0], gas: 6721975 });
-
-        usage = await device.getDeviceUsage.call();
-        assert.equal(web3.utils.toDecimal(usage), 40);
+        let metrics = await device.getMetrics(proof, proofType);
+        console.log(metrics);
     });
 });

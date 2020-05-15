@@ -8,7 +8,6 @@ contract MetricsProof is GenericProof {
         string deviceSN;
         string deviceModel;
         string deviceManufacturer;
-        string timestamp;
     }
 
     mapping(bytes32 => MetricsData) metricsData;
@@ -23,7 +22,7 @@ contract MetricsProof is GenericProof {
             string deviceSN,
             string deviceModel,
             string deviceManufacturer,
-            string timestamp
+            uint256 timestamp
         )
     {
         return (
@@ -31,7 +30,7 @@ contract MetricsProof is GenericProof {
             metricsData[_hash].deviceSN,
             metricsData[_hash].deviceModel,
             metricsData[_hash].deviceManufacturer,
-            metricsData[_hash].timestamp
+            proofs[_hash].timestamp
         );
     }
 
@@ -40,15 +39,13 @@ contract MetricsProof is GenericProof {
         string diskSN,
         string deviceSN,
         string deviceModel,
-        string deviceManufacturer,
-        string timestamp
+        string deviceManufacturer
     ) internal {
         metricsData[_hash] = MetricsData(
             diskSN,
             deviceSN,
             deviceModel,
-            deviceManufacturer,
-            timestamp
+            deviceManufacturer
         );
     }
 }

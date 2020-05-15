@@ -105,10 +105,6 @@ contract("Test for generic proof data", function (accounts) {
     });
 });
 
-function extractEvents(receipt) {
-    return receipt.logs[0].args
-}
-
 function printAddresses(account, block_number, device_factory, handler, device,
                                                                     receipt) {
     console.log(`FOR BLOCK_NUMBER ${block_number}\n`)

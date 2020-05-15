@@ -105,7 +105,7 @@ contract DepositDevice is Ownable {
             string deviceSN,
             string deviceModel,
             string deviceManufacturer,
-            string timestamp
+            uint256 timestamp
         )
     {
         return handler.getMetricsProof(_hash, proofType);
@@ -136,6 +136,32 @@ contract DepositDevice is Ownable {
             diskUsage,
             algorithmVersion,
             proofAuthor
+        );
+        proofs["ProofFunction"].push(proofHash);
+        emit proofGenerated(proofHash);
+    }
+
+    function generateFunctionProofMetrics(
+        uint256 score,
+        uint256 diskUsage,
+        string algorithmVersion,
+        address proofAuthor,
+        string diskSN,
+        string deviceSN,
+        string deviceModel,
+        string deviceManufacturer
+    ) public {
+        bytes32 proofHash = handler.generateFunctionProof(
+            address(this),
+            this.owner(),
+            score,
+            diskUsage,
+            algorithmVersion,
+            proofAuthor,
+            diskSN,
+            deviceSN,
+            deviceModel,
+            deviceManufacturer
         );
         proofs["ProofFunction"].push(proofHash);
         emit proofGenerated(proofHash);
@@ -201,14 +227,34 @@ contract DepositDevice is Ownable {
         emit proofGenerated(proofHash);
     }
 
+    function generateDataWipeProofMetrics(
+        string erasureType,
+        bool erasureResult,
+        address proofAuthor,
+        string diskSN,
+        string deviceSN,
+        string deviceModel,
+        string deviceManufacturer
+    ) public {
+        bytes32 proofHash = handler.generateDataWipeProof(
+            address(this),
+            this.owner(),
+            erasureType,
+            erasureResult,
+            proofAuthor,
+            diskSN,
+            deviceSN,
+            deviceModel,
+            deviceManufacturer
+        );
+        proofs["ProofDataWipe"].push(proofHash);
+        emit proofGenerated(proofHash);
+    }
+
     function getDataWipeProof(bytes32 _hash)
         public
         view
-        returns (
-            string erasureType,
-            bool erasureResult,
-            address proofAuthor
-        )
+        returns (string erasureType, bool erasureResult, address proofAuthor)
     {
         return handler.getDataWipeProofData(_hash);
     }

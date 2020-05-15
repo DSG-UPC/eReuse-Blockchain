@@ -68,8 +68,7 @@ contract ProofsHandler {
         string diskSN,
         string deviceSN,
         string deviceModel,
-        string deviceManufacturer,
-        string timestamp
+        string deviceManufacturer
     ) public returns (bytes32 _hash) {
         bytes32 h = generateFunctionProof(
             deviceAddress,
@@ -84,8 +83,7 @@ contract ProofsHandler {
             diskSN,
             deviceSN,
             deviceModel,
-            deviceManufacturer,
-            timestamp
+            deviceManufacturer
         );
         return h;
     }
@@ -135,8 +133,7 @@ contract ProofsHandler {
         string diskSN,
         string deviceSN,
         string deviceModel,
-        string deviceManufacturer,
-        string timestamp
+        string deviceManufacturer
     ) public returns (bytes32 _hash) {
         bytes32 h = generateDataWipeProof(
             deviceAddress,
@@ -150,8 +147,7 @@ contract ProofsHandler {
             diskSN,
             deviceSN,
             deviceModel,
-            deviceManufacturer,
-            timestamp
+            deviceManufacturer
         );
         return h;
     }
@@ -237,7 +233,7 @@ contract ProofsHandler {
             string deviceSN,
             string deviceModel,
             string deviceManufacturer,
-            string timestamp
+            uint timestamp
         )
     {
         if (compareProofTypes(proofType, "ProofFunction"))

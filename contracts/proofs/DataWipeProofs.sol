@@ -33,7 +33,7 @@ contract DataWipeProofs is MetricsProof {
             string deviceSN,
             string deviceModel,
             string deviceManufacturer,
-            string timestamp
+            uint timestamp
         )
     {
         return getMetricsData(_hash);
@@ -44,16 +44,14 @@ contract DataWipeProofs is MetricsProof {
         string diskSN,
         string deviceSN,
         string deviceModel,
-        string deviceManufacturer,
-        string timestamp
+        string deviceManufacturer
     ) public {
         setMetricsData(
             _hash,
             diskSN,
             deviceSN,
             deviceModel,
-            deviceManufacturer,
-            timestamp
+            deviceManufacturer
         );
     }
 
