@@ -1,18 +1,17 @@
 pragma solidity ^0.4.25;
-import "contracts/proofs/GenericProof.sol";
+import "contracts/proofs/MetricsProof.sol";
 
-contract FunctionProofs is GenericProof {
+contract FunctionProofs is MetricsProof {
     struct ProofData {
         uint256 score;
         uint256 diskUsage;
         string algorithmVersion;
         address proofAuthor;
-        string diskSN;
     }
 
     mapping(bytes32 => ProofData) dataProofs;
 
-    constructor() public GenericProof() {}
+    constructor() public MetricsProof() {}
 
     function getProofData(bytes32 _hash)
         public
@@ -21,17 +20,47 @@ contract FunctionProofs is GenericProof {
             uint256 score,
             uint256 diskUsage,
             string algorithmVersion,
-            address proofAuthor,
-            string diskSN
+            address proofAuthor
         )
     {
         return (
             dataProofs[_hash].score,
             dataProofs[_hash].diskUsage,
             dataProofs[_hash].algorithmVersion,
-            dataProofs[_hash].proofAuthor,
-            dataProofs[_hash].diskSN
+            dataProofs[_hash].proofAuthor
         );
+    }
+
+    function setMetricsInfo(
+        bytes32 _hash,
+        string diskSN,
+        string deviceSN,
+        string deviceModel,
+        string deviceManufacturer,
+        string timestamp
+    ) public {
+        setMetricsData(
+            _hash,
+            diskSN,
+            deviceSN,
+            deviceModel,
+            deviceManufacturer,
+            timestamp
+        );
+    }
+
+    function getMetricsInfo(bytes32 _hash)
+        public
+        view
+        returns (
+            string diskSN,
+            string deviceSN,
+            string deviceModel,
+            string deviceManufacturer,
+            string timestamp
+        )
+    {
+        return getMetricsData(_hash);
     }
 
     function setProofData(
@@ -40,8 +69,7 @@ contract FunctionProofs is GenericProof {
         uint256 score,
         uint256 diskUsage,
         string algorithmVersion,
-        address proofAuthor,
-        string diskSN
+        address proofAuthor
     ) public returns (bytes32 _hash) {
         _hash = generateHash(device_addr, "ProofFunction");
         setProof(_hash, device_addr, owner);
@@ -49,8 +77,7 @@ contract FunctionProofs is GenericProof {
             score,
             diskUsage,
             algorithmVersion,
-            proofAuthor,
-            diskSN
+            proofAuthor
         );
         return _hash;
     }

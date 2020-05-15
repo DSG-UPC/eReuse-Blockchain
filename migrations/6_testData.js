@@ -17,9 +17,8 @@ module.exports = async (deployer, network, accounts) => {
     let diskUsage = 20;
     let algorithmVersion = 'v3.1';
     let proofAuthor = accounts[1]
-    let diskSN = '5QE0RCHD'
     transaction = await device.generateFunctionProof(score, diskUsage,
-        algorithmVersion, proofAuthor, diskSN, { from: accounts[0], gas: 6721975 });
+        algorithmVersion, proofAuthor, { from: accounts[0], gas: 6721975 });
     console.log("Proof of Function")
     console.log('\t', JSON.stringify(transaction.logs))
 
@@ -46,10 +45,9 @@ module.exports = async (deployer, network, accounts) => {
 
     // Proof of Data Wipe
     let erasureType = "complete_erasure";
-    let date = new Date().toDateString();
     let erasureResult = true;
-    transaction = await device.generateDataWipeProof(erasureType, date, erasureResult,
-        proofAuthor, diskSN, { from: accounts[0], gas: 6721975 });
+    transaction = await device.generateDataWipeProof(erasureType, erasureResult,
+        proofAuthor, { from: accounts[0], gas: 6721975 });
     console.log("Proof of DataWipe")
     console.log('\t', JSON.stringify(transaction.logs))
 
@@ -60,7 +58,7 @@ module.exports = async (deployer, network, accounts) => {
     let ticket = "2187463785273jhcd";
     let gpsLocation = "41.3851, 2.1734";
     let recyclerCode = "12u3276b3"
-    transaction = await device.generateRecycleProof(collectionPoint, date, contact,
+    transaction = await device.generateRecycleProof(collectionPoint, contact,
         ticket, gpsLocation, recyclerCode, { from: accounts[0], gas: 6721975 });
     console.log("Proof of recycle")
     console.log('\t', JSON.stringify(transaction.logs))
