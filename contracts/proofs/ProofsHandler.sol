@@ -58,7 +58,7 @@ contract ProofsHandler {
             );
     }
 
-    function generateFunctionProof(
+    function generateFunctionProofMetrics(
         address deviceAddress,
         address owner,
         uint256 score,

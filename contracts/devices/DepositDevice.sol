@@ -151,7 +151,7 @@ contract DepositDevice is Ownable {
         string deviceModel,
         string deviceManufacturer
     ) public {
-        bytes32 proofHash = handler.generateFunctionProof(
+        bytes32 proofHash = handler.generateFunctionProofMetrics(
             address(this),
             this.owner(),
             score,
