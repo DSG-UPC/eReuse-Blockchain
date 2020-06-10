@@ -1,6 +1,7 @@
 pragma solidity ^0.4.25;
 
 import "contracts/DAOInterface.sol";
+import "contracts/LifeCycleEvent.sol";
 import "contracts/tokens/EIP20Interface.sol";
 import "contracts/devices/DeliveryNoteInterface.sol";
 import "contracts/devices/DeviceFactoryInterface.sol";
@@ -12,7 +13,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
  * @title Ereuse Device basic implementation
  */
 
-contract DepositDevice is Ownable {
+contract DepositDevice is Ownable, LifeCycleEvent {
     // parameters -----------------------------------------------------------
     EIP20Interface erc20;
     DAOInterface public DAOContract;
@@ -139,6 +140,14 @@ contract DepositDevice is Ownable {
         );
         proofs["ProofFunction"].push(proofHash);
         emit proofGenerated(proofHash);
+        emit LifeCycleAction(
+            getUid(),
+            "Generate Proof of Function",
+            "Deposit Device",
+            address(this),
+            address(handler),
+            block.timestamp
+        );
     }
 
     function generateFunctionProofMetrics(
@@ -165,6 +174,14 @@ contract DepositDevice is Ownable {
         );
         proofs["ProofFunction"].push(proofHash);
         emit proofGenerated(proofHash);
+        emit LifeCycleAction(
+            getUid(),
+            "Generate Proof of Function",
+            "Deposit Device",
+            address(this),
+            address(handler),
+            block.timestamp
+        );
     }
 
     function getFunctionProof(bytes32 _hash)
@@ -196,6 +213,14 @@ contract DepositDevice is Ownable {
         );
         proofs["ProofTransfer"].push(proofHash);
         emit proofGenerated(proofHash);
+        emit LifeCycleAction(
+            getUid(),
+            "Generate Proof of Transfer",
+            "Deposit Device",
+            address(this),
+            address(handler),
+            block.timestamp
+        );
     }
 
     function getTransferProof(bytes32 _hash)
@@ -225,6 +250,14 @@ contract DepositDevice is Ownable {
         );
         proofs["ProofDataWipe"].push(proofHash);
         emit proofGenerated(proofHash);
+        emit LifeCycleAction(
+            getUid(),
+            "Generate Proof of DataWipe",
+            "Deposit Device",
+            address(this),
+            address(handler),
+            block.timestamp
+        );
     }
 
     function generateDataWipeProofMetrics(
@@ -249,12 +282,24 @@ contract DepositDevice is Ownable {
         );
         proofs["ProofDataWipe"].push(proofHash);
         emit proofGenerated(proofHash);
+        emit LifeCycleAction(
+            getUid(),
+            "Generate Proof of DataWipe",
+            "Deposit Device",
+            address(this),
+            address(handler),
+            block.timestamp
+        );
     }
 
     function getDataWipeProof(bytes32 _hash)
         public
         view
-        returns (string erasureType, bool erasureResult, address proofAuthor)
+        returns (
+            string erasureType,
+            bool erasureResult,
+            address proofAuthor
+        )
     {
         return handler.getDataWipeProofData(_hash);
     }
@@ -273,12 +318,24 @@ contract DepositDevice is Ownable {
         );
         proofs["ProofReuse"].push(proofHash);
         emit proofGenerated(proofHash);
+        emit LifeCycleAction(
+            getUid(),
+            "Generate Proof of Reuse",
+            "Deposit Device",
+            address(this),
+            address(handler),
+            block.timestamp
+        );
     }
 
     function getReuseProof(bytes32 _hash)
         public
         view
-        returns (string receiverSegment, string idReceipt, uint256 price)
+        returns (
+            string receiverSegment,
+            string idReceipt,
+            uint256 price
+        )
     {
         return handler.getReuseProofData(_hash);
     }
@@ -301,6 +358,14 @@ contract DepositDevice is Ownable {
         );
         proofs["ProofRecycling"].push(proofHash);
         emit proofGenerated(proofHash);
+        emit LifeCycleAction(
+            getUid(),
+            "Generate Proof of Recycling",
+            "Deposit Device",
+            address(this),
+            address(handler),
+            block.timestamp
+        );
     }
 
     function getRecycleProof(bytes32 _hash)
@@ -328,6 +393,14 @@ contract DepositDevice is Ownable {
         DeliveryNoteInterface devNote = DeliveryNoteInterface(_deliveryNote);
         devNote.addDevice(address(this), this.owner(), data.deposit);
         transferOwnership(_deliveryNote);
+        emit LifeCycleAction(
+            getUid(),
+            "Add Device to DeliveryNote",
+            "DepositDevice",
+            address(this),
+            _deliveryNote,
+            block.timestamp
+        );
     }
 
     function getOwner() public view returns (address owner) {
