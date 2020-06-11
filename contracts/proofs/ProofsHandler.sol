@@ -5,6 +5,7 @@ import "contracts/proofs/TransferProofs.sol";
 import "contracts/proofs/RecycleProofs.sol";
 import "contracts/proofs/ReuseProofs.sol";
 
+
 contract ProofsHandler {
     DataWipeProofs private dataWipeProofs;
     FunctionProofs private functionProofs;
@@ -57,6 +58,36 @@ contract ProofsHandler {
             );
     }
 
+    function generateFunctionProofMetrics(
+        address deviceAddress,
+        address owner,
+        uint256 score,
+        uint256 diskUsage,
+        string algorithmVersion,
+        address proofAuthor,
+        string diskSN,
+        string deviceSN,
+        string deviceModel,
+        string deviceManufacturer
+    ) public returns (bytes32 _hash) {
+        bytes32 h = generateFunctionProof(
+            deviceAddress,
+            owner,
+            score,
+            diskUsage,
+            algorithmVersion,
+            proofAuthor
+        );
+        functionProofs.setMetricsInfo(
+            h,
+            diskSN,
+            deviceSN,
+            deviceModel,
+            deviceManufacturer
+        );
+        return h;
+    }
+
     function generateTransferProof(
         address deviceAddress,
         address owner,
@@ -80,7 +111,6 @@ contract ProofsHandler {
         address deviceAddress,
         address owner,
         string erasureType,
-        string date,
         bool erasureResult,
         address proofAuthor
     ) public returns (bytes32 _hash) {
@@ -89,10 +119,37 @@ contract ProofsHandler {
                 deviceAddress,
                 owner,
                 erasureType,
-                date,
                 erasureResult,
                 proofAuthor
             );
+    }
+
+    function generateDataWipeProof(
+        address deviceAddress,
+        address owner,
+        string erasureType,
+        bool erasureResult,
+        address proofAuthor,
+        string diskSN,
+        string deviceSN,
+        string deviceModel,
+        string deviceManufacturer
+    ) public returns (bytes32 _hash) {
+        bytes32 h = generateDataWipeProof(
+            deviceAddress,
+            owner,
+            erasureType,
+            erasureResult,
+            proofAuthor
+        );
+        dataWipeProofs.setMetricsInfo(
+            h,
+            diskSN,
+            deviceSN,
+            deviceModel,
+            deviceManufacturer
+        );
+        return h;
     }
 
     function generateReuseProof(
@@ -116,7 +173,6 @@ contract ProofsHandler {
         address deviceAddress,
         address owner,
         string collectionPoint,
-        string date,
         string contact,
         string ticket,
         string gpsLocation,
@@ -127,7 +183,6 @@ contract ProofsHandler {
                 deviceAddress,
                 owner,
                 collectionPoint,
-                date,
                 contact,
                 ticket,
                 gpsLocation,
@@ -150,7 +205,12 @@ contract ProofsHandler {
     function getProof(bytes32 _hash, string proofType)
         public
         view
-        returns (uint256 block_number, address device_id, address owner)
+        returns (
+            uint256 block_number,
+            address device_id,
+            address owner,
+            uint256 timestamp
+        )
     {
         if (compareProofTypes(proofType, "ProofFunction")) {
             return getFunctionProof(_hash);
@@ -165,10 +225,32 @@ contract ProofsHandler {
         }
     }
 
+    function getMetricsProof(bytes32 _hash, string proofType)
+        public
+        view
+        returns (
+            string diskSN,
+            string deviceSN,
+            string deviceModel,
+            string deviceManufacturer,
+            uint timestamp
+        )
+    {
+        if (compareProofTypes(proofType, "ProofFunction"))
+            return functionProofs.getMetricsInfo(_hash);
+        else if (compareProofTypes(proofType, "ProofDataWipe"))
+            return dataWipeProofs.getMetricsInfo(_hash);
+    }
+
     function getFunctionProof(bytes32 _hash)
         public
         view
-        returns (uint256 block_number, address device_id, address owner)
+        returns (
+            uint256 block_number,
+            address device_id,
+            address owner,
+            uint256 timestamp
+        )
     {
         return functionProofs.getProof(_hash);
     }
@@ -189,7 +271,12 @@ contract ProofsHandler {
     function getTransferProof(bytes32 _hash)
         public
         view
-        returns (uint256 block_number, address device_id, address owner)
+        returns (
+            uint256 block_number,
+            address device_id,
+            address owner,
+            uint256 timestamp
+        )
     {
         return transferProofs.getProof(_hash);
     }
@@ -210,7 +297,12 @@ contract ProofsHandler {
     function getDataWipeProof(bytes32 _hash)
         public
         view
-        returns (uint256 block_number, address device_id, address owner)
+        returns (
+            uint256 block_number,
+            address device_id,
+            address owner,
+            uint256 timestamp
+        )
     {
         return dataWipeProofs.getProof(_hash);
     }
@@ -218,12 +310,7 @@ contract ProofsHandler {
     function getDataWipeProofData(bytes32 _hash)
         public
         view
-        returns (
-            string erasureType,
-            string date,
-            bool erasureResult,
-            address proofAuthor
-        )
+        returns (string erasureType, bool erasureResult, address proofAuthor)
     {
         return dataWipeProofs.getProofData(_hash);
     }
@@ -231,7 +318,12 @@ contract ProofsHandler {
     function getRecycleProof(bytes32 _hash)
         public
         view
-        returns (uint256 block_number, address device_id, address owner)
+        returns (
+            uint256 block_number,
+            address device_id,
+            address owner,
+            uint256 timestamp
+        )
     {
         return recycleProofs.getProof(_hash);
     }
@@ -241,7 +333,6 @@ contract ProofsHandler {
         view
         returns (
             string collectionPoint,
-            string date,
             string contact,
             string ticket,
             string gpsLocation,
@@ -254,7 +345,12 @@ contract ProofsHandler {
     function getReuseProof(bytes32 _hash)
         public
         view
-        returns (uint256 block_number, address device_id, address owner)
+        returns (
+            uint256 block_number,
+            address device_id,
+            address owner,
+            uint256 timestamp
+        )
     {
         return reuseProofs.getProof(_hash);
     }
@@ -262,13 +358,8 @@ contract ProofsHandler {
     function getReuseProofData(bytes32 _hash)
         public
         view
-        returns (
-            string receiverSegment,
-            string idReceipt,
-            uint256 price
-        )
+        returns (string receiverSegment, string idReceipt, uint256 price)
     {
         return reuseProofs.getProofData(_hash);
     }
-
 }

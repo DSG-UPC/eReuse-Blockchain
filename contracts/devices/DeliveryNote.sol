@@ -2,10 +2,11 @@ pragma solidity ^0.4.25;
 
 import "contracts/devices/DepositDevice.sol";
 import "contracts/DAOInterface.sol";
+import "contracts/LifeCycleEvent.sol";
 import "contracts/tokens/EIP20Interface.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract DeliveryNote is Ownable {
+contract DeliveryNote is Ownable, LifeCycleEvent {
     
     /*   Interfaces  */
     EIP20Interface erc20;
@@ -90,6 +91,7 @@ contract DeliveryNote is Ownable {
         require(currentState == 0, "The current Delivery Note is not the valid state.");
         require(num_devices>0, "This deliveryNote has 0 devices");
         setState(1);
+        DepositDevice device = DepositDevice(_device);
         emit NoteEmitted("Transfer", deposit);
     }
 

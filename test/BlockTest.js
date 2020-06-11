@@ -31,6 +31,7 @@ contract("Test for generic proof data", function (accounts) {
         let diskUsage = 20;
         let algorithm = "v3"
         let proofAuthor = accounts[3]
+        let diskSN = '5QE0RCHD'
 
         await device_factory.createDevice(id1, 0, accounts[0]);
 
@@ -41,7 +42,7 @@ contract("Test for generic proof data", function (accounts) {
         let device = await DepositDevice.at(deviceAddress);
 
         await device.generateFunctionProof(score, diskUsage, algorithm,
-            proofAuthor, { from: accounts[0], gas: 6721975 });
+            proofAuthor, diskSN, { from: accounts[0], gas: 6721975 });
         await device.generateTransferProof(supplier, receiver, deposit,
             isWaste, { from: accounts[0], gas: 6721975 });
     });
@@ -51,6 +52,7 @@ contract("Test for generic proof data", function (accounts) {
         let diskUsage = 20;
         let algorithm = "v3"
         let proofAuthor = accounts[3]
+        let diskSN = '5QE0RCHD'
         let id1 = 0;
         let id2 = 1;
 
@@ -65,9 +67,9 @@ contract("Test for generic proof data", function (accounts) {
         let device2 = await DepositDevice.at(deviceAddresses[1]);
 
         await device1.generateFunctionProof(score, diskUsage, algorithm,
-            proofAuthor, { from: accounts[0], gas: 6721975 });
+            proofAuthor, diskSN, { from: accounts[0], gas: 6721975 });
         await device2.generateFunctionProof(score, diskUsage, algorithm,
-            proofAuthor, { from: accounts[0], gas: 6721975 });
+            proofAuthor, diskSN, { from: accounts[0], gas: 6721975 });
     });
 
     it("Gets the transactions from some block", async function () {
@@ -75,6 +77,7 @@ contract("Test for generic proof data", function (accounts) {
         let diskUsage = 20;
         let algorithm = "v3"
         let proofAuthor = accounts[3]
+        let diskSN = '5QE0RCHD'
         let proofType = "ProofFunction";
         let id1 = 0;
 
@@ -87,7 +90,7 @@ contract("Test for generic proof data", function (accounts) {
         let device = await DepositDevice.at(deviceAddress);
 
         await device.generateFunctionProof(score, diskUsage, algorithm,
-            proofAuthor, { from: accounts[0], gas: 6721975 });
+            proofAuthor, diskSN, { from: accounts[0], gas: 6721975 });
 
         let hashes = await device.getProofs(proofType);
 
@@ -101,10 +104,6 @@ contract("Test for generic proof data", function (accounts) {
         }
     });
 });
-
-function extractEvents(receipt) {
-    return receipt.logs[0].args
-}
 
 function printAddresses(account, block_number, device_factory, handler, device,
                                                                     receipt) {
