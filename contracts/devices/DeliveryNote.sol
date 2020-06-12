@@ -3,9 +3,10 @@ pragma solidity ^0.4.25;
 import "contracts/devices/DepositDevice.sol";
 import "contracts/DAOInterface.sol";
 import "contracts/tokens/EIP20Interface.sol";
+// import "contracts/LifeCycleEvent.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract DeliveryNote is Ownable {
+contract DeliveryNote is Ownable /*, LifeCycleEvent*/ {
     
     /*   Interfaces  */
     EIP20Interface erc20;

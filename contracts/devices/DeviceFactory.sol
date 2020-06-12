@@ -2,10 +2,11 @@ pragma solidity ^0.4.25;
 
 import "contracts/devices/DepositDevice.sol";
 import "contracts/DAOInterface.sol";
+// import "contracts/LifeCycleEvent.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 
-contract DeviceFactory {
+contract DeviceFactory /*is LifeCycleEvent*/ {
     DAOInterface public dao;
     mapping(address => address[]) deployed_devices;
 
@@ -32,6 +33,14 @@ contract DeviceFactory {
         );
         deployed_devices[_owner].push(newContract);
         emit DeviceCreated(_uid, _initValue, _owner);
+        // emit LifeCycleAction(
+        //     _uid(),
+        //     "Register Device",
+        //     "Device Factory",
+        //     address(this),
+        //     address(newContract),
+        //     block.timestamp
+        // );
         return newContract;
     }
 

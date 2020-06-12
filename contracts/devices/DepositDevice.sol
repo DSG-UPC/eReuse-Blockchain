@@ -5,6 +5,7 @@ import "contracts/tokens/EIP20Interface.sol";
 import "contracts/devices/DeliveryNoteInterface.sol";
 import "contracts/devices/DeviceFactoryInterface.sol";
 import "contracts/proofs/ProofsHandler.sol";
+// import "contracts/LifeCycleEvent.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 
@@ -12,7 +13,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
  * @title Ereuse Device basic implementation
  */
 
-contract DepositDevice is Ownable {
+contract DepositDevice is Ownable /*, LifeCycleEvent*/ {
     // parameters -----------------------------------------------------------
     EIP20Interface erc20;
     DAOInterface public DAOContract;
