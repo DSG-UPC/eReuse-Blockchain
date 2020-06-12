@@ -2,11 +2,11 @@ pragma solidity ^0.4.25;
 
 import "contracts/devices/DepositDevice.sol";
 import "contracts/DAOInterface.sol";
-// import "contracts/LifeCycleEvent.sol";
+import "contracts/LifeCycleEvent.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 
-contract DeviceFactory /*is LifeCycleEvent*/ {
+contract DeviceFactory is LifeCycleEvent {
     DAOInterface public dao;
     mapping(address => address[]) deployed_devices;
 
@@ -16,7 +16,7 @@ contract DeviceFactory /*is LifeCycleEvent*/ {
 
     event DeviceCreated(
         uint256 uid,
-        uint deposit,
+        uint256 deposit,
         address owner
     );
 
@@ -33,14 +33,14 @@ contract DeviceFactory /*is LifeCycleEvent*/ {
         );
         deployed_devices[_owner].push(newContract);
         emit DeviceCreated(_uid, _initValue, _owner);
-        // emit LifeCycleAction(
-        //     _uid(),
-        //     "Register Device",
-        //     "Device Factory",
-        //     address(this),
-        //     address(newContract),
-        //     block.timestamp
-        // );
+        emit LifeCycleAction(
+            _uid,
+            "Register Device",
+            "Device Factory",
+            address(this),
+            address(newContract),
+            block.timestamp
+        );
         return newContract;
     }
 
@@ -50,14 +50,18 @@ contract DeviceFactory /*is LifeCycleEvent*/ {
     }
 
     function deleteOwnership(address owner) internal {
-        uint256 length = deployed_devices[owner].length;
-        for (uint256 i = 0; i < length; i++) {
+        uint length = deployed_devices[owner].length;
+        uint ownerIndex = length + 1;
+        for (uint i = 0; i < length; i++) {
             if (deployed_devices[owner][i] == msg.sender) {
-                deployed_devices[owner][i] = deployed_devices[owner][length - 1];
-                delete deployed_devices[owner][length - 1];
-                deployed_devices[owner].length--;
+                ownerIndex = i;
                 break;
             }
+        }
+        if (ownerIndex <= length) {
+            deployed_devices[owner][ownerIndex] = deployed_devices[owner][length - 1];
+            delete deployed_devices[owner][length - 1];
+            deployed_devices[owner].length--;
         }
     }
 
