@@ -28,13 +28,11 @@ contract("Test to find older events", function (accounts) {
         let id1 = 0;
         let id2 = 1;
 
-        let device_factory = await DeviceFactory.deployed();
-        await device_factory.createDevice(id1, 0, sender);
-        await device_factory.createDevice(id2, 0, sender);
+        const deviceFactory = await DeviceFactory.deployed();
+        await deviceFactory.createDevice(id1, 0, sender);
+        await deviceFactory.createDevice(id2, 0, sender);
 
-        let events = await device_factory.getPastEvents('LifeCycleAction',
-            { fromBlock: 0, toBlock: 'latest' })
-
+        let events = await getEvents(deviceFactory, 'LifeCycleAction');
         assert(events.length == 2);
     });
 
@@ -46,19 +44,25 @@ contract("Test to find older events", function (accounts) {
         const receiverSegment = "segment1";
         const idReceipt = "1876323hh823";
 
-        const device_factory = await DeviceFactory.deployed();
-        await device_factory.createDevice(id1, 0, sender);
+        const deviceFactory = await DeviceFactory.deployed();
+        await deviceFactory.createDevice(id1, 0, sender);
 
-        let d1 = await device_factory.getDeployedDevices({ from: sender });
+        let d1 = await deviceFactory.getDeployedDevices({ from: sender });
         let device = await DepositDevice.at(d1[0]);
 
         await device.generateReuseProof(receiverSegment, idReceipt, price,
             { from: accounts[0], gas: 6721975 });
 
-        let events = await device.getPastEvents('LifeCycleAction',
-            { fromBlock: 0, toBlock: 'latest' })
+        let eventLog = await getEvents(device, 'LifeCycleAction');
+        assert(eventLog.length == 1);
 
-        assert(events.length == 1);
+        console.log(eventLog);
     });
 
 });
+
+async function getEvents(contract, eventName) {
+    let eventLog = await contract.getPastEvents(eventName,
+        { fromBlock: 0, toBlock: 'latest' });
+    return events;
+}

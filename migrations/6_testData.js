@@ -2,7 +2,6 @@ const DeviceFactory = artifacts.require("DeviceFactory")
 const DepositDevice = artifacts.require("DepositDevice")
 
 module.exports = async (deployer, network, accounts) => {
-    if (network == 'test') {
         const deviceFactory = await DeviceFactory.deployed();
         await deviceFactory.createDevice(0, 0, accounts[0]);
         await deviceFactory.createDevice(1, 1, accounts[0]);
@@ -85,5 +84,4 @@ module.exports = async (deployer, network, accounts) => {
             { from: accounts[0], gas: 6721975 });
         console.log("2nd Proof of Reuse")
         console.log('\t', JSON.stringify(transaction.logs))
-    }
 };
