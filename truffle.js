@@ -19,6 +19,13 @@ module.exports = {
       gas: 6721975,
       //from: "",
     },
+    abc2: {
+      host: "45.150.187.30",
+      port: 8545,
+      network_id: 456,
+      gasPrice: 0,
+      gas: 8000000,
+    },
   },
   compilers: {
     solc: {

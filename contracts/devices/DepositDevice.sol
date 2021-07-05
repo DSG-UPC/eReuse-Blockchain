@@ -24,24 +24,33 @@ contract DepositDevice is Ownable {
     // types ----------------------------------------------------------------
     //Struct that mantains the basic values of the device
     struct DevData {
-        uint256 uid;
+        string uid;
         uint256 erc721Id;
         uint256 deposit;
         address owner;
         uint256 state;
+        string registrantData;
     }
 
     // variables -------------------------------------------------------------
     DevData data;
 
     // events ----------------------------------------------------------------
+    event functionProof(address userAddress, address deviceAddress, uint256 score, uint256 diskUsage, string algorithmVersion);
     event proofGenerated(bytes32 indexed proofHash);
+    event transferProof(address supplierAddress, address receiverAddress, address deviceAddress);
+    event dataWipeProof(address userAddress, address deviceAddress, string erasureType, bool erasureResult);
+    event reuseProof(address userAddress, address deviceAddress, string receiverSegment, string idReceipt, uint256 price);
+    event recycleProof(address userAddress, address deviceAddress, string date);    
+    event DeviceTransferred(address deviceAddress, address new_owner, string new_registrant);
+    event DeviceRecycled(address deviceAddress);
 
     constructor(
-        uint256 _uid,
+        string _uid,
         address _sender,
         uint256 _initialDeposit,
-        address _daoAddress
+        address _daoAddress,
+        string _registrantData
     ) public {
         DAOContract = DAOInterface(_daoAddress);
         address erc20Address = DAOContract.getERC20();
@@ -53,6 +62,7 @@ contract DepositDevice is Ownable {
         data.owner = _sender;
         data.deposit = _initialDeposit;
         data.uid = _uid;
+        data.registrantData = _registrantData;
         _transferOwnership(_sender);
         types = [
             "ProofDataWipe",
@@ -63,17 +73,20 @@ contract DepositDevice is Ownable {
         ];
     }
 
-    function transferDevice(address _to, uint256 _new_deposit)
+    function transferDevice(address _to, uint256 _new_deposit, string _new_registrant)
         public
         onlyOwner
     {
         // Return the deposit first of all
         returnDeposit();
 
-        factory.transfer(data.owner, _to);
+        factory.transfer(data.owner, _to, data.registrantData, _new_registrant);
         data.owner = _to;
+        data.registrantData = _new_registrant;
         data.deposit = _new_deposit;
         transferOwnership(_to);
+
+        emit DeviceTransferred(address(this), data.owner, data.registrantData);
     }
 
     function getProofs(string proofType)
@@ -120,6 +133,7 @@ contract DepositDevice is Ownable {
         );
         proofs["ProofFunction"].push(proofHash);
         emit proofGenerated(proofHash);
+        emit functionProof(this.owner(), address(this), score, diskUsage, algorithmVersion);
     }
 
     function getFunctionProof(bytes32 _hash)
@@ -151,6 +165,7 @@ contract DepositDevice is Ownable {
         );
         proofs["ProofTransfer"].push(proofHash);
         emit proofGenerated(proofHash);
+        emit transferProof(supplier, receiver, address(this));
     }
 
     function getTransferProof(bytes32 _hash)
@@ -182,6 +197,7 @@ contract DepositDevice is Ownable {
         );
         proofs["ProofDataWipe"].push(proofHash);
         emit proofGenerated(proofHash);
+        emit dataWipeProof(proofAuthor, address(this), erasureType, erasureResult);
     }
 
     function getDataWipeProof(bytes32 _hash)
@@ -211,6 +227,7 @@ contract DepositDevice is Ownable {
         );
         proofs["ProofReuse"].push(proofHash);
         emit proofGenerated(proofHash);
+        emit reuseProof(this.owner(), address(this), receiverSegment, idReceipt, price);
     }
 
     function getReuseProof(bytes32 _hash)
@@ -241,6 +258,7 @@ contract DepositDevice is Ownable {
         );
         proofs["ProofRecycling"].push(proofHash);
         emit proofGenerated(proofHash);
+        emit recycleProof(this.owner(), address(this), date);    
     }
 
     function getRecycleProof(bytes32 _hash)
@@ -279,16 +297,19 @@ contract DepositDevice is Ownable {
         return data.deposit;
     }
 
-    function getUid() public view returns (uint256 uid) {
+    function getUid() public view returns (string uid) {
         return data.uid;
     }
 
-    function recycle(address _owner) public {
+    function recycle() public {
         require(
             this.owner() == msg.sender,
             "Only owner can recycle the device."
         );
         returnDeposit();
-        factory.recycle(_owner);
+        factory.recycle(msg.sender, data.registrantData);
+        emit DeviceRecycled(address(this));
+
+
     }
 }

@@ -123,7 +123,7 @@ contract DeliveryNote is Ownable {
             erc20.transfer(_device, _deposit);
         }
         DepositDevice device = DepositDevice(_device);
-        device.transferDevice(receiver, _deposit);
+        device.transferDevice(receiver, _deposit, "TODO"); //should handle the registrantData
     }
 
     function acceptRecycle()
@@ -153,7 +153,7 @@ contract DeliveryNote is Ownable {
     internal
     {
         DepositDevice device = DepositDevice(_device);
-        device.recycle(msg.sender);
+        device.recycle();
     }
 
     function kill() internal onlyOwner
