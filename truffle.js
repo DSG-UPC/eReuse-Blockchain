@@ -24,6 +24,12 @@ module.exports = {
     solc: {
       //version: "./node_modules/solc",
       version: '0.4.25',
+      settings : {
+        optimizer: {
+          enabled: true,
+          runs: 200
+        }
+      }
     }
   },
   mocha: {

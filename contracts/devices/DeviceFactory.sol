@@ -2,18 +2,23 @@ pragma solidity ^0.4.25;
 
 import "contracts/devices/DepositDevice.sol";
 import "contracts/DAOInterface.sol";
+import "contracts/LifeCycleEvent.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract DeviceFactory {
+
+contract DeviceFactory is LifeCycleEvent {
     DAOInterface public dao;
     mapping(address => address[]) deployed_devices;
-
-    //-------  EVENTS  -------//
-    event DeviceCreated(address indexed _deviceAddress);
 
     constructor(address daoAddress) public {
         dao = DAOInterface(daoAddress);
     }
+
+    event DeviceCreated(
+        uint256 uid,
+        uint256 deposit,
+        address owner
+    );
 
     function createDevice(
         uint256 _uid,
@@ -27,7 +32,15 @@ contract DeviceFactory {
             address(dao)
         );
         deployed_devices[_owner].push(newContract);
-        emit DeviceCreated(newContract);
+        emit DeviceCreated(_uid, _initValue, _owner);
+        emit LifeCycleAction(
+            _uid,
+            "Register Device",
+            "Device Factory",
+            address(this),
+            address(newContract),
+            block.timestamp
+        );
         return newContract;
     }
 
@@ -37,14 +50,18 @@ contract DeviceFactory {
     }
 
     function deleteOwnership(address owner) internal {
-        uint256 length = deployed_devices[owner].length;
-        for (uint256 i = 0; i < length; i++) {
+        uint length = deployed_devices[owner].length;
+        uint ownerIndex = length + 1;
+        for (uint i = 0; i < length; i++) {
             if (deployed_devices[owner][i] == msg.sender) {
-                deployed_devices[owner][i] = deployed_devices[owner][length - 1];
-                delete deployed_devices[owner][length - 1];
-                deployed_devices[owner].length--;
+                ownerIndex = i;
                 break;
             }
+        }
+        if (ownerIndex <= length) {
+            deployed_devices[owner][ownerIndex] = deployed_devices[owner][length - 1];
+            delete deployed_devices[owner][length - 1];
+            deployed_devices[owner].length--;
         }
     }
 
@@ -59,5 +76,4 @@ contract DeviceFactory {
     {
         return deployed_devices[msg.sender];
     }
-
 }

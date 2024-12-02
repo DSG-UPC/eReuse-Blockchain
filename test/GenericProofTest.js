@@ -32,14 +32,15 @@ contract("Test for generic proof data", function (accounts) {
         let diskUsage = 20;
         let algorithmVersion = 'v3.1';
         let proofAuthor = accounts[1]
+        let diskSN = '5QE0RCHD'
         let proofType = "ProofFunction";
 
         let device = await DepositDevice.at(deviceAddress);
 
-        await device.generateFunctionProof(score, diskUsage,
-            algorithmVersion, proofAuthor, { from: accounts[0], gas: 6721975 });
-        await device.generateFunctionProof(score, diskUsage,
-            algorithmVersion, proofAuthor, { from: accounts[0], gas: 6721975 });
+        await device.generateFunctionProof(score, diskUsage, algorithmVersion,
+            proofAuthor, diskSN, { from: accounts[0], gas: 6721975 });
+        await device.generateFunctionProof(score, diskUsage, algorithmVersion,
+            proofAuthor, diskSN, { from: accounts[0], gas: 6721975 });
 
         let hashes = await device.getProofs(proofType);
 
@@ -84,14 +85,15 @@ contract("Test for generic proof data", function (accounts) {
         let date = new Date().toDateString();
         let erasureResult = true;
         let proofAuthor = accounts[1];
+        let diskSN = '5QE0RCHD'
 
         let proofType = "ProofDataWipe";
         let device = await DepositDevice.at(deviceAddress);
 
         await device.generateDataWipeProof(erasureType, date, erasureResult,
-            proofAuthor, { from: accounts[0], gas: 6721975 });
+            proofAuthor, diskSN, { from: accounts[0], gas: 6721975 });
         await device.generateDataWipeProof(erasureType, date, erasureResult,
-            proofAuthor, { from: accounts[0], gas: 6721975 });
+            proofAuthor, diskSN, { from: accounts[0], gas: 6721975 });
 
         let hashes = await device.getProofs(proofType);
 

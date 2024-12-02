@@ -1,33 +1,57 @@
 pragma solidity ^0.4.25;
-import "contracts/proofs/GenericProof.sol";
+import "contracts/proofs/MetricsProof.sol";
 
-contract DataWipeProofs is GenericProof {
+
+contract DataWipeProofs is MetricsProof {
     struct ProofData {
         string erasureType;
-        string date;
         bool erasureResult;
         address proofAuthor;
     }
 
     mapping(bytes32 => ProofData) dataProofs;
 
-    constructor() public GenericProof() {}
+    constructor() public MetricsProof() {}
 
     function getProofData(bytes32 _hash)
         public
         view
-        returns (
-            string erasureType,
-            string date,
-            bool erasureResult,
-            address proofAuthor
-        )
+        returns (string erasureType, bool erasureResult, address proofAuthor)
     {
         return (
             dataProofs[_hash].erasureType,
-            dataProofs[_hash].date,
             dataProofs[_hash].erasureResult,
             dataProofs[_hash].proofAuthor
+        );
+    }
+
+    function getMetricsInfo(bytes32 _hash)
+        public
+        view
+        returns (
+            string diskSN,
+            string deviceSN,
+            string deviceModel,
+            string deviceManufacturer,
+            uint timestamp
+        )
+    {
+        return getMetricsData(_hash);
+    }
+
+    function setMetricsInfo(
+        bytes32 _hash,
+        string diskSN,
+        string deviceSN,
+        string deviceModel,
+        string deviceManufacturer
+    ) public {
+        setMetricsData(
+            _hash,
+            diskSN,
+            deviceSN,
+            deviceModel,
+            deviceManufacturer
         );
     }
 
@@ -35,18 +59,12 @@ contract DataWipeProofs is GenericProof {
         address device_addr,
         address owner,
         string erasureType,
-        string date,
         bool erasureResult,
         address proofAuthor
     ) public returns (bytes32 _hash) {
         _hash = generateHash(device_addr, "ProofDataWipe");
         setProof(_hash, device_addr, owner);
-        dataProofs[_hash] = ProofData(
-            erasureType,
-            date,
-            erasureResult,
-            proofAuthor
-        );
+        dataProofs[_hash] = ProofData(erasureType, erasureResult, proofAuthor);
         return _hash;
     }
 }

@@ -43,13 +43,13 @@ export async function hasDeviceProofs(contractInstance): Promise<string> {
 
 export type ProofType = 'ProofDataWipe' | 'ProofTransfer' | 'ProofFunction' | 'ProofReuse' | 'ProofRecycling'
 export type Proof = ProofDataWipe | ProofTransfer | ProofFunction | ProofReuse | ProofRecycling
-export type ProofAttribute = 'erasureType' | 'date' | 'erasureResult' | 'proofAuthor' | 
+export type ProofAttribute = 'erasureType' | 'date' | 'erasureResult' | 'proofAuthor' |
     'supplier' | 'receiver' | 'deposit' | 'isWaste' |
     'score' | 'diskUsage' | 'algorithmVersion' |
-    'receiverSegment' | 'idReceipt' | 'price' | 
+    'receiverSegment' | 'idReceipt' | 'price' |
     'collectionPoint' | 'contact' | 'ticket' | 'gpsLocation' | 'recyclerCode'
 
-export interface ProofID  {
+export interface ProofID {
     hash: string,
     type: ProofType
 }
@@ -58,7 +58,8 @@ export interface ProofDataWipe {
     erasureType: string,
     date: string,
     erasureResult: boolean,
-    proofAuthor: string
+    proofAuthor: string,
+    diskSN: string
 }
 
 export interface ProofFunction {
@@ -66,6 +67,7 @@ export interface ProofFunction {
     diskUsage: number,
     algorithmVersion: string
     proofAuthor: string,
+    diskSN: string
 }
 
 export interface ProofTransfer {
@@ -93,9 +95,9 @@ export interface ProofRecycling {
 export const proofTypes = ['ProofDataWipe', 'ProofTransfer', 'ProofFunction', 'ProofReuse', 'ProofRecycling']
 
 export const proofTypeAttributes = {
-    'ProofDataWipe': ['erasureType', 'date', 'erasureResult', 'proofAuthor'],
+    'ProofDataWipe': ['erasureType', 'date', 'erasureResult', 'proofAuthor', 'diskSN'],
     'ProofTransfer': ['supplier', 'receiver', 'deposit', 'isWaste'],
-    'ProofFunction': ['score', 'diskUsage', 'algorithmVersion', 'proofAuthor'],
+    'ProofFunction': ['score', 'diskUsage', 'algorithmVersion', 'proofAuthor', 'diskSN'],
     'ProofReuse': ['receiverSegment', 'idReceipt', 'price'],
     'ProofRecycling': ['collectionPoint', 'date', 'contact', 'ticket',
         'gpsLocation', 'recyclerCode']

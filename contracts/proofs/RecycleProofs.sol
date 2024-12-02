@@ -4,7 +4,6 @@ import "contracts/proofs/GenericProof.sol";
 contract RecycleProofs is GenericProof {
     struct ProofData {
         string collectionPoint;
-        string date;
         string contact;
         string ticket;
         string gpsLocation;
@@ -19,7 +18,6 @@ contract RecycleProofs is GenericProof {
         view
         returns (
             string collectionPoint,
-            string date,
             string contact,
             string ticket,
             string gpsLocation,
@@ -28,7 +26,6 @@ contract RecycleProofs is GenericProof {
     {
         return (
             dataProofs[_hash].collectionPoint,
-            dataProofs[_hash].date,
             dataProofs[_hash].contact,
             dataProofs[_hash].ticket,
             dataProofs[_hash].gpsLocation,
@@ -40,7 +37,6 @@ contract RecycleProofs is GenericProof {
         address device_addr,
         address owner,
         string collectionPoint,
-        string date,
         string contact,
         string ticket,
         string gpsLocation,
@@ -50,7 +46,6 @@ contract RecycleProofs is GenericProof {
         setProof(_hash, device_addr, owner);
         dataProofs[_hash] = ProofData(
             collectionPoint,
-            date,
             contact,
             ticket,
             gpsLocation,

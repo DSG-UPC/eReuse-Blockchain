@@ -1,6 +1,6 @@
 # eReuse Blockchain
 
-This repository contains a Blockchain approach of the eReuse system.
+This repository contains a Blockchain approach of the eReuse system. 
 
 
 ## Compile

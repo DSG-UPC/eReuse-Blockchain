@@ -7,7 +7,6 @@ contract DAOInterface {
     address public ProofsHandler;
     address public OracleQuery;
     address public OracleResponse;
-    uint256 public pricePerMB;
 
     function getReserveAccount() public view returns (address);
 
@@ -20,8 +19,6 @@ contract DAOInterface {
     function getERC721() public view returns (address);
 
     function getOwners() public view returns (address);
-
-    function getPricePerMB() public view returns (uint256);
 
     // function getRoleManager() public view returns (address);
 

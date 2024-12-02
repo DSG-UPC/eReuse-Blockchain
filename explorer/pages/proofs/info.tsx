@@ -7,9 +7,9 @@ import { getProofInformation, proofTypeAttributes, Proof, ProofType, proofTypes 
 import { ProofID } from '../../lib/proofs'
 import { List } from 'antd';
 import { Instance } from '../../lib/types'
-import Router, {withRouter} from 'next/router'
+import Router, { withRouter } from 'next/router'
 
- function DeviceView(props) {
+function DeviceView(props) {
     return <AppContext.Consumer>
         {context => <ProofComponent {...context} />}
     </AppContext.Consumer>
@@ -31,24 +31,13 @@ class ProofComponent extends Component<IAppContext, State> {
         super(props);
     }
 
-    // parseParams(query: string): object {
-    //     const params = query.split('&');
-    //     let result = {}
-    //     params.map((i: string) => {
-    //         let entry = i.split('=')
-    //         result[entry[0]] = entry[1]
-    //     })
-    //     return result
-    // }
-
     formatProperties(properties: Proof, proofType: ProofType): Proof {
-        // let proofKeys = getProofKeys(proofType);
         let proofKeys = proofTypeAttributes[proofType];
-        let result = {} as Proof
+        let result = {} as Proof;
         for (let k in proofKeys) {
             result[proofKeys[k]] = properties[k].toString();
         }
-        return result
+        return result;
     }
 
     static async getInitialProps(query) {
@@ -59,8 +48,10 @@ class ProofComponent extends Component<IAppContext, State> {
         console.log("Router" + Router.query)
         const type = Router.query.type
         const hash = Router.query.hash
-        if (!type || !hash || Array.isArray(type) || Array.isArray(hash)) throw new Error("Invalid arguments")
-        if (!proofTypes.includes(type)) throw new Error("Invalid proof type")
+        if (!type || !hash || Array.isArray(type) || Array.isArray(hash))
+            throw new Error("Invalid arguments")
+        if (!proofTypes.includes(type))
+            throw new Error("Invalid proof type")
         let contractInstance: Instance = await getProofsHandler(this.props.provider, this.props.networkName);
         let proofID: ProofID = {
             hash: hash,

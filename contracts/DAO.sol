@@ -12,7 +12,6 @@ contract DAO is Ownable {
     address public ProofsHandler;
     address OracleResponse;
     address ReserveAccount;
-    // uint256 public pricePerMB;
 
     constructor(address _OracleQuery) public {
         OracleResponse = msg.sender;
